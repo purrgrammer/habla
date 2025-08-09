@@ -10,6 +10,14 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 
+function googleFont(font: string) {
+  return {
+    rel: "stylesheet",
+    href: `https://fonts.googleapis.com/css2?family=${font}:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap`,
+  };
+}
+
+// TODO: load fonts from a CDN or local file, not Google
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
@@ -17,12 +25,11 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.gstatic.com",
     crossOrigin: "anonymous",
   },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
+  googleFont("Lato"),
+  googleFont("Crimson+Pro"),
 ];
 
+// TODO: dynamic `lang`
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -32,7 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="flex flex-col items-center min-h-[100dvh]">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -45,6 +52,8 @@ export default function App() {
   return <Outlet />;
 }
 
+// TODO: make error messages translatable
+// TODO: full stack trace during dev, pretty error page in production
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
@@ -62,7 +71,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
+    <>
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (
@@ -70,6 +79,6 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
           <code>{stack}</code>
         </pre>
       )}
-    </main>
+    </>
   );
 }
