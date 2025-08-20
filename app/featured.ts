@@ -113,10 +113,242 @@ const articles = [
       ],
     ],
   },
+  {
+    content:
+      'A couple of weeks ago, I shared a post on Nostr about my curiosity surrounding the carnivore diet. As someone who spent over 20 years as a vegetarian — including five strict vegan years — it’s been a wild shift. I’d been reading a lot about the diet’s potential benefits, especially for reducing fatigue and inflammation, and wondered if it could help me as a runner and a woman constantly battling low energy.\n\nWhat I didn’t expect was how fascinating, hilarious, and downright strange this journey would be, especially as someone who grew up in Berlin, where meat-eaters are often seen as the enemy. Let me walk you through my experience, from meat aversion to savoring steak, and everything in between.\n\n## Why I became vegetarian\n\nTo understand my shift, you need to know where I came from. I grew up in Berlin in a household that valued high-quality food, including meat. My parents ate meat, but only the good stuff — local, organic, free from antibiotics. Still, I just *didn’t* like the taste of it. Even as a kid, I avoided meat whenever I could, and since most of my friends were vegetarian too, it felt completely normal.\n\nWhen I moved to London in 2015, I took things further and went fully vegan. *Why?* Well, two reasons:\n\n1. **Ethics & costs**: seeing a whole chicken priced at £3 made me question the source and quality of animal products in general. Eggs, dairy — where was this stuff even coming from?\n2. **Health beliefs**: I was convinced I was lactose intolerant, so cutting dairy seemed like a no-brainer.\n\nBack then, I was broke and couldn\'t afford organic groceries, so I stuck to a clean, whole-food, plant-based diet. No fake cheese or vegan "meat" substitutes - just veggies, grains, and nuts. It wasn\'t bad, but in hindsight, I realize I was often bloated and never truly satiated.\n\nBack then, I was broke and couldn’t afford organic groceries, so I stuck to a clean, whole-food, plant-based diet. No fake cheese or vegan “meat” substitutes — just veggies, grains, and nuts. It wasn’t bad, but in hindsight, I realize I was often bloated and never truly satiated.\n\n## Returning to eggs and fish\n\nAfter a couple of years, I moved back to Berlin and started reintroducing eggs and fish into my diet. The change was *immediate*. I felt more awake and energized, and I began to notice how different foods made me feel. It wasn’t just about ideology anymore — it was about what my body needed.\n\nAround this time, a friend stayed at my flat and threw out all the “junk” in my kitchen: seed oils, processed foods, and anything overly refined. In their place, they stocked my shelves with high-quality, nutrient-dense options. It was a turning point, but it still took me another year to reintroduce dairy. Cheese came first, but I avoided milk and yogurt for a long time, clinging to plant-based alternatives (minus soy — I’d given up on that).\n\n## The Berlin steak\n\n\nThe real game-changer came this past September, a few weeks before I flew to Argentina. After years of avoiding meat, I decided to take the leap in Berlin, with the only three people I know who love meat that time.&nbsp;\nI can still picture the scene. It was a cozy restaurant with friends who were as curious as I was about how this experiment would go. When the steak arrived, I was nervous - excited but hesitant. Cutting into it, I couldn\'t help but wonder, "Is this going to mess me up? Will I even like it?"\nTo my surprise, it was good. Really good. And for the first time in years, I felt full. Not bloated, not "I guess I ate something" full - but deeply, truly satisfied. That moment shattered so many of my mental barriers around meat. I didn\'t feel guilty, and more importantly, my body didn\'t rebel. It felt fine. It felt great, even.\nThat steak opened the door. A couple of weeks later, I boarded a plane to South America, ready to take this experiment to the next level.\n\n## The South American meat adventure\n\nLanding in Argentina — the global capital of steak — I knew this was the perfect place to dive deeper into my carnivore journey. Here, meat isn’t just food; it’s culture, art, and community. Surrounded by people who were thrilled to guide me, I started trying different cuts, exploring flavors, and, for the first time, cooking meat for myself.\n\nWhat surprised me most was the quality. The meat here isn’t just any meat — it’s grass-fed, tender, and bursting with flavor. Every cut offered something new, and I began to see steak as more than “just meat.” It became a source of nourishment and enjoyment in a way I never thought possible.\n\nAt the same time, other small shifts began happening. I stopped drinking almond milk after realizing it was packed with seed oils, switching back to real milk. I traded plant-based yogurt for the real thing. Each step felt natural, and my body responded with more energy and clarity.\n\n## The struggles\n\nNot everything has been smooth sailing, though. One night, we went to a restaurant offering endless meat, including more adventurous options like chicken hearts. My friends encouraged me to try, but my brain wasn’t having it. Even wrapped in lettuce to disguise the texture, I couldn’t get past the mental block. Baby steps, right?\n\nTwo months into eating meat, I feel stronger than ever. I’m not constantly hungry, and for the first time, I’ve experienced what it feels like to be truly full after a meal. It’s a complete 180 from my vegan days, where I often felt bloated yet unsatisfied.\n\nThis journey has been as much about unlearning old beliefs as it has been about embracing new habits. While I’m still working on organ meats (maybe one day!), I’m excited to see where this path takes me.\n\nTo anyone considering a similar shift, I’ll say this: Listen to your body, take it one step at a time, and don’t be afraid to challenge your assumptions. My journey isn’t about proving one diet is better than another — it’s about finding what works for *me*.\n\nWhether you’re a meat-lover or a lifelong vegetarian, I’d love to hear your thoughts. Have you ever tried a radical dietary change? What did you learn?Let’s keep the conversation going — meat or no meat!\n\n#### ',
+    created_at: 1733591961,
+    id: "2c6fd2e0f986e85160ff0fb0781264cbe5a2cf46fbd901a7e06df19bbd124b47",
+    kind: 30023,
+    pubkey: "b8a9df8218084e490d888342a9d488b7cf0fb20b1a19b963becd68ed6ab5cbbd",
+    sig: "e76b99c6caff9d68146fb33be6a97c55972333df60ad1c23e8ea2540a4ca95ef5c0be8d07ece9e8ca65036fb3abf4ce39aaf437ecc781d441dbf723251ecc90d",
+    tags: [
+      ["title", "From vegan to carnivore"],
+      [
+        "image",
+        "https://blossom.primal.net/26ce13dd8720f47520866f531d03dcc80a50d5301032e6eabad59b045719f93c.jpg",
+      ],
+      ["t", "carnivore"],
+      ["t", "diet"],
+      ["t", "vegan"],
+      ["t", "food"],
+      ["t", "vegetarian"],
+      ["published_at", "1733591960"],
+      ["d", "From-vegan-to-carnivore-d2qwfj"],
+    ],
+  },
+  {
+    id: "be82d4e81e994da571d51ec5746601db7a0b46b64f302775af10f784a76cfa3d",
+    pubkey: "1c8c756b11bee55a9539dc96fa3032cf08ca65ce04b4f68ec1d09193f0527c6e",
+    created_at: 1754083945,
+    kind: 30023,
+    tags: [
+      ["title", "My Exit from Fiat Food"],
+      ["summary", "I ate the lies, and got sick."],
+      [
+        "image",
+        "https://blossom.primal.net/6b901838e42516eb15c979e4d18096b3b96c9ba064425805ddc6620a0e854b58.jpg",
+      ],
+      ["d", "my-exit-from-fiat-food"],
+      ["r", "wss://nostr.0x7e.xyz/"],
+      ["r", "wss://nostrja-kari.heguro.com/"],
+      ["r", "wss://relay.livefreebtc.dev/"],
+      ["r", "wss://relay.primal.net/"],
+      ["r", "wss://relayable.org/"],
+      ["r", "wss://sgl.rustcorp.com.au/"],
+      ["client", "Primal Studio"],
+      ["published_at", "1754083945"],
+    ],
+    content:
+      "**Food is Everything.** It shapes how you look, how you feel, how you think, and ultimately — how you live. Every system in your body runs on what you put into it. But most of what we’re told is “food” today isn’t actually food at all.\n\nWe’re living in a world of *fiat food* — ultra-processed, nutrient-depleted products designed to look cheap while hiding the true cost of inflation. Real, nourishing food like grass-fed steak from your local butcher is priced like a luxury, while fake food pumped full of seed oils and fillers is made artificially cheap. They’ve quietly stripped the nutrients out of our food to protect the illusion that everything’s “affordable.”\n\nI didn’t understand any of this when I left home for college. I thought I was eating well. I thought I was making smart choices. I was doing everything “right”, at least according to the mainstream. What I didn’t realize was that I was slowly destroying my body.\n\nThis is my story of waking up to the truth about food — and taking my health back.\n\nWhen I moved out for college, I was on my own for meals for the first time. As a college athlete, I knew fuelling my body mattered, but little did I know, I had no idea how to actually do it. I was 18, heavily influenced by what I saw online and what my friends were doing. The internet screamed one thing: hit your protein goals, keep your calories low. So that’s what I did.\n\nMy diet turned into a rotation of protein shakes and bars with ingredient lists I couldn’t even pronounce. Outside of that, I relied on packaged meals from the grocery store, the kind labeled “healthy.” They looked clean on the outside, but were filled with preservatives, seed oils, and artificial additives. As long as the label said “high protein,” it felt like I was doing the right thing. But I wasn’t. My body knew it before I did.\n\nAfter a few months, I became severely constipated. I would go an entire week without a bowel movement, over and over again. The pain was constant and consuming. I felt bloated everyday, like there was a brick sitting in my stomach. I tried adding fiber to my diet, drinking more water, taking laxatives, but nothing worked. My stomach was distended, my energy was gone, and I started to feel like my body was turning against me. But still, I didn't make the connection. I was \"eating healthy\" right? High protein, low calorie. I couldn't see that my gut was shutting down, because I thought I was doing everything right.\n\nEventually, the internal issues started showing up on the outside, and nowhere was more obvious than my face. My acne became the worst it had ever been, painful and inflamed. I tried everything the internet recommended: new face washes, topical treatments, and expensive skincare. I was ashamed of how I looked. I wore makeup everyday to hide the redness and texture, desperate to feel normal. But, none of it worked because the problem was not skin deep. My skin was a reflection of the damage happening inside my body, and I just did not know it yet.\n\n![](https://lh7-rt.googleusercontent.com/docsz/AD_4nXdxTGXYtObhRzkQqNaQhA_o8VNk3FLmOw9M1A8uUYsfGePtf4pOutMFDzgUBSyoDx1CPeClqvrzvx0a-JxTH4fWE8AyFXn9BrpIwBRqT_8hSrvBIzZzlTUHUUuhRV-J0d4JV7bJWw?key=2MCX7m1_WrWzer6-EplTYA)\n\nThe truth is, we're being fed poison that wrecks not just our gut, hormones, and metabolism, but our skin, our confidence, and our mental health. Instead of being offered real solutions, we're told to fix these problems with even more poison: harsh topicals, and pharmaceuticals. When these skincare products don't work, the next step is Accutane. Accutane is a drug so strong it can cause birth defects and liver damage. I have friends on it. I see what it does. It's all part of the same system: create the problem, then sell the \"cure\". The system is broken, and the only way out is to stop playing by its rules.\n\nAround the same time, the skin on my body began to change. I developed dark patches on my stomach and back, almost like leopard spots. This was very concerning to me as a young girl and beach volleyball athlete. I would look at myself in the mirror and cry. I went to the doctor, but she brushed it off without offering any answers (thanks, Canadian healthcare). She barely looked at my skin before prescribing me with medication to cure skin fungus. I used this medication for a year. My skin only got worse.\n\n![](https://blossom.primal.net/63295138eda7c78c03aa5b394702e9134b1644d0411690ebfa32b8eaead4377c.jpg)\n\nI was tired of cycling through medications for skin fungus (that no doctor confirmed I actually had) and seeing no results, so I finally pushed for a biopsy. The diagnosis: EDP - a chronic, incurable skin condition. My doctor told me nothing caused it, and nothing could cure it. It was just something I would have to live with. But I couldn't accept that. I spoke with my (based) parents and they pushed me to make a radical shift in my diet. I cut out dairy, seed oils, and gluten completely. I want to clarify - **high quality dairy is not inherently bad&#x20;**- but in my research, I found that there could be a link between EDP and dairy, so I removed it to see how my body would respond. I focused on real, nutrient-dense foods: high-quality eggs and grass-fed steak everyday. I eliminated all industrial cooking oils from my kitchen and started cooking exclusively with grass-fed butter and beef tallow.\n\nThat changed everything.\n\nThe “incurable” skin spots disappeared completely. What started as a desperate attempt to heal my skin turned into a full body transformation. My acne cleared. I lost 10 pounds without even trying. I was finally having regular bowel movements. I had energy again. Mental clarity. Confidence. For the first time in years, I felt like *myself.*\n\nThat's when I started waking up to the bigger picture. It wasn't just about food anymore, it was about the system. The healthcare system that offered me pills instead of solutions. The nutrition classes that pushed food pyramids built by corporate lobbyists. The \"experts\" who told me nothing was wrong, when everything clearly was. It all clicked: the system isn't broken, it's functioning exactly as designed. And it's not designed to make you healthy.\n\nMy experience with fiat food, and all the horrible side effects that came with it, taught me one of the most important lessons of my life: **question everything.&#x20;**&#x49;t forced me to stop blindly trusting the system. If I hadn't gone through all of it - the gut issues, the acne, the diagnosis, the healing - I genuinely don't think I would see the world in the way I do now.\n\nIt opened my eyes to the way governments operate, how the health industry profits off sickness, and how deeply broken the food system really is. But more than that, it helped me understand why Bitcoin and Nostr matter. Why decentralization matters. Why sovereignty matters.\n\nEveryone has their own story. Their own moment when they realize society, the economy, and health are not what they seem. For some, it's money. For others, it's politics. For me, food was the crack in the illusion. And I'm grateful for that. Because once you see it, you can't unsee it, and from there you can finally start taking your power back.\n\nIn the end, **all of these problems are symptoms of broken money**. When money is manipulated, everything built on top of it becomes distorted. From our food supply to our healthcare to our freedom. That's why **fixing the money fixes the system.&#x20;**&#x42;itcoin is a lifeline. It's how we reclaim truth, health, and sovereignty.\n",
+    sig: "9f54d788696c641cc3f4352fc13515a39f2bfd51ce955535cb2e4eb598fc71a541819532b65ffee99dc44d0dd8603bb5fe4ca7a2779c0024ae5d7ef8e444584a",
+  },
+  {
+    kind: 30023,
+    id: "cd0ec44be475a533d9aa5bc5dae1c38cd110937b2d06e5d20e6c5f81a99668d5",
+    pubkey: "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d",
+    created_at: 1706494765,
+    tags: [
+      ["d", "d0b15ac7"],
+      ["title", "Nostr: a quick introduction, attempt #1"],
+      ["published_at", "1706445000"],
+      ["t", "nostr"],
+    ],
+    content:
+      '\n# Nostr: a quick introduction, attempt #1\n\n![](https://miro.medium.com/v2/resize:fit:1100/format:webp/0*TyaSRBLhkTNgEoIJ)\n\nNostr doesn\'t have a material existence, it is not a website or an app. Nostr is just a description what kind of messages each computer can send to the others and vice-versa. It\'s a very simple thing, but the fact that such description exists allows different apps to connect to different servers automatically, without people having to talk behind the scenes or sign contracts or anything like that.\n\nWhen you use a Nostr _client_ that is what happens, your _client_ will connect to a bunch of servers, called _relays_, and all these _relays_ will speak the same "language" so your _client_ will be able to publish notes to them all and also download notes from other people.\n\nThat\'s basically what Nostr is: this communication layer between the _client_ you run on your phone or desktop computer and the _relay_ that someone else is running on some server somewhere. There is no central authority dictating who can connect to whom or even anyone who knows for sure where each note is stored.\n\nIf you think about it, Nostr is very much like the internet itself: there are millions of websites out there, and basically anyone can run a new one, and there are websites that allow you to store and publish your stuff on them.\n\nThe added benefit of Nostr is that this unified "language" that all Nostr _clients_ speak allow them to switch very easily and cleanly between _relays_. So if one _relay_ decides to ban someone that person can switch to publishing to others _relays_ and their audience will quickly follow them there. Likewise, it becomes much easier for _relays_ to impose any restrictions they want on their users: no _relay_ has to uphold a moral ground of "absolute free speech": each _relay_ can decide to delete notes or ban users for no reason, or even only store notes from a preselected set of people and no one will be entitled to complain about that.\n\nThere are some bad things about this design: on Nostr there are no guarantees that _relays_ will have the notes you want to read or that they will store the notes you\'re sending to them. We can\'t just assume all _relays_ will have everything — much to the contrary, as Nostr grows more _relays_ will exist and people will tend to publishing to a small set of all the _relays_, so depending on the decisions each _client_ takes when publishing and when fetching notes, users may see a different set of replies to a note, for example, and be confused.\n\nAnother problem with the idea of publishing to multiple servers is that they may be run by all sorts of malicious people that may edit your notes. Since no one wants to see garbage published under their name, Nostr fixes that by requiring notes to have a cryptographic signature. This signature is attached to the note and verified by everybody at all times, which ensures the notes weren\'t tampered (if any part of the note is changed even by a single character that would cause the signature to become invalid and then the note would be dropped). The fix is perfect, except for the fact that it introduces the requirement that each user must now hold this 63-character code that starts with "nsec1", which they must not reveal to anyone. Although annoying, this requirement brings another benefit: that users can automatically have the same identity in many different contexts and even use their Nostr identity to login to non-Nostr websites easily without having to rely on any third-party.\n\nTo conclude: Nostr is like the internet (or the internet of some decades ago): a little chaotic, but very open. It is better than the internet because it is structured and actions can be automated, but, like in the internet itself, nothing is guaranteed to work at all times and users many have to do some manual work from time to time to fix things. Plus, there is the cryptographic key stuff, which is painful, but cool.\n',
+    sig: "5b329fb66a83c2ed09d176c3116a113a12a904b54dbd5f0dd2d2dea55c95a4f397116eb66540101683270c8ffcfeedf7970082238a190815a51d8650ae57b647",
+  },
+  {
+    content:
+      "I’m not sure if nostr:npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6 had a Web of Trust in mind when designing nostr and its use of public contact lists but I think it’s very important to nostr’s future.\n\nTechnically there is no need to publish a follow list, if a nostr client wants to show a feed of follows it just needs a list of contacts, this list does not need to exist in public or on relays, but the fact that it does is what makes the Web of Trust work.\n\n**Accidental**\n\nThe only other Web of Trust that I know of is PGP’s Web of Trust, it is only used by IT and security people, which is also the reason why it is unusable for most people. It leaves no room for error because security has the highest priority in those circles.\n\nBut on nostr the Web of Trust is a side effect of just following people. You press Follow a few times and you are accidentally building a Web of Trust without even knowing it. It might not be perfect, but that’s also why it works, because it is so simple, like nostr itself.\n\nAttempts to “fix” or improve the Web of Trust should be made with that simplicity in mind. Creating new lists with granularity of people you really trust, partially trust, don’t trust at all etc are all great, but this will make it possible for it to end up like PGP. Nostr’s Web of Trust works precisely because people don’t have to think about it.\n\nThere is also this idea that likes, reposts or any signal that can be made by users are useless because they can be gamed, but they can only be gamed if you don’t use a Web of Trust.\n\n**Web of Trust fixes almost everything**\n\nnostr:note1a8nq7kdqgr20dnvzmhv2a6quy8vx3l56pfzjlly3jv2u2l55exhs84cev8\n\nWeb of Trust fixes spam, bots, abuse of trending/hot algorithms \n\nZaps were supposed to fix the problem of gaming/abusing likes or reposts, but Web of Trust fixes it better. Zaps are useful for sending value, so let’s use it to send actual value. 1 sat zaps are not much different from Like-spam and considering the technical overhead required for zaps and possibility for timeouts and failures it’s actually worse.\n\nSo, Web of Trust Makes Likes Great Again, and with that you can make algorithms that are useful to the individual instead of the advertisers or platforms.\n\n![image](https://nostur.com/a/nostur-wot.png)\n*Example of a most basic Web of Trust filter (follows + follows of follows)*\n\nNostur uses follows + follows of follows to filter spam and bots, and it uses likes and reposts from follows uniquely ranked to create Hot and Gallery feeds.\n\nAnother example is nostr:npub1yxprsscnjw2e6myxz73mmzvnqw5kvzd5ffjya9ecjypc5l0gvgksh8qud4‘s https://oddbean.com, a community website where the content of the community is based on the administrator’s follows, the algorithm is incredibly simple and transparent, and it wouldn’t be possible if nostr did not have an accidental Web of Trust:\n![image](https://nostur.com/a/oddbean-wot.png)\n\n**Challenges**\n\nNow there are still some challenges to be solved, new users being onboarded won’t have a Web of Trust yet, maybe we could give them training wheels, a preloaded Web of Trust until they followed enough people to use their own. \n\nAlso, new users don’t exist in anyone else’s Web of Trust yet, so they won’t be seen until someone follows them. This is not a good new user experience.\n\nYou also might miss someone’s post because they are not in your Web of Trust yet.\n\nThese are all challenges and I will keep exploring solutions for these.\n",
+    created_at: 1695886895,
+    id: "810e27171f27fa307a2ac092b690342cf77f782caf39d82932ed71ea6fdd414f",
+    kind: 30023,
+    pubkey: "9be0be0e64d38a29a9cec9a5c8ef5d873c2bfa5362a4b558da5ff69bc3cbb81e",
+    sig: "40e2a27cedaea78ed7afa34341ecc31bdbace433e2caa72f7417b49d5a5b1cde83fbaa191e9fe2b16595e896ba91b80013049bd37c73ffbd5f8146bac0a1e6df",
+    tags: [
+      ["d", "nostr-web-of-trust"],
+      ["title", "Nostr and the accidental Web of Trust"],
+      [
+        "summary",
+        "Why I think nostr's Web of Trust is important to nostr's future",
+      ],
+      ["published_at", "1695886895"],
+      ["t", "nostr"],
+      ["t", "wot"],
+      ["image", "https://nostur.com/a/nostr-wot-article.png"],
+      ["p", "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d"],
+      ["e", "e9e60f59a040d4f6cd82ddd8aee81c21d868fe9a0a452ffc919315c57e94c9af"],
+      ["p", "218238431393959d6c8617a3bd899303a96609b44a644e973891038a7de8622d"],
+    ],
+  },
+  {
+    content:
+      "# The importance of being lindy\n\nI've been thinking about what Vitor said about #Amethyst living on extended time. And thinking. And doing a bit more thinking...\n\n![Winnie the Pooh](https://i.pinimg.com/736x/89/b1/c0/89b1c00006954836a703dfc0457c8626.jpg)\n\nIt's a valid point. Why does Amethyst (or, analog, #Damus) still exist? Why is it as popular as it is? Shouldn't they be quickly washed-away by power-funded corporate offerings or highly-polished, **blackbox-coded apps**?\n\nBecause a lot of people trust them to read the code, that's why. The same way that they trust Michael to read it and they trust me to test it. And, perhaps more importantly, they trust us to not deliver corrupted code. Intentionally, or inadvertently.\n\n> The developer's main job will not be coding the commit, it will be reviewing and approving the PR.\n\nAs AI -- which all developers now use, to some extent, if they are planning on remaining in the business -- becomes more efficient and effective at writing the code, the effort shifts to evaluating and curating what it writes. That makes software code a commodity, and commodities are rated according to brand.\n\nMost of us don't want to make our own shampoo, for instance. Rather, we go to the store and select the brand that we're used to. We have learned, over the years, that this brand won't kill us and does the job we expect it to do. Offloading the decision of *Which shampoo?* to a brand is worth some of our time and money, which is why strong, reliable brands can charge a premium and are difficult to dislodge.\n\nEven people, like myself, who can read the code from many common programming languages, do not have the time, energy, or interest to read through thousands of lines of Kotlin, Golang, or Typescript or -- God forbid -- C++, from repos we are not actively working on. And asking AI to analyze the code for you leaves you trusting the AI to have a conscience and be virtuous, and may you have fun with that.\n\nThe software is no longer the brand. The feature set alone isn't enough. And the manner in which it is written, or the tools it was written with, are largely irrelevant. The thing that matters most is *Who approved this version?*\n\n# The Era of Software Judges has arrived\n\n![Judge Taylor](https://thecriticalcritics.com/review/wp-content/images/judge-taylor-movie-judges.jpg)\n\nAnd that has always been the thing that mattered most, really. \n\nThat's why software inertia is a real thing and that's why it's going to still be worth it to train up junior devs. Those devs will be trained up to be *moral actors*, specializing in reviewing and testing code and confirming its adherance to the project's ethical standards. Because those standards aren't universal; they're nuanced and edge cases will need to be carefully weighed and judged and evaluated and analysed. It will not be enough to add *Don't be evil.* to the command prompt and call it a day.\n\nSo, we shall need judges and advocates, and we must train them up, in the way they shall go.",
+    created_at: 1749885843,
+    id: "90064ed3a748776b88aecef412b02610d8f1b78b2582357f84516ad83c9ba7a8",
+    kind: 30023,
+    pubkey: "dd664d5e4016433a8cd69f005ae1480804351789b59de5af06276de65633d319",
+    sig: "8b345cee285394608ded6a787eebd16b5a595cc37057a549913cdbf874e951ddb2cfbd37662e65e01841151ffe811d5d50b518bb90014980352fbc47ad3aa864",
+    tags: [
+      ["d", "1749882441713"],
+      ["title", "Character counts"],
+      ["summary", "Why we still need to read the code."],
+      ["published_at", "1749885659"],
+      [
+        "alt",
+        "This is a long form article, you can read it in https://habla.news/a/naddr1qvzqqqr4gupzphtxf40yq9jr82xdd8cqtts5szqyx5tcndvaukhsvfmduetr85ceqqxnzde58yursv35xscnwvfnzeukws",
+      ],
+      ["t", "devs"],
+      ["t", "AI"],
+      ["t", "vibecoding"],
+      ["t", "Amethyst"],
+      ["t", "Damus"],
+      [
+        "image",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Gregory_Peck_Atticus_Publicity_Photo.jpg/500px-Gregory_Peck_Atticus_Publicity_Photo.jpg",
+      ],
+      ["published_at", "1749885659"],
+    ],
+  },
+  {
+    content:
+      "Vibe coding is taking the nostr developer community by storm. While it's all very exciting and interesting, I think it's important to pump the brakes a little - not in order to stop the vehicle, but to try to keep us from flying off the road as we approach this curve.\n\nIn this note Pablo is subtweeting something I said to him recently (although I'm sure he's heard it from other quarters as well):\n\nnostr:nevent1qvzqqqqqqypzp75cf0tahv5z7plpdeaws7ex52nmnwgtwfr2g3m37r844evqrr6jqy2hwumn8ghj7un9d3shjtnyv9kh2uewd9hj7qghwaehxw309aex2mrp0yh8qunfd4skctnwv46z7qg6waehxw309ac8junpd45kgtnxd9shg6npvchxxmmd9uqzq0z48d4ttzzkupswnkyt5a2xfkhxl3hyavnxjujwn5k2k529aearwtecp4\n\nThere is a naive, curmudgeonly case for simply \"not doing AI\". I think the intuition is a good one, but the subject is obviously more complicated - not doing it, either on an individual or a collective level, is just not an option. I recently read Tools for Conviviality by Ivan Illich, which I think can help us here. For Illich, the best kind of tool is one which serves \"politically interrelated individuals rather than managers\".\n\nThis is obviously a core value for bitcoiners. And I think the talks given at the Oslo Freedom Forum this year present a compelling case for adoption of LLMs for the purposes of 1. using them for good, and 2. developing them further so that they don't get captured by corporations and governments. Illich calls both the telephone and print \"almost ideally convivial\". I would add the internet, cryptography, and LLMs to this list, because each one allows individuals to work cooperatively within communities to embody their values in their work.\n\nBut this is only half the story. Illich also points out how \"the manipulative nature of institutions... have put these ideally convivial tools at the service of more [managerial dominance].\"\n\nPreventing the subversion and capture of our tools is not just a matter of who uses what, and for which ends. It also requires an awareness of the environment that the use of the tool (whether for virtuous or vicious ends) creates, which in turn forms the abilities, values, and desires of those who inhabit the environment.\n\nThe natural tendency of LLMs is to foster ignorance, dependence, and detachment from reality. This is not the fault of the tool itself, but that of humans' tendency to trade liberty for convenience. Nevertheless, the inherent values of a given tool naturally gives rise to an environment through use: the tool changes the world that the tool user lives in. This in turn indoctrinates the user into the internal logic of the tool, shaping their thinking, blinding them to the tool's influence, and neutering their ability to work in ways not endorsed by the structure of the tool-defined environment.\n\nThe result of this is that people are _formed_ by their tools, becoming their slaves. We often talk about LLM misalignment, but the same is true of humans. Unreflective use of a tool creates people who are misaligned with their own interests. This is what I mean when I say that AI use is anti-human. I mean it in the same way that all unreflective tool use is anti-human. See Wendell Berry for an evaluation of industrial agriculture along the same lines.\n\nWhat I'm not claiming is that a minority of high agency individuals can't use the technology for virtuous ends. In fact, I think that is an essential part of the solution. Tool use can be good. But tools that bring their users into dependence on complex industry and catechize their users into a particular system should be approached with extra caution. The plow was a convivial tool, and so were early tractors. Self-driving John Deere monstrosities are a straightforward extension of the earlier form of the technology, but are self-evidently an instrument of debt slavery, chemical dependency, industrial centralization, and degradation of the land. This over-extension of a given tool can occur regardless of the intentions of the user. As Illich says:\n\n> There is a form of malfunction in which growth does not yet tend toward the destruction of life, yet renders a tool antagonistic to its specific aims. Tools, in other words, have an optimal, a tolerable, and a negative range.\n\nThe initial form of a tool is almost always beneficial, because tools are made by humans for human ends. But as the scale of the tool grows, its logic gets more widely and forcibly applied. The solution to the anti-human tendencies of any technology is an understanding of scale. To prevent the overrun of the internal logic of a given tool and its creation of an environment hostile to human flourishing, we need to impose limits on scale.\n\n> Tools that require time periods or spaces or energies much beyond the order of corresponding natural scales are dysfunctional.\n\nMy problem with LLMs is:\n\n- Not their imitation of human idioms, but their subversion of them and the resulting adoption of robotic idioms by humans\n- Not the access they grant to information, but their ability to obscure accurate or relevant information\n- Not their elimination of menial work, but its increase (Bullshit Jobs)\n- Not their ability to take away jobs, but their ability to take away the meaning found in good work\n- Not their ability to confer power to the user, but their ability to confer power to their owner which can be used to exploit the user\n- Not their ability to solve problems mechanistically, but the extension of their mechanistic value system to human life\n- Not their explicit promise of productivity, but the environment they implicitly create in which productivity depends on their use\n- Not the conversations they are able to participate in, but the relationships they displace\n\nAll of these dysfunctions come from the over-application of the technology in evaluating and executing the fundamentally human task of _living_. AI work is the same kind of thing as an AI girlfriend, because work is not only for the creation of value (although that's an essential part of it), but also for the exercise of human agency in the world. In other words, tools must be tools, not masters. This is a problem of scale - when tool use is extended beyond its appropriate domain, it becomes what Illich calls a \"radical monopoly\" (the domination of a single paradigm over all of human life).\n\nSo the important question when dealing with any emergent technology becomes: how can we set limits such that the use of the technology is naturally confined to its appropriate scale?\n\nHere are some considerations:\n\n- Teach people how to use the technology well (e.g. cite sources when doing research, use context files instead of fighting the prompt, know when to ask questions rather than generate code)\n- Create and use open source and self-hosted models and tools (MCP, stacks, tenex). Refuse to pay for closed or third-party hosted models and tools.\n- Recognize the dependencies of the tool itself, for example GPU availability, and diversify the industrial sources to reduce fragility and dependence.\n- Create models with built-in limits. The big companies have attempted this (resulting in Japanese Vikings), but the best-case effect is a top-down imposition of corporate values onto individuals. But the idea isn't inherently bad - a coding model that refuses to generate code in response to vague prompts, or which asks clarifying questions is an example. Or a home assistant that recognized childrens' voices and refuses to interact.\n- Divert the productivity gains to human enrichment. Without mundane work to do, novice lawyers, coders, and accountants don't have an opportunity to hone their skills. But their learning could be subsidized by the bots in order to bring them up to a level that continues to be useful.\n- Don't become a slave to the bots. Know when not to use it. Talk to real people. Write real code, poetry, novels, scripts. Do your own research. Learn by experience. Make your own stuff. Take a break from reviewing code to write some. Be independent, impossible to control. Don't underestimate the value to your soul of good work.\n- Resist both monopoly and \"radical monopoly\". Both naturally collapse over time, but by cultivating an appreciation of the goodness of hand-crafted goods, non-synthetic entertainment, embodied relationship, and a balance between mobility and place, we can relegate new, threatening technologies to their correct role in society.\n\nI think in all of this is implicit the idea of technological determinism, that productivity is power, and if you don't adapt you die. I reject this as an artifact of darwinism and materialism. The world is far more complex and full of grace than we think.\n\nThe idea that productivity creates wealth is, as we all know, bunk. GDP continues to go up, but ungrounded metrics don't reflect anything about the reality of human flourishing. We have to return to a qualitative understanding of life as whole, and contextualize quantitative tools and metrics within that framework.\n\nFinally, don't believe the hype. Even if AI delivers everything it promises, conservatism in changing our ways of life will decelerate the rate of change society is subjected to and allow time for reflection and proper use of the tool. Curmudgeons are as valuable as technologists. There will be no jobspocalypse if there is sufficient political will to value human good over mere productivity. It's ok to pump the breaks.\n",
+    created_at: 1749242913,
+    id: "b7b3ed1d0c8018e9945749d4581cd94bf68db59f683d9fd755736ece6611ee75",
+    kind: 30023,
+    pubkey: "97c70a44366a6535c145b333f973ea86dfdc2d7a99da618c40c64705ad98e322",
+    sig: "a1bc99343236008fbcabc30156d4b7c92fd6d440354a6a440d8702302b67516bf9d3a92e864a827df86c1222f58e4e28012011e7d0165b190b57e3b05a7066c4",
+    tags: [
+      ["d", "1749232910842"],
+      ["title", "AI is Anti-Human (and assorted qualifications)"],
+      [
+        "summary",
+        "AI is like any other tool. It's our responsibility to make sure it stays convivial.",
+      ],
+      ["published_at", "1749233419"],
+      [
+        "alt",
+        "This is a long form article, you can read it in https://habla.news/a/naddr1qvzqqqr4gupzp978pfzrv6n9xhq5tvenl9e74pklmskh4xw6vxxyp3j8qkke3cezqqxnzde58yerxv3exycrsdpjq8wy72",
+      ],
+      [
+        "e",
+        "3c553b6ab58856e060e9d88ba75464dae6fc6e4eb2669724e9d2cab5145ee7a3",
+        "wss://relay.damus.io/",
+        "mention",
+      ],
+      ["p", "fa984bd7dbb282f07e16e7ae87b26a2a7b9b90b7246a44771f0cf5ae58018f52"],
+      ["published_at", "1749233419"],
+      ["t", "AI"],
+      ["t", "LLMs"],
+      ["t", "tools"],
+      ["t", "technology"],
+      ["t", "convivial"],
+      ["t", "Illich"],
+      [
+        "image",
+        "https://coracle-media.us-southeast-1.linodeobjects.com/Screenshot%202025-06-06%20at%2011.03.31%E2%80%AFAM.png",
+      ],
+      ["published_at", "1749233419"],
+    ],
+  },
+  {
+    id: "ff833770baca61e144bb9ad06dd1d3262632aaced9ad4faa4e295d2e4f965754",
+    pubkey: "fd208ee8c8f283780a9552896e4823cc9dc6bfd442063889577106940fd927c1",
+    created_at: 1735196579,
+    kind: 30023,
+    tags: [
+      ["d", "1735141757862"],
+      ["title", "Can Nostr save the Creatives?"],
+      ["summary", "Are we ending the tyranny of innovation over invention?"],
+      ["published_at", "1735143200"],
+      [
+        "alt",
+        "This is a long form article, you can read it in https://habla.news/a/naddr1qvzqqqr4gupzplfq3m5v3u5r0q9f255fdeyz8nyac6lagssx8zy4wugxjs8ajf7pqqxnzdenx5cngvfhx5mnsd3jmn59e7",
+      ],
+      ["t", "IQ"],
+      ["t", "intelligence"],
+      ["t", "innovation"],
+      ["t", "science"],
+      ["t", "Alexandria"],
+      ["image", "https://i.nostr.build/7dXa7RbR9opwUplR.png"],
+      ["published_at", "1735143200"],
+    ],
+    content:
+      "I just read this, and found it enlightening.\n\n> Jung... notes that intelligence can be seen as problem solving at an everyday level..., whereas creativity may represent problem solving for less common issues\n\n> Other studies have used metaphor creation as a creativity measure instead of divergent thinking and a spectrum of CHC components instead of just g and have found much higher relationships between creativity and intelligence than past studies\n\nhttps://www.mdpi.com/2079-3200/3/3/59\n\nI'm unusually intelligent (Who isn't?), but I'm much more creative, than intelligent, and I think that confuses people. The ability to apply intelligence, to solve completely novel problems, on the fly, is something IQ tests don't even claim to measure. They just claim a correlation.\n\nCreativity requires taking wild, mental leaps out into nothingness; simply trusting that your brain will land you safely.\nAnd this is why I've been at the forefront of massive innovation, over and over, but never got rich off of it.\n\n*I'm a starving autist.*\n\nZaps are the first time I've ever made money directly, for solving novel problems. Companies don't do this because there is a span of time between providing a solution and the solution being implemented, and the person building the implementation (or their boss) receives all the credit for the existence of the solution. At best, you can hope to get pawned off with a small bonus.\n\nNobody can remember who came up with the solution, originally, and that person might not even be there, anymore, and probably never filed a patent, and may have no idea that their idea has even been built. They just run across it, later, in a tech magazine or museum, and say, \"Well, will you look at that! Someone actually went and built it! Isn't that nice!\"\n\nUniversities at least had the idea of cementing novel solutions in academic papers, but that:\n1) only works if you're an academic, and at a university,\n2) is an incredibly slow process, not appropriate for a truly innovative field,\n3) leads to manifestations of perverse incentives and biased research frameworks, coming from 'publish or perish' policies.\n\nBut I think long-form notes and zaps solve for this problem. #Alexandria, especially, is being built to cater to this long-suffering class of chronic underachievers. It leaves a written, public, time-stamped record of *Clever Ideas We Have Had*.\n\nBecause they are clever, the ideas.\nAnd we have had them.",
+    sig: "7d5da1bd85d6b57862d306600bef685065f6b35b292afa73d52c18f4a12cb2e570109f59da0ac6178100bffea28daafe5209d42446c2ebc227c41e1ed399cca2",
+  },
+];
+
+const highlights = [
+  {
+    kind: 9802,
+    id: "b85d66dfe36a459abb0f9606e8c3806ebbe56372d364f1caaa39b0cdaad94693",
+    pubkey: "a9434ee165ed01b286becfc2771ef1705d3537d051b387288898cc00d5c885be",
+    created_at: 1711014451,
+    tags: [
+      [
+        "context",
+        'The point is that nostr provides an easy way to publish your own "websites", a nice way to find them, and a great way to populate them with data (notes, longforms, profiles) and interactivity (forms that create more events, like notes on a guestbook page for instance).',
+      ],
+      ["r", "https://github.com/futurepaul/hypernote/"],
+      [
+        "client",
+        "highlighter",
+        "31990:73c6bb92440a9344279f7a36aa3de1710c9198b1e9e8a394cd13e0dd5c994c63:1704502265408",
+      ],
+    ],
+    content:
+      'The point is that nostr provides an easy way to publish your own "websites", a nice way to find them, and a great way to populate them with data (notes, longforms, profiles) and interactivity (forms that create more events, like notes on a guestbook page for instance).',
+    sig: "0d2af7b5a88e20732aec88bf80792bcd5aecebbaed701419b211db2b3e3f846ac6545a529409ad45ddb77dc07316651f7da3e82083982d3b83985cad94a13b81",
+  },
+  {
+    content: "Let's fix the web",
+    created_at: 1755614318,
+    id: "f8b3402c65721ef46ac63ed1607456f4e067af2c801b556824266b64939d0a13",
+    kind: 9802,
+    pubkey: "9be0be0e64d38a29a9cec9a5c8ef5d873c2bfa5362a4b558da5ff69bc3cbb81e",
+    sig: "74439f80b975b74295d27cdc40df0cbd3fe3b5290203f8f117275ab54f633794e1caed1a21463e7f711cfde6462e26d2aeb6b7a171deed5c5457dbd6d8b2309a",
+    tags: [
+      ["r", "https://nostrver.se/"],
+      ["p", "06639a386c9c1014217622ccbcf40908c4f1a0c33e23f8d6d68f4abf655f8f71"],
+      [
+        "client",
+        "Nostur",
+        "31990:9be0be0fc079548233231614e4e1efc9f28b0db398011efeecf05fe570e5dd33:1685868693432",
+      ],
+      ["comment", ""],
+    ],
+  },
 ];
 
 export async function getFeaturedArticles(): Promise<NostrEvent[]> {
   return (articles as NostrEvent[]).sort(
+    (a, b) => getArticlePublished(b) - getArticlePublished(a),
+  );
+}
+
+export async function getFeaturedHighlights(): Promise<NostrEvent[]> {
+  return (highlights as NostrEvent[]).sort(
     (a, b) => getArticlePublished(b) - getArticlePublished(a),
   );
 }
@@ -155,6 +387,36 @@ export async function getFeaturedUsers(): Promise<User[]> {
       nip05: "gigi",
       pubkey:
         "6e468422dfb74a5738702a8823b9b28168abab8655faacb6853cd0ee15deee93",
+    },
+    {
+      nip05: "tanja",
+      pubkey:
+        "b8a9df8218084e490d888342a9d488b7cf0fb20b1a19b963becd68ed6ab5cbbd",
+    },
+    {
+      nip05: "fabian",
+      pubkey:
+        "9be0be0e64d38a29a9cec9a5c8ef5d873c2bfa5362a4b558da5ff69bc3cbb81e",
+    },
+    {
+      nip05: "laeserin",
+      pubkey:
+        "dd664d5e4016433a8cd69f005ae1480804351789b59de5af06276de65633d319",
+    },
+    {
+      nip05: "silberengel",
+      pubkey:
+        "fd208ee8c8f283780a9552896e4823cc9dc6bfd442063889577106940fd927c1",
+    },
+    {
+      nip05: "niel",
+      pubkey:
+        "a9434ee165ed01b286becfc2771ef1705d3537d051b387288898cc00d5c885be",
+    },
+    {
+      nip05: "jonb",
+      pubkey:
+        "35a8f9c0272c119a620f47c055c8db39e9f805fef1b22d0b7a42b189351dae66",
     },
   ];
 }

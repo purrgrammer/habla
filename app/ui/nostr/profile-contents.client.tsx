@@ -152,7 +152,7 @@ export default function ProfileContents({
               kinds: [kinds.Highlights],
             }}
             components={components}
-            className="md:grid-cols-1 gap-6 md:gap-8"
+            className="w-full md:grid-cols-1 gap-6 md:gap-8"
           />
         ) : null}
       </TabsContent>

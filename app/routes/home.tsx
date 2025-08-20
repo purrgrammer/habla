@@ -8,10 +8,12 @@ import {
   HandCoins,
 } from "lucide-react";
 import type { Route } from "./+types/home";
-import { getFeaturedArticles } from "~/featured";
+import { getFeaturedArticles, getFeaturedHighlights } from "~/featured";
 import defaults from "~/seo";
 import ArticleCard from "~/ui/nostr/article-card";
+import Highlight from "~/ui/nostr/highlight";
 import Grid from "~/ui/grid";
+import NostrCard from "~/ui/nostr/card";
 
 export function meta({}: Route.MetaArgs) {
   return defaults;
@@ -19,7 +21,8 @@ export function meta({}: Route.MetaArgs) {
 
 export async function loader() {
   const articles = await getFeaturedArticles();
-  return { articles };
+  const highlights = await getFeaturedHighlights();
+  return { articles, highlights };
 }
 
 function Hero() {
@@ -92,6 +95,29 @@ function FeaturedArticles({ articles }: { articles: NostrEvent[] }) {
   );
 }
 
+function FeaturedHighlights({ highlights }: { highlights: NostrEvent[] }) {
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-row items-center gap-2">
+        <Highlighter className="size-6 text-orange-200 dark:text-orange-100" />
+        <h3 className="text-2xl uppercase font-light">Highlights</h3>
+      </div>
+      <Grid className="md:grid-cols-1">
+        {highlights.map((event) => (
+          <NostrCard
+            className="border-none"
+            noFooter
+            key={event.id}
+            event={event}
+          >
+            <Highlight noHeader event={event} />
+          </NostrCard>
+        ))}
+      </Grid>
+    </div>
+  );
+}
+
 export default function Home({ loaderData }: Route.ComponentProps) {
   const { articles } = loaderData;
   return (
@@ -101,6 +127,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <Features />
       </div>
       <FeaturedArticles {...loaderData} />
+      <FeaturedHighlights {...loaderData} />
     </div>
   );
 }

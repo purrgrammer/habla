@@ -38,8 +38,9 @@ export default function Highlight({
   const p = getTagValue(event, "p");
   // TODO: User > OP - article title
   const address = a ? aToAddress(a) : null;
+  console.log(event);
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-full">
       {noHeader ? null : (
         <div>
           <User pubkey={event.pubkey} profile={profile} />
