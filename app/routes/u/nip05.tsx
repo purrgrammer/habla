@@ -14,7 +14,6 @@ export function meta({ loaderData }: Route.MetaArgs) {
 export async function loader({ params }: Route.MetaArgs) {
   const { nip05 } = params;
   const pointer = await queryProfile(nip05);
-  console.log("POINTA", { nip05, pointer });
   if (pointer) {
     const profile = await serverFetchProfile(pointer);
     if (profile) {
@@ -30,7 +29,6 @@ export async function loader({ params }: Route.MetaArgs) {
 export async function clientLoader({ params }: Route.MetaArgs) {
   const { nip05 } = params;
   const pointer = await queryProfile(nip05);
-  console.log("CLIENT.POINTA", { nip05, pointer });
   if (pointer) {
     const profile = await clientFetchProfile(pointer);
     if (profile) {

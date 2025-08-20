@@ -31,6 +31,7 @@ export default [
   ]),
 
   route(".well-known/nostr.json", "./routes/nip05.ts"),
+  route("sitemap.xml", "./routes/sitemap.ts"),
   // /faq
   // require auth, client side rendered:
   // /settings

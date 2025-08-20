@@ -46,7 +46,6 @@ export function useCurrency() {
             : currency === "USD"
               ? "BTC"
               : "sats";
-      console.log("NEXTCURR", currency, newCurrency);
       setCurrency(newCurrency);
     }, [currency]),
     useFiat,

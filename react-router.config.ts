@@ -8,7 +8,7 @@ export default {
   ssr: true,
   presets: [vercelPreset()],
   async prerender() {
-    let result = ["/", "/.well-known/nostr.json"];
+    let result = ["/", "/sitemap.xml", "/.well-known/nostr.json"];
     const users = await getFeaturedUsers();
     for (const user of users) {
       result.push(`${user.nip05}`);

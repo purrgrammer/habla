@@ -29,7 +29,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
   const description = getArticleSummary(event);
   const image = getArticleImage(event);
   const publishedAt = getArticlePublished(event);
-  // TODO: author meta tags
+
   return [
     { title },
     { name: "og:title", content: title },

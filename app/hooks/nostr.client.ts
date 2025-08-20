@@ -80,7 +80,6 @@ export function useRelays(pubkey: string): string[] {
       map((event) => {
         if (event) {
           const userRelays = getRelayURLs(event);
-          console.log("USERELAYS", userRelays);
           return userRelays;
         }
         return [];

@@ -86,7 +86,6 @@ export default function Article(props: {
   const title = getArticleTitle(event);
   const image = getArticleImage(event);
   const summary = getArticleSummary(event);
-  console.log(event);
   return (
     <div className="flex flex-col gap-4 sm:gap-6 w-full">
       <Author article={event} author={author} />

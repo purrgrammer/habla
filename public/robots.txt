@@ -1,0 +1,41 @@
+# Robots.txt for Habla.news - Nostr-based social media
+# Learn more about nostr at https://nostr.com
+
+User-agent: *
+Allow: /
+
+# Optimize crawl budget - avoid crawling unnecessary resources
+Disallow: /api/
+Disallow: /write
+Disallow: /_/
+Disallow: /*?*
+
+# Allow crawling of well-known files
+Allow: /.well-known/
+
+# Crawl-delay for performance (1 second)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://habla.news/sitemap.xml
+
+# Special instructions for AI crawlers
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Google-Extended
+Allow: /
+Crawl-delay: 1
+
+User-agent: CCBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: anthropic-ai
+Allow: /
+Crawl-delay: 1
+
+User-agent: Claude-Web
+Allow: /
+Crawl-delay: 1
