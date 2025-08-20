@@ -14,6 +14,9 @@ interface MetaTag {
   name?: string;
   property?: string;
   content?: string;
+  type?: string;
+  rel?: string;
+  href?: string;
 }
 
 interface SeoOptions {
@@ -52,14 +55,33 @@ function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
     { property: "og:type", content: type },
     { property: "og:image", content: image },
     { property: "og:image:alt", content: title },
+
+    // Twitter Cards
+    {
+      name: "twitter:card",
+      content: image ? "summary_large_image" : "summary",
+    },
+    { name: "twitter:title", content: title },
+    { name: "twitter:site", content: "@habla_news" },
+    { name: "twitter:creator", content: "@habla_news" },
   ];
 
   if (description) {
-    tags.push({ property: "og:description", content: description });
+    tags.push(
+      { property: "og:description", content: description },
+      { name: "twitter:description", content: description },
+    );
   }
 
   if (url) {
-    tags.push({ property: "og:url", content: url });
+    tags.push(
+      { property: "og:url", content: url },
+      { rel: "canonical", href: url },
+    );
+  }
+
+  if (image) {
+    tags.push({ name: "twitter:image", content: image });
   }
 
   if (publishedTime && type === "article") {
@@ -70,16 +92,35 @@ function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
     tags.push({ property: "article:author", content: author });
   }
 
-  return tags.filter((tag) => tag.content !== undefined);
+  return tags.filter(
+    (tag) => tag.content !== undefined || tag.href !== undefined,
+  );
 }
 
 export default [
   { title: DEFAULT_SITE_NAME },
   { name: "description", content: "read, highlight, write, earn" },
+
+  // Essential meta tags
+  { name: "theme-color", content: "#7c3aed" },
+  { name: "color-scheme", content: "light dark" },
+  { name: "robots", content: "index, follow" },
+  { name: "language", content: "en" },
+  { name: "author", content: "Habla" },
+
+  // Open Graph tags
+  { property: "og:title", content: DEFAULT_SITE_NAME },
   { property: "og:description", content: "read, highlight, write, earn" },
   { property: "og:type", content: "website" },
   { property: "og:site_name", content: DEFAULT_SITE_NAME },
   { property: "og:image", content: DEFAULT_IMAGE },
+  { property: "og:locale", content: "en_US" },
+
+  // Twitter Cards
+  { name: "twitter:card", content: "summary_large_image" },
+  { name: "twitter:title", content: DEFAULT_SITE_NAME },
+  { name: "twitter:description", content: "read, highlight, write, earn" },
+  { name: "twitter:image", content: DEFAULT_IMAGE },
 ];
 
 export function profileMeta(
@@ -108,7 +149,10 @@ export function articleMeta(
   const title = `${getArticleTitle(event)} - ${getDisplayName(author)}`;
   const description = getArticleSummary(event);
   const image = getArticleImage(event);
-  const publishedTime = getArticlePublished(event);
+  const publishedTimeRaw = getArticlePublished(event);
+  const publishedTime = publishedTimeRaw
+    ? new Date(parseInt(publishedTimeRaw.toString()) * 1000).toISOString()
+    : undefined;
   const authorName = getDisplayName(author);
 
   return buildBaseSeoTags({
