@@ -12,6 +12,9 @@ import {
 export default [
   { title: "Habla" },
   { name: "description", content: "read, highlight, write, earn" },
+  { name: "og:description", content: "read, highlight, write, earn" },
+  { name: "og:type", content: "website" },
+  { name: "og:image", content: "https://habla.news/family.png" },
 ];
 
 export function profileMeta(pubkey: string, profile: ProfileContent) {
