@@ -347,6 +347,64 @@ export async function getFeaturedArticles(): Promise<NostrEvent[]> {
   );
 }
 
+const CATEGORY_IDS = {
+  socialMedia: [
+    "d3f509e5eb6dd06f96d4797969408f5f9c90e9237f012f83130b1fa592b26433", // Jack - "a native internet protocol for social media"
+    "c2be87b0c35a62225c1c0b35145652cfc16340cc348139a13dd879e03ade3cbc", // Rabble - "We Deserve Better: A New Social Media Bill of Rights"
+  ],
+  nostrTech: [
+    "cd0ec44be475a533d9aa5bc5dae1c38cd110937b2d06e5d20e6c5f81a99668d5", // "Nostr: a quick introduction, attempt #1"
+    "810e27171f27fa307a2ac092b690342cf77f782caf39d82932ed71ea6fdd414f", // "Nostr and the accidental Web of Trust"
+    "8056a4a1f1d99cb8d77bebfe0c7491969b6542f0bdf9864070799f81a8ba470c", // "Why Keys Matter"
+    "1a1fe6c838400f3347f97a9adce08c10068f3bc35a279520c911b025c387b061", // "Purple Text, Orange Highlights"
+  ],
+  tech: [
+    "90064ed3a748776b88aecef412b02610d8f1b78b2582357f84516ad83c9ba7a8", // "Character counts"
+    "b7b3ed1d0c8018e9945749d4581cd94bf68db59f683d9fd755736ece6611ee75", // "AI is Anti-Human"
+  ],
+  health: [
+    "2c6fd2e0f986e85160ff0fb0781264cbe5a2cf46fbd901a7e06df19bbd124b47", // "From vegan to carnivore"
+    "be82d4e81e994da571d51ec5746601db7a0b46b64f302775af10f784a76cfa3d", // "My Exit from Fiat Food"
+  ],
+  society: [
+    "ff833770baca61e144bb9ad06dd1d3262632aaced9ad4faa4e295d2e4f965754", // "Can Nostr save the Creatives?"
+  ],
+};
+
+export async function getArticlesByCategory(): Promise<{
+  socialMedia: NostrEvent[];
+  nostrTech: NostrEvent[];
+  tech: NostrEvent[];
+  health: NostrEvent[];
+  society: NostrEvent[];
+}> {
+  const allArticles = await getFeaturedArticles();
+
+  const categorized = {
+    socialMedia: [] as NostrEvent[],
+    nostrTech: [] as NostrEvent[],
+    tech: [] as NostrEvent[],
+    health: [] as NostrEvent[],
+    society: [] as NostrEvent[],
+  };
+
+  for (const article of allArticles) {
+    if (CATEGORY_IDS.socialMedia.includes(article.id)) {
+      categorized.socialMedia.push(article);
+    } else if (CATEGORY_IDS.nostrTech.includes(article.id)) {
+      categorized.nostrTech.push(article);
+    } else if (CATEGORY_IDS.tech.includes(article.id)) {
+      categorized.tech.push(article);
+    } else if (CATEGORY_IDS.health.includes(article.id)) {
+      categorized.health.push(article);
+    } else if (CATEGORY_IDS.society.includes(article.id)) {
+      categorized.society.push(article);
+    }
+  }
+
+  return categorized;
+}
+
 export async function getFeaturedHighlights(): Promise<NostrEvent[]> {
   return (highlights as NostrEvent[]).sort(
     (a, b) => getArticlePublished(b) - getArticlePublished(a),

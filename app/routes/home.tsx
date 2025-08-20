@@ -6,9 +6,14 @@ import {
   Feather,
   Highlighter,
   HandCoins,
+  Globe,
+  Network,
+  Bot,
+  Apple,
+  Users,
 } from "lucide-react";
 import type { Route } from "./+types/home";
-import { getFeaturedArticles, getFeaturedHighlights } from "~/featured";
+import { getArticlesByCategory, getFeaturedHighlights } from "~/featured";
 import defaults from "~/seo";
 import ArticleCard from "~/ui/nostr/article-card";
 import Highlight from "~/ui/nostr/highlight";
@@ -20,9 +25,9 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function loader() {
-  const articles = await getFeaturedArticles();
+  const categorizedArticles = await getArticlesByCategory();
   const highlights = await getFeaturedHighlights();
-  return { articles, highlights };
+  return { categorizedArticles, highlights };
 }
 
 function Hero() {
@@ -71,12 +76,24 @@ function Features() {
   );
 }
 
-function FeaturedArticles({ articles }: { articles: NostrEvent[] }) {
+function CategorySection({
+  title,
+  icon,
+  articles,
+  iconColor = "text-orange-200 dark:text-orange-100",
+}: {
+  title: string;
+  icon: React.ReactNode;
+  articles: NostrEvent[];
+  iconColor?: string;
+}) {
+  if (articles.length === 0) return null;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-row items-center gap-2">
-        <Sparkles className="size-6 text-orange-200 dark:text-orange-100" />
-        <h3 className="text-2xl uppercase font-light">Featured</h3>
+        <div className={`size-6 ${iconColor}`}>{icon}</div>
+        <h3 className="text-2xl uppercase font-light">{title}</h3>
       </div>
       <Grid>
         {articles.map((article) => (
@@ -119,14 +136,49 @@ function FeaturedHighlights({ highlights }: { highlights: NostrEvent[] }) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { articles } = loaderData;
+  const { categorizedArticles } = loaderData;
   return (
     <div className="py-12 pb-32 flex flex-col gap-24">
       <div className="flex flex-col gap-16 md:gap-64 md:flex-row items-center justify-between select-none">
         <Hero />
         <Features />
       </div>
-      <FeaturedArticles {...loaderData} />
+
+      <CategorySection
+        title="Social Media"
+        icon={<Globe />}
+        articles={categorizedArticles.socialMedia}
+        iconColor="text-blue-500 dark:text-blue-400"
+      />
+
+      <CategorySection
+        title="Nostr"
+        icon={<Network />}
+        articles={categorizedArticles.nostrTech}
+        iconColor="text-purple-500 dark:text-purple-400"
+      />
+
+      <CategorySection
+        title="Technology & AI"
+        icon={<Bot />}
+        articles={categorizedArticles.tech}
+        iconColor="text-slate-600 dark:text-slate-400"
+      />
+
+      <CategorySection
+        title="Health & Diet"
+        icon={<Apple />}
+        articles={categorizedArticles.health}
+        iconColor="text-emerald-500 dark:text-emerald-400"
+      />
+
+      <CategorySection
+        title="Society & Culture"
+        icon={<Users />}
+        articles={categorizedArticles.society}
+        iconColor="text-amber-600 dark:text-amber-400"
+      />
+
       <FeaturedHighlights {...loaderData} />
     </div>
   );
