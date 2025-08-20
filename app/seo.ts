@@ -9,51 +9,139 @@ import {
   getArticlePublished,
 } from "applesauce-core/helpers";
 
+interface MetaTag {
+  title?: string;
+  name?: string;
+  property?: string;
+  content?: string;
+}
+
+interface SeoOptions {
+  title: string;
+  description?: string;
+  image?: string;
+  url?: string;
+  type?: string;
+  publishedTime?: string;
+  author?: string;
+  siteName?: string;
+}
+
+const DEFAULT_SITE_NAME = "Habla";
+const DEFAULT_IMAGE = "https://habla.news/family.png";
+
+function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
+  const {
+    title,
+    description,
+    image = DEFAULT_IMAGE,
+    url,
+    type = "website",
+    publishedTime,
+    author,
+    siteName = DEFAULT_SITE_NAME,
+  } = options;
+
+  const tags: MetaTag[] = [
+    { title },
+    { name: "description", content: description },
+
+    // Open Graph tags
+    { property: "og:title", content: title },
+    { property: "og:site_name", content: siteName },
+    { property: "og:type", content: type },
+    { property: "og:image", content: image },
+    { property: "og:image:alt", content: title },
+  ];
+
+  if (description) {
+    tags.push({ property: "og:description", content: description });
+  }
+
+  if (url) {
+    tags.push({ property: "og:url", content: url });
+  }
+
+  if (publishedTime && type === "article") {
+    tags.push({ property: "article:published_time", content: publishedTime });
+  }
+
+  if (author && type === "article") {
+    tags.push({ property: "article:author", content: author });
+  }
+
+  return tags.filter((tag) => tag.content !== undefined);
+}
+
 export default [
-  { title: "Habla" },
+  { title: DEFAULT_SITE_NAME },
   { name: "description", content: "read, highlight, write, earn" },
-  { name: "og:description", content: "read, highlight, write, earn" },
-  { name: "og:type", content: "website" },
-  { name: "og:image", content: "https://habla.news/family.png" },
+  { property: "og:description", content: "read, highlight, write, earn" },
+  { property: "og:type", content: "website" },
+  { property: "og:site_name", content: DEFAULT_SITE_NAME },
+  { property: "og:image", content: DEFAULT_IMAGE },
 ];
 
-export function profileMeta(pubkey: string, profile: ProfileContent) {
+export function profileMeta(
+  pubkey: string,
+  profile: ProfileContent,
+  url?: string,
+) {
   const title = getDisplayName(profile) || pubkey;
   const description = profile?.about;
   const image = getProfilePicture(profile);
 
-  // TODO: author og meta tags
-  return [
-    { title },
-    { name: "og:title", content: title },
-    { name: "og:type", content: "profile" },
-    { name: "profile:username", content: title },
-    ...(description
-      ? [
-          { name: "description", content: description },
-          { name: "og:description", content: description },
-        ]
-      : []),
-    // todo: image type
-    ...(image ? [{ name: "og:image", content: image }] : []),
-  ];
+  return buildBaseSeoTags({
+    title,
+    description,
+    image,
+    url,
+    type: "profile",
+  });
 }
 
-export function articleMeta(event: NostrEvent, author: ProfileContent) {
+export function articleMeta(
+  event: NostrEvent,
+  author: ProfileContent,
+  url?: string,
+) {
   const title = `${getArticleTitle(event)} - ${getDisplayName(author)}`;
   const description = getArticleSummary(event);
   const image = getArticleImage(event);
-  const publishedAt = getArticlePublished(event);
-  return [
-    { title },
-    { name: "og:title", content: title },
-    { name: "og:type", content: "article" },
-    ...(description
-      ? [
-          { name: "description", content: description },
-          { name: "og:description", content: description },
-        ]
-      : []),
-    ...(image ? [{ name: "og:image", content: image }] : []),
-  ];
+  const publishedTime = getArticlePublished(event);
+  const authorName = getDisplayName(author);
+
+  return buildBaseSeoTags({
+    title,
+    description,
+    image,
+    url,
+    type: "article",
+    publishedTime,
+    author: authorName,
+  });
+}
+
+export function relayMeta(relayUrl: string, url?: string) {
+  const title = `${relayUrl} - Relay`;
+  const description = `Browse posts and discover content from the ${relayUrl} Nostr relay`;
+
+  return buildBaseSeoTags({
+    title,
+    description,
+    url,
+    type: "website",
+  });
+}
+
+export function tagMeta(tag: string, url?: string) {
+  const title = `#${tag}`;
+  const description = `Explore posts tagged with #${tag} on Habla`;
+
+  return buildBaseSeoTags({
+    title,
+    description,
+    url,
+    type: "website",
+  });
 }
