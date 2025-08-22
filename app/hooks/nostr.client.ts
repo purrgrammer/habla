@@ -2,11 +2,18 @@
 
 import { useState, useEffect } from "react";
 import type { NostrEvent } from "nostr-tools";
-import { map } from "rxjs";
+import { map, scan } from "rxjs";
 import { type Filter, kinds } from "nostr-tools";
 import { type EventPointer, type AddressPointer } from "nostr-tools/nip19";
 import { useObservableMemo } from "applesauce-react/hooks";
-import { safeParse, getTagValue, getSeenRelays } from "applesauce-core/helpers";
+import {
+  getSeenRelays,
+  getAddressPointerForEvent,
+  getEventPointerForEvent,
+  getZapPayment,
+  getZapSender,
+} from "applesauce-core/helpers";
+import { EventZapsModel, ReceivedZapsModel } from "applesauce-core/models/zaps";
 import { getRelayURLs } from "~/lib/url";
 import {
   createTimelineLoader,
@@ -21,18 +28,22 @@ import {
   profileLoader,
 } from "~/services/loaders.client";
 import { getArticlePublished } from "applesauce-core/helpers";
+import { isReplaceableKind } from "nostr-tools/kinds";
+import { AGGREGATOR_RELAYS } from "~/const";
+import { ProfileModel } from "applesauce-core/models";
 
 export function useProfile(pubkey: string): ProfileContent | undefined {
-  // TODO: refactor to use ProfileModel
+  const relays = useRelays(pubkey);
   const eventStore = useEventStore();
   const profile = useObservableMemo(() => {
-    return eventStore.profile(pubkey);
+    return eventStore.model(ProfileModel, pubkey);
   }, [pubkey]);
 
   useEffect(() => {
     const subscription = profileLoader({
       kind: kinds.Metadata,
       pubkey,
+      relays,
     }).subscribe();
 
     return () => subscription.unsubscribe();
@@ -112,11 +123,15 @@ export function useTimeline(
 
   useEffect(() => {
     if (relays.length === 0) return;
-
-    const loader = createTimelineLoader(pool, relays, filters, {
-      eventStore,
-      limit,
-    });
+    const loader = createTimelineLoader(
+      pool,
+      relays.concat(AGGREGATOR_RELAYS),
+      filters,
+      {
+        eventStore,
+        limit,
+      },
+    );
     setIsLoading(true);
     const subscription = loader().subscribe({
       complete: () => {
@@ -127,13 +142,13 @@ export function useTimeline(
   }, [id, relays.length]);
 
   const timeline = useObservableMemo(() => {
-    return eventStore.timeline(filters).pipe(
-      map((items) => {
-        return items.filter((ev) => {
-          const seenRelays = getSeenRelays(ev);
-          return relays.some((r) => seenRelays?.has(r));
-        });
-      }),
+    return eventStore.timeline(filters, false).pipe(
+      //map((items) => {
+      //  return items.filter((ev) => {
+      //    const seenRelays = getSeenRelays(ev);
+      //    return relays.some((r) => seenRelays?.has(r));
+      //  });
+      //}),
       map((items) =>
         items.sort((a, b) => getArticlePublished(b) - getArticlePublished(a)),
       ),
@@ -149,29 +164,125 @@ export type Zap = NostrEvent & {
 };
 
 function parseZap(event: NostrEvent): Zap | null {
-  const description = getTagValue(event, "description");
-  if (!description) return null;
-  const json = safeParse(description);
-  if (!json) return null;
-  const amount = getTagValue(json, "amount");
-  if (!amount || !Number(amount)) return null;
-  return { ...json, amount: Number(amount) / 1000 } as Zap;
+  const amount = getZapPayment(event)?.amount;
+  if (!amount) return null;
+  return { ...event, amount: amount / 1000 };
+}
+
+export function usePubkeyZaps(pubkey: string) {
+  const relays = useRelays(pubkey);
+  const eventStore = useEventStore();
+  const filters = {
+    kinds: [kinds.Zap],
+    "#p": [pubkey],
+  };
+  // todo: exhaust loader to load all
+
+  useEffect(() => {
+    const loader = createTimelineLoader(
+      pool,
+      relays.concat(AGGREGATOR_RELAYS),
+      filters,
+      { eventStore },
+    );
+    const subscription = loader().subscribe();
+    return () => subscription.unsubscribe();
+  }, [pubkey]);
+
+  return useObservableMemo(() => {
+    return eventStore.timeline(filters).pipe(
+      map((items) => {
+        const sorted = [...items];
+        return (sorted.map(parseZap).filter(Boolean) as Zap[]).sort(
+          (a, b) => b.amount - a.amount,
+        );
+      }),
+      map((items) => {
+        // todo: use scan?
+        const senders = items.reduce(
+          (acc, z) => {
+            const sender = getZapSender(z);
+            if (!sender) return acc;
+            acc[sender] = (acc[sender] | 0) + z.amount;
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
+        const zappers = Object.entries(senders)
+          .map((kv) => {
+            const [k, v] = kv;
+            return { pubkey: k, amount: v };
+          })
+          .sort((a, b) => b.amount - a.amount);
+        return {
+          zaps: items,
+          total: items.reduce((acc, z) => acc + z.amount, 0),
+          zappers,
+        };
+      }),
+    );
+  }, [pubkey]);
 }
 
 export function useZaps(event: NostrEvent) {
+  const relays = useRelays(event.pubkey);
+  const pointer = isReplaceableKind(event.kind)
+    ? getAddressPointerForEvent(event)
+    : getEventPointerForEvent(event);
   const eventStore = useEventStore();
-  const [zaps, setZaps] = useState<Zap[]>([]);
 
   useEffect(() => {
-    const loader = createZapsLoader(pool, { eventStore });
-    const subscription = loader(event).subscribe((zapEvent) => {
-      const zap = parseZap(zapEvent);
-      if (zap) {
-        setZaps((prev) => [...prev, zap].sort((a, b) => b.amount - a.amount));
-      }
+    // Load existing zaps
+    const loader = createZapsLoader(pool, {
+      eventStore,
+      extraRelays: AGGREGATOR_RELAYS.concat(relays),
+      useSeenRelays: false,
     });
-    return () => subscription.unsubscribe();
+    const loaderSubscription = loader(event, relays).subscribe((zapEvent) => {
+      eventStore.add(zapEvent);
+    });
+
+    // Subscribe to new zaps in real-time
+    const zapFilters = isReplaceableKind(event.kind)
+      ? {
+          kinds: [kinds.Zap],
+          "#a": [
+            `${event.kind}:${event.pubkey}:${event.tags.find((t) => t[0] === "d")?.[1] || ""}`,
+          ],
+          since: Math.floor(Date.now() / 1000),
+        }
+      : {
+          kinds: [kinds.Zap],
+          "#e": [event.id],
+          since: Math.floor(Date.now() / 1000),
+        };
+
+    const realtimeSubscription = pool
+      .subscription(AGGREGATOR_RELAYS.concat(relays), zapFilters)
+      .subscribe((zapEvent) => {
+        eventStore.add(zapEvent);
+      });
+
+    return () => {
+      loaderSubscription.unsubscribe();
+      realtimeSubscription.unsubscribe();
+    };
   }, [event.id]);
 
-  return zaps;
+  return useObservableMemo(() => {
+    return eventStore.model(EventZapsModel, pointer).pipe(
+      map((items) => {
+        const sorted = [...items];
+        return (sorted.map(parseZap).filter(Boolean) as Zap[]).sort(
+          (a, b) => b.amount - a.amount,
+        );
+      }),
+      map((items) => {
+        return {
+          zaps: items,
+          total: items.reduce((acc, z) => acc + z.amount, 0),
+        };
+      }),
+    );
+  }, [event.id]);
 }

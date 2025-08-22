@@ -1,6 +1,6 @@
-import { getFeaturedUsers } from "~/featured";
+import { getMembers } from "~/services/data.server";
 
 export async function loader() {
-  const users = await getFeaturedUsers();
+  const users = await getMembers();
   return Response.json(users);
 }

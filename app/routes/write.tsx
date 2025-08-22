@@ -1,11 +1,15 @@
 import Editor from "~/ui/editor.client";
 import ClientOnly from "~/ui/client-only";
 
+import { buildBaseSeoTags } from "~/seo";
+
 export function meta() {
-  return [
-    { title: "Write" },
-    { name: "description", content: "What's on your mind?" },
-  ];
+  return buildBaseSeoTags({
+    title: "Write",
+    description: "What's on your mind?",
+    url: "https://habla.news/write",
+    type: "website",
+  });
 }
 
 // TODO: Editor skeleton

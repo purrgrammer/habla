@@ -1,26 +1,11 @@
-import { useMemo } from "react";
 import { type NostrEvent, kinds } from "nostr-tools";
 import { type FeedComponent, PureFeed } from "~/ui/nostr/feed.client";
 import Highlight from "./highlight";
 import NostrCard from "./card";
-import type { AddressPointer } from "nostr-tools/nip19";
-import { useRelays } from "~/hooks/nostr.client";
-import { type Zap, useZaps, useTimeline } from "~/hooks/nostr.client";
+import { useTimeline } from "~/hooks/nostr.client";
 import Note from "./note";
-import { useCurrency, useExchangeRate } from "~/services/currency.client";
-import UserLink from "./user-link.client";
-import { Badge } from "../badge";
-import {
-  Highlighter,
-  Zap as ZapIcon,
-  MessageCircle,
-  Bitcoin,
-  DollarSign,
-  Euro,
-  HandCoins,
-} from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "../tabs";
-import { CurrencyAmount } from "../currency.client";
+import { getReplaceableAddress } from "applesauce-core/helpers";
+import Zaps from "../zaps.client";
 
 const components: Record<number, FeedComponent> = {
   [kinds.Highlights]: ({ event, profile }) => {
@@ -49,51 +34,14 @@ const components: Record<number, FeedComponent> = {
   },
 };
 
-function ZapPill({ zap }: { zap: Zap }) {
-  const comment = zap.content.trim();
-  return (
-    <Badge variant="pill">
-      <div className="flex flex-row items-center flex-wrap gap-3">
-        <UserLink img="size-5" name="text-lg" pubkey={zap.pubkey} />
-        <CurrencyAmount amount={zap.amount} />
-        {comment && comment.length < 42 ? (
-          <p className="text-lg max-w-[80dvw] overflow-hidden overflow-x-scroll no-scrollbar font-light text-muted-foreground line-clamp-1">
-            {comment}
-          </p>
-        ) : null}
-      </div>
-    </Badge>
-  );
-}
-
-function Zaps({ zaps }: { zaps: Zap[] }) {
-  const total = zaps.reduce((acc, z) => acc + z.amount, 0);
-  const { currency, useFiat } = useCurrency();
-  const { data: exchangeRate } = useExchangeRate(currency);
-  return (
-    <div className="flex flex-col items-center gap-16 w-full">
-      <div className="flex flex-col items-center gap-3">
-        <CurrencyAmount amount={total} size="xl" />
-      </div>
-      <div className="flex flex-col sm:flex-row gap-2 flex-wrap w-full">
-        {zaps.map((zap) => (
-          <ZapPill key={zap.id} zap={zap} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function Highlights({
-  address,
   event,
   relays,
 }: {
-  address: AddressPointer;
   event: NostrEvent;
   relays: string[];
 }) {
-  const a = `${address.kind}:${address.pubkey}:${address.identifier}`;
+  const a = getReplaceableAddress(event);
   const filters = {
     kinds: [kinds.Highlights],
     "#a": [a],
@@ -111,14 +59,8 @@ function Highlights({
   );
 }
 
-function Comments({
-  address,
-  relays,
-}: {
-  address: AddressPointer;
-  relays: string[];
-}) {
-  const a = `${address.kind}:${address.pubkey}:${address.identifier}`;
+function Comments({ event, relays }: { event: NostrEvent; relays: string[] }) {
+  const a = getReplaceableAddress(event);
   const filters = {
     kinds: [kinds.ShortTextNote],
     "#a": [a],
@@ -136,11 +78,16 @@ function Comments({
   );
 }
 
-export default function ArticleConversation({ event }: { event: NostrEvent }) {
-  const zaps = useZaps(event);
+export default function ArticleConversation({
+  event,
+  relays,
+}: {
+  event: NostrEvent;
+  relays: string[];
+}) {
   return (
     <div className="flex flex-col gap-12 pb-16 items-center">
-      <Zaps zaps={zaps} />
+      <Zaps event={event} />
       {/*
       <Tabs defaultValue="highlights" className="w-full">
         <TabsList className="w-full mb-4">
@@ -156,10 +103,10 @@ export default function ArticleConversation({ event }: { event: NostrEvent }) {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="highlights">
-          <Highlights address={address} event={event} relays={relays} />
+          <Highlights event={event} relays={relays} />
         </TabsContent>
         <TabsContent value="comments">
-          <Comments address={address} relays={relays} />
+          <Comments event={event} relays={relays} />
         </TabsContent>
       </Tabs>
       */}

@@ -1,37 +1,69 @@
-import { kinds } from "nostr-tools";
-import { addressLoader, profileLoader } from "~/services/loaders.client";
+import { type NostrEvent, kinds } from "nostr-tools";
+import { toArray, firstValueFrom, lastValueFrom } from "rxjs";
+import type {
+  ProfilePointer,
+  EventPointer,
+  AddressPointer,
+} from "nostr-tools/nip19";
+import {
+  eventLoader,
+  addressLoader,
+  profileLoader,
+} from "../services/loaders.server";
+import { getRelayURLs } from "./url";
+import { createTimelineLoader } from "applesauce-loaders/loaders";
+import { getProfileContent } from "applesauce-core/helpers";
+import { type ProfileContent } from "applesauce-core/helpers";
+import pool from "../services/relay-pool";
+import eventStore from "../services/event-store";
 
-export async function fetchRelays(pubkey: string) {
-  return addressLoader({
-    kind: kinds.RelayList,
-    pubkey,
-  });
+export function fetchRelays(pubkey: string): Promise<string[]> {
+  return firstValueFrom(profileLoader({ kind: kinds.RelayList, pubkey })).then(
+    (event) => {
+      if (event) {
+        return getRelayURLs(event);
+      }
+      return [];
+    },
+  );
 }
 
-export async function fetchProfile(pubkey: string) {
-  return profileLoader({
-    kind: kinds.Metadata,
-    pubkey,
-  });
+export function fetchProfile(
+  pointer: ProfilePointer,
+): Promise<ProfileContent | undefined> {
+  return firstValueFrom(
+    profileLoader({ kind: kinds.Metadata, ...pointer }),
+  ).then(getProfileContent);
 }
 
-export async function fetchArticle(
+export function fetchEvent(
+  pointer: EventPointer,
+): Promise<NostrEvent | undefined> {
+  return firstValueFrom(eventLoader(pointer));
+}
+
+export function fetchAddress(
+  pointer: AddressPointer,
+): Promise<NostrEvent | undefined> {
+  return firstValueFrom(addressLoader(pointer));
+}
+
+export async function fetchArticles(
   pubkey: string,
-  identifier: string,
-  relays: string[],
-) {
-  return addressLoader({
-    kind: kinds.LongFormArticle,
-    pubkey,
-    identifier,
+  since?: number,
+): Promise<NostrEvent[]> {
+  const relays = await fetchRelays(pubkey);
+  const timelineLoader = createTimelineLoader(
+    pool,
     relays,
-  });
-}
-
-export function fetchArticles(pubkey: string, relays: string[]) {
-  return addressLoader({
-    kind: kinds.LongFormArticle,
-    pubkey,
-    relays,
-  });
+    {
+      kinds: [kinds.LongFormArticle],
+      authors: [pubkey],
+    },
+    {
+      limit: 200,
+      eventStore,
+    },
+  )(since);
+  return lastValueFrom(timelineLoader.pipe(toArray()));
 }

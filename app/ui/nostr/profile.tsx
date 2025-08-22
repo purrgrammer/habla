@@ -10,8 +10,7 @@ import RichText from "./rich-text";
 import { prettify } from "~/lib/url";
 import { Card as SkeletonCard } from "~/ui/skeleton";
 import Banner from "~/ui/banner";
-import Nip05 from "./nip05";
-import { Loading as LoadingNip05 } from "./pure-nip05";
+import UserLink from "./user-link";
 
 export default function Profile({
   pubkey,
@@ -33,16 +32,13 @@ export default function Profile({
             profile={profile}
           />
           <div className="flex flex-col gap-0">
-            <Username
+            <UserLink
+              withNip05={true}
               pubkey={pubkey}
               profile={profile}
-              className="text-4xl line-clamp-1"
+              img="hidden"
+              name="text-4xl line-clamp-1"
             />
-            {profile?.nip05 ? (
-              <ClientOnly fallback={<LoadingNip05 nip05={profile.nip05} />}>
-                {() => <Nip05 pubkey={pubkey} nip05={profile.nip05!} />}
-              </ClientOnly>
-            ) : null}
           </div>
         </div>
         <div className="px-4 pt-4 flex flex-col gap-3">
@@ -50,14 +46,18 @@ export default function Profile({
             <ClientOnly
               fallback={<p className="text-md leading-tight">{about}</p>}
             >
-              {() => <RichText content={about} />}
+              {() => (
+                <p className="text-md leading-tight">
+                  <RichText content={about} />
+                </p>
+              )}
             </ClientOnly>
           ) : null}
           {profile?.website ? (
             <Link
               target="_blank"
               className="flex flex-row items-center gap-1.5 text-md text-primary 
-              break-all
+              line-clamp-1
               hover:underline hover:decoration-dotted"
               to={profile.website}
             >

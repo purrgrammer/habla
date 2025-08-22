@@ -1,18 +1,7 @@
-import { getFeaturedUsers } from "~/featured";
+import { getNip05 } from "~/services/data.server";
 
 export async function loader() {
   //const { username } = request.query;
-  const users = await getFeaturedUsers();
-  const names = users.reduce((acc, user) => {
-    const { nip05, pubkey } = user;
-    return { ...acc, [nip05]: pubkey };
-  }, {});
-  const relays = users.reduce((acc, user) => {
-    const { pubkey, relays } = user;
-    if (relays) {
-      return { ...acc, [pubkey]: relays };
-    }
-    return acc;
-  }, {});
-  return Response.json({ names, relays });
+  const response = await getNip05();
+  return Response.json(response);
 }

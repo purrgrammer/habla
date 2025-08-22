@@ -1,6 +1,73 @@
-import { getArticlePublished } from "applesauce-core/helpers";
 import { type NostrEvent } from "nostr-tools";
-import { type ProfilePointer } from "nostr-tools/nip19";
+import { getArticlePublished } from "applesauce-core/helpers";
+
+export const faq = {
+  pubkey: "7f5c2b4e48a0e9feca63a46b13cdb82489f4020398d60a2070a968caa818d75d",
+  content:
+    "This FAQ is also available in Spanish: nostr:naddr1qqx9zat994jhxttgv93xccgpr9mhxue69uhhyetvv9ujumn0wd68y6trdqhxcctwvsq3jamnwvaz7tmsw4exzanfv3sjumn0wd68ytnvv9hxgqg4waehxw309ahx7um5wghxjmn0wd6xztnrvvq32amnwvaz7tmwdaehgu3wd45kcmm49ekx7mqpzemhxue69uhhyetvv9ujumn0wd68ytnzv9hxgqgswaehxw309ahx7um5wgh8w6twv5qkvamnwvaz7tmxd9k8getj9ehx7um5wgh8w6twv5hkuur4vgcnqcth0f4ku6n8x4er2mrpdfh8ydfnxsensmnyvduk57tvvachxunwwf68zdt8wfengwf4wc6ryutrxeshwum2xs6hjueh8a38ymmpv33kzum58468yat9qyt8wumn8ghj7cnfw33k76twv4ezuum0vd5kzmqprfmhxue69uhhyetvv9ujummjv9hxwetsd9kxctnyv4mqzxnhwden5te0wfjkccte9ehx7um5wfcxcetzwvhxxmmdqyw8wumn8ghj7atwd9mx2unnv5hxummnw3exjcmg9ekxzmnyqyw8wumn8ghj7mn0wd68ytndw46xjmnewaskcmr9wshxxmmdqy2hwumn8ghj7etyv4hzumn0wd68ytnvv9hxgqgcwaehxw309aex2mrp0yhxummnw3exzarf9e3k7mgzypl4c26wfzswnlk2vwjxky7dhqjgnaqzqwvdvz3qwz5k3j4grrt46qcyqqq823crwnvag thanks to nostr:npub138s5hey76qrnm2pmv7p8nnffhfddsm8sqzm285dyc0wy4f8a6qkqtzx624 \n\n***\n\n## What is Habla News?\n\n[Habla](https://habla.news/) is a Nostr-based platform that allows you to create and manage long-form posts. You could compare it to Medium, yet Habla is so much more than that. Habla is superior to traditional blogging platforms because it is built on top of [Nostr](https://bevstr.com/Nostr/). It is interoperable with a plethora of other [Nostr apps](https://www.nostrapps.com/), which makes the user experience seamless and more engaging. Moreover, thanks to the [Lightning Network](https://www.lopp.net/lightning-information.html), your input – if found valuable by the readers – can and will be instantly rewarded with the best money humanity has ever witnessed: [bitcoin](https://www.lopp.net/bitcoin-information.html).\n\n## What is Nostr?\n\nNostr is a new way to communicate online that provides a ton of benefits for its users. It is free for everyone; you do not require an ID or any other third party verification to start connecting, mingling with like-minded people, and growing the community around you. Nostr is often mistaken for a social media platform, but it is much more than that. We encourage you to check out the Nostr resources gathered [here](https://www.bevstr.com/Nostr/) to realize the potential magnitude of this tool.\n\n## How do I sign into Habla?\n\nTo start writing on Habla, simply create an Habla/Nostr account and log in. Follow these [few simple steps](https://nosta.me/) to register, start sharing value, and receive value back.\n\n## How do I earn with Habla?\n\nHabla allows you to receive value directly from your readers. No bank account or ID is required. Simply connect your Lightning address to your Habla / Nostr account and receive funds directly to your wallet  – no third parties, no waiting for withdrawals, no sweat. Follow [these simple steps](https://lnshort.it/earn-with-nostr/) to do so.\n\n## Why is posting on Habla different?\n\nThe Nostr protocol is super lightweight, which introduces some peculiarities into how the Nostr-based apps must behave. We won't go into technical details, but the most obvious difference you will notice as a content creator is that you'll have to use a different and, possibly, unusual format of text while composing your posts. But fear not; Habla provides tools that make this process easy and intuitive. Here's a quick video by nostr:npub1wkljx5c6a8uccc5etws8ry0y3r4dgavh2dcav0tal4rtmcdl4z2sfu5u0t explaining the basics of posting with Habla (the guide was made prior to the redesign, yet remains useful):\n\nhttps://nostr.build/p/nb9474.mp4\n\nHabla (and many other Nostr apps) uses the well-established format, which is called Markdown. It has been around for almost a decade now and is supported by most apps you use every day. The reason you might not have heard about Markdown is because traditional apps usually hide it from the user, and we are working on doing so as well. You can find out more about Markdown [here](https://markdown.land/).\n\n## Where is my content stored?\n\nTraditional blogging platforms store your content on their own servers. It is a convenient and (used to be) solid approach, but it bears critical risks. Leaving the fruits of your labor with a single party means they have full control over your  content. Nostr fixes this. Every time you post something, your content is broadcast to numerous [relays](https://lnshort.it/nostr-relays) for further storage and redistribution. If any relay operator blocks your post or refuses to redistribute it, your readers can turn to other relays and access your content (do not worry if this sounds complicated; everything happens under the hood). This ensures you never get silenced. That said, Habla does not run its own relay; we've decided to concentrate on what we do best – build an intuitive, efficient, and easy-to-use blogging platform that rewards – and leave the content storage and distribution to the pros in that field.\n\n## How do I post?\n\nHabla provides all the necessary tools to produce rich posts that stand out. Prepare your article, format your text with the help of designated tools, add media, and preview the results prior to publishing. All you need is at your fingertips, and the platform is only getting better and friendlier day by day. \n\n## Who can read my posts on Habla?\n\nAnyone on the Internet can read your posts. However, if your readers would like to interact with your work – be it by following you / commenting / giving value back – they should create a Nostr account. We encourage you to onboard your followers to grow a thriving community and reach new heights. This [quick guide](http://lnshort.it/nostr-welcome/) will help you and your peers get started.\n\n***\n\n_This FAQ is a work in progress, and it will evolve as both Habla and Nostr develop into even more powerful tools. Please provide feedback so that I can make it better._\n\n",
+  id: "73bfa01edbff60c8aa042a0bff17f5b216858bfca8ef85ffb90654eb30d31e6b",
+  created_at: 1688564717,
+  kind: 30023,
+  tags: [
+    ["d", "1684234032185"],
+    ["title", "Habla FAQ"],
+    [
+      "summary",
+      "Are you a newly-joined content creator with a talent for composing long-form posts? Interested in instantly monetizing your efforts without relying on third parties and advertisers? Habla.news is a platform for you, and this FAQ will help you get on track.",
+    ],
+    ["published_at", "1684240265"],
+    ["t", "FAQ"],
+    ["t", "newcomers"],
+    ["t", "onboarding"],
+    ["t", "guide"],
+    ["t", "Habla"],
+    ["t", "long-form posts"],
+    ["t", "monetization"],
+    ["t", "creators"],
+    ["t", "tips"],
+    ["image", "https://nostr.build/p/nb8626.png"],
+    ["p", "89e14be49ed0073da83b678279cd29ba5ad86cf000b6a3d1a4c3dc4aa4fdd02c"],
+    ["p", "75bf23531ae9f98c62995ba07191e488ead475975371d63d7dfd46bde1bfa895"],
+  ],
+} as NostrEvent;
+
+export const features = {
+  content:
+    "[Habla](https://habla.news/) revolutionizes the blogging experience by seamlessly integrating the familiar functionality of traditional platforms with enhanced interaction capabilities. Thanks to [Bitcoin](https://www.lopp.net/bitcoin-information.html) and [Lightning Network](https://www.lopp.net/lightning-information.html) integration, Habla allows you not only to enjoy all the features you're accustomed to but also elevates how you interact with  your favorite authors and how you produce your own writing. Explore the array of powerful features Habla offers to maximize your engagement and take your online connections to the next level.\n\nFor readers\n===========\n\nComments\n--------\n\nProviding feedback is a straightforward feature that speaks for itself. Your input holds significant value for both authors and the community. Simply log in to Habla to express your thoughts and opinions on your favorite articles.\n\n![](https://nostr.build/p/nb9910.png)\n\nYou can log in via a dedicated browser extension ([guide](https://worldtravelambitions.notion.site/How-to-Set-Up-Nostr-Using-GetAlby-and-Snort-social-c3fabb2ecc8d465dba0e73a3f1c2558a)).\n\nHighlights\n----------\n\nHighlighter is an impressive tool that seamlessly integrates with a variety of Nostr apps including Habla. Think of it as the liberated version of Medium's highlight function. With Highlighter, you can easily mark your favorite sections of text, share them across Nostr apps, boost them, and even receive bitcoin as a reward for sharing compelling thoughts.\n\nnostr:note1kw5q4usve5yuks8r009adl669qt02rrg9qtwxclyz49jzvrlv65szs7dmg\n\nCheck out how highlights work in your Highlighter dashboard (alpha version at the moment): [https://highlighter.com/my/highlights](https://highlighter.com/my/highlights). And see my guide on Highlighter here: nostr:naddr1qqxnzd3cxg6rxdfkxyerzv3nqyvhwumn8ghj7mn0wd68ytn0wah8xcmpd3jjummjvuhsz9rhwden5te0wfjkcctev93xcefwdaexwtcpz9mhxue69uhkummnw3ezuamfdejj7qg4waehxw309aex2mrp0yhxgctdw4eju6t09uq36amnwvaz7tm4de5hvetjwdjjumn0wd68y6trdqhxcctwvshsygrlts45uj9qa8lv5caydvfumwpy386qyquc6c9zqu9fdr92sxxht5psgqqqw4rssug3ew\n\nHighlighting stuff has become super easy with Habla: simply select the text you want to highlight and tap the highlight button at the bottom right of your screen. \n\n![](https://nostr.build/p/nb9909.png)\n\n> Explore [this guide](https://lnshort.it/highlighter) to unlock the full potential of Highlighter.\n\nThe highlights will appear in a dedicated Highlights tab and in your Highlighter dashboard in a dedicated app. Simply click on a highlight to Interact with it:\n\n![](https://nostr.build/i/57a6ce9592d724c4fd5b71525370e81261c7e7aa9891244da5a756985395b8b0.jpg)\n\nZaps\n----\n\nZaps are a built-in feature of Nostr that allows you to express genuine appreciation for the content you receive. Unlike traditional likes, zaps carry tangible value and serve as a powerful motivator for your favorite creators to continue producing high-quality content.\n\n![](https://nostr.build/av/1dcdfa9d0b5b1b587e69da17a6a6b81f3fdbd94d7ae87b88b6428857fd77508b.mp4)\n\nThey also act as a signal, helping authors understand which topics resonate the most with their audience, enabling them to prioritize those topics in the future. If you enjoyed an article on Habla, zap it to show the author that this type of content is valued. Follow [these few simple steps](https://lnshort.it/earn-with-nostr/) to start sending and receiving zaps.\n\nFor creators\n============\n\nMarkdown\n--------\n\nMarkdown is a user-friendly markup language that enables the creation of formatted text using a plain-text editor. It serves as a simple yet powerful tool for specifying the desired formatting of text output. While Markdown itself is not a distinct feature of Habla, the platform fully supports this widely adopted format. As an Habla user, you have the advantage of leveraging Markdown to share beautifully structured posts.\n\n![](https://nostr.build/p/nb9913.png)\n\nTo help you get started, Habla provides a handy toolbar for basic formatting, making it accessible even to those unfamiliar with Markdown. A more detailed explanation of Markdown and examples of its syntax are available [here](https://markdown.land/). Additionally, I'd like to highlight a few particularly interesting elements that you may find useful in your posts.\n\n### Checklists\n\n_You can post checklists by inputting the following:_\n\n```\n\n- [x] Wake up\n\n- [x] Stack sats\n\n- [ ] Go to work\n\n```\n\nHere's what these lists look like for the reader:\n\n- [x] Wake up\n\n- [x] Stack sats\n\n- [ ] Go to work\n\n### Tables\n\nTables help make your posts more illustrative and digestible. Adding a table is as simple as tapping a corresponding button in the toolbar:\n\n![](https://nostr.build/p/nb9914.png)\n\nYou can hover over the icons to see what they offer. \n\n| | Habla | Medium | Substack |\n| --- | --- | --- | --- |\n| Permissionless monetization | ✅ | ❌ | ❌ |\n| Redundancy[^1] | ✅ | ❌ | ❌ |\n| Interoperability | ✅ | ❌ | ❌ |\n| Popularity | 📈 | ✅ | ✅ |\n| Newsletters | soon™ | ✅ | ✅ |\n\nFootnotes \n---------\n\nFootnotes let you reference relevant information without disrupting the flow of what you're trying to say. Here's how you insert footnotes into your Habla post:\n\n```\n\nSimply add this[^1] symbol where applicable. \nAs you want to add more footnotes, change the number to[^2] and [^3].\n\nProvide references at the end of your article:\n\n[^1]: first reference\n\n[^2]: second reference\n\n[^3]: third reference  \n\n```\n\nHere's how[^2] this will look for the reader[^3].\n\nNostr apps interoperability\n---------------------------\n\nNostr-related links automatically turn into embeds. This is one of the superpowers of Nostr apps - as everything built on Nostr follows the same protocol rules, user experience tends to be more seamless. It's worth noting that there may be exceptions: as some Nostr apps are developed at a higher pace or have first-mover advantage, they may have more features and better compatibility.\n\nHabla takes this to the next level by converting all Nostr-related links into embeds or mentions. By copying a link to any Nostr user or event and pasting it into Habla you will get such reader-friendly results:\n\n-   Mentioning a Nostr user:\n\nnostr:npub107jk7htfv243u0x5ynn43scq9wrxtaasmrwwa8lfu2ydwag6cx2quqncxg\n\n-   Mentioning a long-form post:\n\nnostr:naddr1qqxnzd3cxserxdpsxverzwp4qyvhwumn8ghj7un9d3shjtnndehhyapwwdhkx6tpdshszxthwden5te0dehhxarj9ehhwmnnvdskcefwdaexwtcpz9mhxue69uhkummnw3ezuamfdejj7qgmwaehxw309ahx7um5wghx7unpdenk2urfd3kzuer9wchsz9rhwden5te0wfjkcctev93xcefwdaexwtczypl4c26wfzswnlk2vwjxky7dhqjgnaqzqwvdvz3qwz5k3j4grrt46qcyqqq823ccza0tv\n\n-   Embedding a note:\n\nnostr:nevent1qqs8azup6vleusxx2jymsyw5m6mgahyp02va74lxqt2fzkmae0n0s2spqymq4uph68\n\n-   Embedding a badge (can be created and awarded by visiting [https://badges.page](https://badges.page))\n\nnostr:naddr1qq85sctzd3sjqun9wd5kgetww3esygrlts45uj9qa8lv5caydvfumwpy386qyquc6c9zqu9fdr92sxxht5psgqqqw5usef54zg\n\n> All of this can be achieved by simply copying a link to the desired user or event from a search bar of your browser and pasting it into the editor field on Habla.\n\nHere's a post by nostr:npub107jk7htfv243u0x5ynn43scq9wrxtaasmrwwa8lfu2ydwag6cx2quqncxg that is dedicated to reference possibilities of Habla: nostr:naddr1qq98yetxv4ex2mnrv4eszxthwden5te0wfjkccte9eekummjwsh8xmmrd9skctcpzamhxue69uhhyetvv9ujumn0wd68ytnzv9hxgtcpvemhxue69uhkv6tvw3jhytnwdaehgu3wwa5kuef0dec82c33xpshw7ntde4xwdtjx4kxz6nwwg6nxdpn8phxgcmedfukcem3wdexuun5wy6kwunnxsun2a35xfckxdnpwaek5dp409enw0mzwfhkzerrv9ehg0t5wf6k2qg4waehxw309aex2mrp0yhxgctdw4eju6t09uq3zamnwvaz7tmwdaehgu3wwa5kuef0qgs8lft0t45k92c78n2zfe6ccvqzhpn977cd3h8wnl579zxhw5dvr9qrqsqqqa28c8lz2q\n\nLists\n-----\n\nLists are a great way to organize Nostr users into categories to later conveniently access their content. Lists can:\n\n-   be embedded into Habla posts and help you share accounts/events related to a topic you are describing;\n\n-   be a handy tool to have the contacts of people you need quick access to at your fingertips;\n\n-   act as an alternative to your following feed.\n\nLists are very easy to create and manage thanks to [https://listr.lol/](https://listr.lol/) by nostr:npub1zuuajd7u3sx8xu92yav9jwxpr839cs0kc3q6t56vd5u9q033xmhsk6c2uc.\n\nAll you need to do is:\n\n1.  Login to Listr web app with your NIP-07 extension (see guide [here](https://worldtravelambitions.notion.site/How-to-Set-Up-Nostr-Using-GetAlby-and-Snort-social-c3fabb2ecc8d465dba0e73a3f1c2558a))\n\n2.  Tap \"New List\"\n\n3.  Choose the kind you need\n\n4.  Give it a name\n\n5.  Add npubs of people you want to add.\n\nAfter you're done, save the list, find the list you need on your Listr profile page, press \"Copy link\" and paste it into your Habla post. You now have a beautifully integrated list embedded into your article and your readers can easily interact with the mentioned people:\n\nnostr:naddr1qq85sctzd3sjqun9wd5kgetww3esygrlts45uj9qa8lv5caydvfumwpy386qyquc6c9zqu9fdr92sxxht5psgqqqw5cqe8f7jr\n\nEmbedding media from traditional platforms\n------------------------------------------\n\nWhile Nostr is undoubtedly superior to traditional means of communication, many readers aren't yet ready to say goodbye to the YouTubes and Twitters of the world. Habla fixes this by letting you embed traditional social media posts, podcasts, videos and even files.\n\n![](https://nostr.build/i/0b2626ad7d100e7d051d9d6e0be9688e62fad7291cd1b0eeb041ff47c6c606ca.gif)\n\nSimply click the share button on the platform of your choice, choose \"embed\", copy the suggested code and paste it into Habla.\n\n<iframe allow=\"autoplay *; encrypted-media *; fullscreen *; clipboard-write\" frameborder=\"0\" height=\"450\" style=\"width:100%;max-width:660px;overflow:hidden;border-radius:10px;\" sandbox=\"allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation\" src=\"https://embed.podcasts.apple.com/hk/podcast/nostrovia-the-nostr-podcast/id1678531266\"></iframe>\n\nThe same goes for other traditional platforms: just find the </> sign in their \"share\" section, copy the provided code and drop it into your Habla post.\n\nEmbedding media from Nostr-based platforms\n------------------------------------------\n\n### Zapstr\n\nEmbedding audio tracks can significantly enrich your posts. Doing so by referring to a Nostr-based app makes the embed ever more convenient for the readers. Arguably, the best Nostr client for audio content is [Zapstr](https://zapstr.live/). Simply copy a link to the Zapstr media file -- be it a song or a podcast episode, and paste it into Habla. Here's an example of a beautiful embed that will appear on your post:\n\nnostr:naddr1qq2hy7ttd3u8saehvsux5em3wa3x67tddparyq3qjk9h2jsa8hjmtm9qlcca942473gnyhuynz5rmgve0dlu6hpeazxqxpqqqpaxj3u2r66\n\n### Zap Stream\n\nThe same goes for video streams. Newly launched [zaps.stream](https://zap.stream/) platform allowing anyone to permissionlessly stream live videos and receive sats directly to their Lightning wallets. Embedding a live stream is just as easy as copy-pasting its link. Find out more in my post here: nostr:naddr1qqfxc6tkv5khxarjv4sk6tt9d43x2ernqyvhwumn8ghj7un9d3shjtnwdaehgunfvd5zumrpdejqzxthwden5te0wp6hyctkd9jxztnwdaehgu3wd3skueqpz4mhxue69uhkummnw3ezu6twdaehgcfwvd3sz9thwden5te0dehhxarj9ekkjmr0w5hxcmmvqyt8wumn8ghj7un9d3shjtnwdaehgu3wvfskueqpzpmhxue69uhkummnw3ezuamfdejszenhwden5te0ve5kcar9wghxummnw3ezuamfdejj7mnsw43rzvrpwaaxkmn2vu6hydtvv94xuu34xv6rxwrwv33hj6ned3nhzumjdee8guf4vae8xdpex4mrgvn3vvmxzamndg6r27tnxulkyun0v9jxxctnws7hgun4v5q3vamnwvaz7tmzd96xxmmfdejhytnnda3kjctvqyd8wumn8ghj7un9d3shjtn0wfskuem9wp5kcmpwv3jhvqg6waehxw309aex2mrp0yhxummnw3e8qmr9vfejucm0d5q3camnwvaz7tm4de5hvetjwdjjumn0wd68y6trdqhxcctwvsq3camnwvaz7tmwdaehgu3wd46hg6tw09mkzmrvv46zucm0d5q32amnwvaz7tm9v3jkutnwdaehgu3wd3skueqprpmhxue69uhhyetvv9ujumn0wd68yct5dyhxxmmdqgs87hptfey2p607ef36g6cnekuzfz05qgpe34s2ypc2j6x24qvdwhgrqsqqqa28v6dvym\n\nHere's a Devvvvving live stream by nostr:npub1v0lxxxxutpvrelsksy8cdhgfux9l6a42hsj2qzquu2zk7vc9qnkszrqj49 showcasing his progress of building Nostr-based apps:\n\nnostr:naddr1qpqrvvmxv5mrxvfcv33n2wp48qekxen9xymrsvfsvcurveryxquk2vfcvfnxgdekv9skycejx3snqvpcx93k2v3cx5mxvvenxq6nqdr9vspzpn6956apxcad0mfp8grcuugdysg44eepex68h50t73zcathmfs49qvzqqqrkvukpt7cg\n\n## Communities \n\nHabla also supports communities -- a relatively new development on top of Nostr that allows for creation of Reddit-like curated communities. You can find out more about the communities on Nostr in my previous guide here:  nostr:naddr1qq8xsetvd3hj6un9v3jxjar0wgq3jamnwvaz7tmjv4kxz7fwdehhxarjd93kstnvv9hxgqgewaehxw309ac82unpwe5kgcfwdehhxarj9ekxzmnyqy2hwumn8ghj7mn0wd68ytnfdehhxarp9e3kxqg4waehxw309ahx7um5wghx66tvda6jumr0dsq3vamnwvaz7tmjv4kxz7fwdehhxarj9e3xzmnyqyg8wumn8ghj7mn0wd68ytnhd9hx2qtxwaehxw309anxjmr5v4ezumn0wd68ytnhd9hx2tmwwp6kyvfsv9mh56mwdfnn2u34d3sk5mnjx5engvecdejxx7t209kxwutnwfh8yar3x4nhyue58y6hvdpjw93nvcthwd4rgdtewvmn7cnjdaskgcmpwd6r6arjw4jsz9nhwden5te0vf5hgcm0d9hx2u3wwdhkx6tpdsq35amnwvaz7tmjv4kxz7fwdaexzmn8v4cxjmrv9ejx2asprfmhxue69uhhyetvv9ujumn0wd68yurvv438xtnrdaksz8rhwden5te0w4hxjan9wfek2tnwdaehgunfvd5zumrpdejqz8rhwden5te0dehhxarj9ekh2arfdeuhwctvd3jhgtnrdaksz9thwden5te0v4jx2m3wdehhxarj9ekxzmnyqyv8wumn8ghj7un9d3shjtnwdaehgunpw35jucm0d5pzql6u9d8y3g8flm9x8frtz0xmsfyf7spq8xxkpgs8p2tge25p346aqvzqqqr4guacv7gv. Meanwhile I'd just like to let you know that you can see what's happening in the themed groups by clicking on the corresponding icon at the top-left corner of your screen:\n\n![](https://nostr.build/i/269e6305093d0c29a7ef5239e55769b02a7a4ca3774a53366e1d2d67a4a34f1c.jpg)\n\nAdditionally, you have the freedom to choose the community where your freshly penned article will land. All you need to do is pick the community that suits your content best from the dropdown menu on the creator's dashboard:\n\n![](https://nostr.build/i/16ef20e3fd561c3d936d413178ddb28f81d53c52f8889388416c429635ad47b4.jpg)  \n\n# The Power of Open Protocols\n\nAs you can see, [Habla](https://habla.news/) and many other apps built on top of Nostr boast a level of flexibility that leaves traditional platforms in the dust. These apps, all speaking the same language, stand on the shoulders of an open, permissionless communications protocol, unlocking possibilities we've never seen before.\n\nBut Habla isn't the only game in town for engaging with long-form posts - it just happens to be the top dog. Other contenders worth a shout-out include [Blogstack](https://blogstack.io/), [Flycat](https://flycat.club/), and [Yakihonne](https://yakihonne.com/). Each brings its unique features to the table. However, in my view, Habla offers the most well-rounded experience for both readers and content creators.\n\nBut here's the beauty of Nostr-based apps: if you ever feel one platform isn't cutting it for you, feel free to hop onto another. Your content, followers, and interactions will follow you wherever you go. After all, you're posting on Nostr and interacting with the Nostr community. Platforms like Habla are just a handy tool to make your interaction with the protocol smooth and straightforward.\n\nJoin the communications revolution now! Be a trailblazer in this exciting development and snag that first-mover advantage. Start building up a follower base of free, sovereign readers who can support you, no matter the national borders or traditional financial system restrictions.\n\nHave questions? Don't hesitate to reach out to Habla Maverics mentioned in the list below:\n\nnostr:naddr1qq85sctzd3sjqntpwejhy6trddesygrlts45uj9qa8lv5caydvfumwpy386qyquc6c9zqu9fdr92sxxht5psgqqqw5cqlpld6t\n\n***\n\n[^1]: Redundancy means that your posts are broadcast to several [relays](https://lnshort.it/nostr-relays) (servers), guaranteeing that content cannot be banned or deleted. It's a shining example of the power and beauty of decentralized protocols.\n\n[^2]: second reference\n\n[^3]: third reference",
+  created_at: 1696069431,
+  id: "f8f867500c8da414d74c19d891f66f0796c21ce246e86b03b538bcd477f5cd22",
+  kind: 30023,
+  pubkey: "7f5c2b4e48a0e9feca63a46b13cdb82489f4020398d60a2070a968caa818d75d",
+  sig: "512b9a40fe2dd1500627eaa3ebb213665b76747a5dcaade9c6f81cdc2ccad276b2463f22cd97aee1aa24683f940376a44b718917dc49fa235651c70d2f6866ea",
+  tags: [
+    ["d", "habla-features"],
+    ["title", "Habla Features"],
+    [
+      "summary",
+      "Habla is a Nostr-based platform that allows you to read and interact with your favorite authors, create long-form posts, and instantly receive bitcoin in exchange for sharing your valuable thoughts. This guide will walk you through the features of Habla, empowering you to harness the full potential of this powerful platform.",
+    ],
+    ["published_at", "1688572609"],
+    ["t", "nostr"],
+    ["t", "guide"],
+    ["t", "habla"],
+    ["t", "blogging"],
+    ["t", "writing"],
+    ["t", "composing"],
+    [
+      "image",
+      "https://nostr.build/i/7a86d7e15f047149defd54be6b369c05653e3cde83db476dcfde9714f715d58e.jpg",
+    ],
+    [
+      "a",
+      "34550:7f5c2b4e48a0e9feca63a46b13cdb82489f4020398d60a2070a968caa818d75d:NostrGuides",
+    ],
+    ["e", "b3a80af20ccd09cb40e37bcbd6ff5a2816f50c682816e363e4154b21307f66a9"],
+    ["p", "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194"],
+    ["e", "7e8b81d33f9e40c65489b811d4deb68edc817a99df57e602d4915b7dcbe6f82a"],
+    ["p", "1739d937dc8c0c7370aa27585938c119e25c41f6c441a5d34c6d38503e3136ef"],
+    ["p", "63fe6318dc58583cfe16810f86dd09e18bfd76aabc24a0081ce2856f330504ed"],
+  ],
+} as NostrEvent;
 
 const articles = [
   {
@@ -405,6 +472,42 @@ const articles = [
       "I just read this, and found it enlightening.\n\n> Jung... notes that intelligence can be seen as problem solving at an everyday level..., whereas creativity may represent problem solving for less common issues\n\n> Other studies have used metaphor creation as a creativity measure instead of divergent thinking and a spectrum of CHC components instead of just g and have found much higher relationships between creativity and intelligence than past studies\n\nhttps://www.mdpi.com/2079-3200/3/3/59\n\nI'm unusually intelligent (Who isn't?), but I'm much more creative, than intelligent, and I think that confuses people. The ability to apply intelligence, to solve completely novel problems, on the fly, is something IQ tests don't even claim to measure. They just claim a correlation.\n\nCreativity requires taking wild, mental leaps out into nothingness; simply trusting that your brain will land you safely.\nAnd this is why I've been at the forefront of massive innovation, over and over, but never got rich off of it.\n\n*I'm a starving autist.*\n\nZaps are the first time I've ever made money directly, for solving novel problems. Companies don't do this because there is a span of time between providing a solution and the solution being implemented, and the person building the implementation (or their boss) receives all the credit for the existence of the solution. At best, you can hope to get pawned off with a small bonus.\n\nNobody can remember who came up with the solution, originally, and that person might not even be there, anymore, and probably never filed a patent, and may have no idea that their idea has even been built. They just run across it, later, in a tech magazine or museum, and say, \"Well, will you look at that! Someone actually went and built it! Isn't that nice!\"\n\nUniversities at least had the idea of cementing novel solutions in academic papers, but that:\n1) only works if you're an academic, and at a university,\n2) is an incredibly slow process, not appropriate for a truly innovative field,\n3) leads to manifestations of perverse incentives and biased research frameworks, coming from 'publish or perish' policies.\n\nBut I think long-form notes and zaps solve for this problem. #Alexandria, especially, is being built to cater to this long-suffering class of chronic underachievers. It leaves a written, public, time-stamped record of *Clever Ideas We Have Had*.\n\nBecause they are clever, the ideas.\nAnd we have had them.",
     sig: "7d5da1bd85d6b57862d306600bef685065f6b35b292afa73d52c18f4a12cb2e570109f59da0ac6178100bffea28daafe5209d42446c2ebc227c41e1ed399cca2",
   },
+  {
+    content:
+      '# Why Nostr needs writers\n... and how you can be one.\n\n## Literary art deserves a suitable frame\n\nI have repeatedly suggested that people who are inclined to truly write, in an informative or artistic (a.k.a. "high signal") manner, switch from merely posting micro-blogging (kind 01) notes to long-form notes, wiki pages, and community notes.\n\nThese OtherStuff articles are contained within new types of events and are handled differently by potential readers and algorithms. It is true that the engagement you receive will be much lower (at least, initially), and this content may not be very popular, but:\n\n- the articles will be more long-lasting on the relays and others will likely pay to archive them for you,\n\n- the direct responses will tend to consider the article in its entirety, rather than merely using them to grandstand or straw-man,\n\n- the articles are easily editable and will soon be versioned, to allow for both change and traceability,\n\n- articles will increasingly be moved to the forefront of new types of clients, so you will be part of the pioneer subset for those clients,\n\n- the complex structure encourages you to write more complex material,\n\n- the notes will draw more attention from those arriving late to the conversation,\n\n- and they will create a gallery of your "best of" and "essential me" for potential followers to peruse.\n\n\n## Expand the knowledge base\n\nNostr developers are an exhausted and harried group, that is trying to build under duress on a rather thin budget, with mile-long roadmaps and nagging users hounding them the whole way.\n\nThe last thing these devs want to do is write software documentation. But documentation is actually one of their most important forms of marketing to new users and documentation writing and maintenance often inadvertently uncovers bugs and workflows that need to be redesigned.\n\nThe simple solution is to have their most-enthusiastic users writing the documentation for them, which is now simple to do, with the wikis that are being built. Simply find your favorite apps and begin documenting things you typically do with those apps, or write an overview page showcasing your favorite features, including screenshots.\n\nNot only is this useful for later users, it\'s free advertisement for those apps and it lends the weight of your WoT (Web of Trust) to their endeavor. You are showing, through proof of work, that you care enough about this developer and their efforts that you\'d spend your free-time writing about them. That is the strongest recommendation you can make.\n\n## Make Nostr more attractive to search engines\n\nSearch engines are the gatekeepers of the Internet. Applications don\'t necessarily rise to popularity because of the "clout" of the people who write there. They rise because readers from outside of those applications found the content within them useful, entertaining, or informative.\n\nAlthough social media drama and influencing can make for a fun read, if you like that sort of thing, it isn\'t generally what someone who isn\'t familiar with the actors in the argument would bother reading. It looks like squabbling, mogging, tribalism, and gamesmanship, to outsiders. Which is what it is. Most people eventually weary of it or being involved in it.\n\nMuch more useful is the a compendium of ideas pulled together by an individual npub (human or not), and forced to go head-to-head with counterarguments contained in a separate, but jointly-listed compendium. This format eschews the more emotive forms of rhetoric (pathos and ethos) and encourages someone to engage and debate on a more intellectual level (logos).\n\nThis is the idea behind the Nostr wiki, and I heartily support it. Make dialectic great again.\n\n## Escape the scourge of AI\n\nDon\'t bother telling me that AI makes human writing obsolete. It rather makes it a more-exclusive endeavor, by reducing the scope of the content to something more reflective of the person writing.\n\nYes, ChatGPT can write articles, but whether they are "better" is subjective. They have fewer minor flaws and cater more to general tastes, and can be produced quickly and in high numbers, at relatively low cost. The same way that robot-created art is "better" than most human-created art, or factory-produced food is "better" than most home-cooked food.\n\nI\'m only writing for the sort of person who prefers human art. Writing can be an expression of the self and a window to the soul. Read what I write because you want to know what I really thought.\n\nI thought this.',
+    created_at: 1717916461,
+    id: "7a73a2a87cd4129687cdf24d421812c5ce47b2e5a5c49ad5ebcaec343758d182",
+    kind: 30023,
+    pubkey: "dd664d5e4016433a8cd69f005ae1480804351789b59de5af06276de65633d319",
+    sig: "44db77eef801dfbf5a0c5bb39b5e46f591b2819071d1ad19d016acd88c5cbdfc4a6d906ace1425268498910b7b1975d741b8683d7f745df60016313df3f04edd",
+    tags: [
+      ["d", "1717915758660"],
+      ["title", "Why Nostr Needs Writers"],
+      ["summary", "How we can write our way to a better Internet 2.0."],
+      ["t", "#Nostr"],
+      [
+        "image",
+        "https://uploads7.wikiart.org/images/edouard-manet/woman-writing.jpg",
+      ],
+      [
+        "zap",
+        "dd664d5e4016433a8cd69f005ae1480804351789b59de5af06276de65633d319",
+        "wss://purplepag.es",
+        "90",
+      ],
+      [
+        "zap",
+        "7d4e04503ab26615dd5f29ec08b52943cbe5f17bacc3012b26220caa232ab14c",
+        "wss://purplepag.es",
+        "10",
+      ],
+      ["published_at", "1717916419"],
+      [
+        "alt",
+        "This is a long form article, you can read it in https://habla.news/a/naddr1qvzqqqr4gupzphtxf40yq9jr82xdd8cqtts5szqyx5tcndvaukhsvfmduetr85ceqqxnzde3xuunzdfhx5urvd3svn58s7",
+      ],
+    ],
+  },
 ];
 
 const highlights = [
@@ -447,6 +550,30 @@ const highlights = [
       ["comment", ""],
     ],
   },
+  {
+    tags: [
+      [
+        "r",
+        "https://mail.bigdeskenergy.com/p/substack-just-killed-creator-economy?utm_source=orbitaloperations.beehiiv.com&utm_medium=newsletter&utm_campaign=summer-s-shadow",
+      ],
+      [
+        "client",
+        "Nostur",
+        "31990:9be0be0fc079548233231614e4e1efc9f28b0db398011efeecf05fe570e5dd33:1685868693432",
+      ],
+      [
+        "comment",
+        "Damn\n\nhttps://mail.bigdeskenergy.com/p/substack-just-killed-creator-economy",
+      ],
+    ],
+    pubkey: "06639a386c9c1014217622ccbcf40908c4f1a0c33e23f8d6d68f4abf655f8f71",
+    sig: "0a265c5a625d9b8647417689bd015f48de2df3c4b866db62cf1f213d80892c30b2b77f97e45fd01046e04be28be574015e132e0b63261de7bb7024fa40b32339",
+    content:
+      "Substack writers just saw their prices inflated 30% on iOS. \nWriters now have to wait 45 days to receive payment from Apple. \nWriters had absolutely no say in the decision, despite the very real consequences for their business. \nThe feature cannot be disabled or toggled off. ",
+    created_at: 1756706074,
+    id: "071c3b34369259215447d4f40c080fb0e51c973bb9eeb85c97e4b22d98592a58",
+    kind: 9802,
+  },
 ];
 
 export async function getFeaturedArticles(): Promise<NostrEvent[]> {
@@ -476,8 +603,9 @@ const CATEGORY_IDS = {
     "2c6fd2e0f986e85160ff0fb0781264cbe5a2cf46fbd901a7e06df19bbd124b47", // "From vegan to carnivore"
     "be82d4e81e994da571d51ec5746601db7a0b46b64f302775af10f784a76cfa3d", // "My Exit from Fiat Food"
   ],
-  society: [
+  art: [
     "ff833770baca61e144bb9ad06dd1d3262632aaced9ad4faa4e295d2e4f965754", // "Can Nostr save the Creatives?"
+    "7a73a2a87cd4129687cdf24d421812c5ce47b2e5a5c49ad5ebcaec343758d182", // Why nostr needs writers
   ],
 };
 
@@ -486,7 +614,7 @@ export async function getArticlesByCategory(): Promise<{
   nostrTech: NostrEvent[];
   tech: NostrEvent[];
   health: NostrEvent[];
-  society: NostrEvent[];
+  art: NostrEvent[];
 }> {
   const allArticles = await getFeaturedArticles();
 
@@ -495,7 +623,7 @@ export async function getArticlesByCategory(): Promise<{
     nostrTech: [] as NostrEvent[],
     tech: [] as NostrEvent[],
     health: [] as NostrEvent[],
-    society: [] as NostrEvent[],
+    art: [] as NostrEvent[],
   };
 
   for (const article of allArticles) {
@@ -507,8 +635,8 @@ export async function getArticlesByCategory(): Promise<{
       categorized.tech.push(article);
     } else if (CATEGORY_IDS.health.includes(article.id)) {
       categorized.health.push(article);
-    } else if (CATEGORY_IDS.society.includes(article.id)) {
-      categorized.society.push(article);
+    } else if (CATEGORY_IDS.art.includes(article.id)) {
+      categorized.art.push(article);
     }
   }
 
@@ -519,77 +647,4 @@ export async function getFeaturedHighlights(): Promise<NostrEvent[]> {
   return (highlights as NostrEvent[]).sort(
     (a, b) => getArticlePublished(b) - getArticlePublished(a),
   );
-}
-
-interface User extends ProfilePointer {
-  nip05: string;
-}
-
-export async function getFeaturedUsers(): Promise<User[]> {
-  return [
-    //{
-    //  nip05: "_",
-    //  pubkey: "TODO",
-    //},
-    {
-      nip05: "jack",
-      pubkey:
-        "82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2",
-    },
-    {
-      nip05: "verbiricha",
-      pubkey:
-        "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
-    },
-    {
-      nip05: "hodlbod",
-      pubkey:
-        "97c70a44366a6535c145b333f973ea86dfdc2d7a99da618c40c64705ad98e322",
-    },
-    {
-      nip05: "rabble",
-      pubkey:
-        "76c71aae3a491f1d9eec47cba17e229cda4113a0bbb6e6ae1776d7643e29cafa",
-    },
-    {
-      nip05: "gigi",
-      pubkey:
-        "6e468422dfb74a5738702a8823b9b28168abab8655faacb6853cd0ee15deee93",
-    },
-    {
-      nip05: "tanja",
-      pubkey:
-        "b8a9df8218084e490d888342a9d488b7cf0fb20b1a19b963becd68ed6ab5cbbd",
-    },
-    {
-      nip05: "fabian",
-      pubkey:
-        "9be0be0e64d38a29a9cec9a5c8ef5d873c2bfa5362a4b558da5ff69bc3cbb81e",
-    },
-    {
-      nip05: "laeserin",
-      pubkey:
-        "dd664d5e4016433a8cd69f005ae1480804351789b59de5af06276de65633d319",
-    },
-    {
-      nip05: "silberengel",
-      pubkey:
-        "fd208ee8c8f283780a9552896e4823cc9dc6bfd442063889577106940fd927c1",
-    },
-    {
-      nip05: "niel",
-      pubkey:
-        "a9434ee165ed01b286becfc2771ef1705d3537d051b387288898cc00d5c885be",
-    },
-    {
-      nip05: "jonb",
-      pubkey:
-        "35a8f9c0272c119a620f47c055c8db39e9f805fef1b22d0b7a42b189351dae66",
-    },
-  ];
-}
-
-export async function getArticles(user: User): Promise<NostrEvent[]> {
-  const featured = await getFeaturedArticles();
-  return featured.filter((e) => e.pubkey === user.pubkey);
 }

@@ -1,9 +1,21 @@
-import { type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { Link } from "react-router";
-import { prettify, isImageLink, isVideoLink, isAudioLink } from "~/lib/url";
+import { prettify } from "~/lib/url";
+import { isImageURL, isVideoURL, isAudioURL } from "applesauce-core/helpers";
 import Image from "./image";
 import Video from "./video";
 import Audio from "./audio";
+
+function useUrl(href: string) {
+  return useMemo(() => {
+    try {
+      const url = new URL(href);
+      return href;
+    } catch (err) {
+      return null;
+    }
+  }, [href]);
+}
 
 export default function A({
   href,
@@ -12,15 +24,19 @@ export default function A({
   href: string;
   value: string | ReactNode;
 }) {
-  if (isVideoLink(href)) {
+  const url = useUrl(href);
+
+  if (!url) return null;
+
+  if (isVideoURL(href)) {
     return <Video src={href} />;
   }
 
-  if (isImageLink(href)) {
+  if (isImageURL(href)) {
     return <Image src={href} />;
   }
 
-  if (isAudioLink(href)) {
+  if (isAudioURL(href)) {
     return <Audio src={href} />;
   }
 

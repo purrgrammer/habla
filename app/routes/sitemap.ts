@@ -1,6 +1,6 @@
-import type { Route } from "./+types/sitemap[.]xml";
-import { getFeaturedUsers, getArticles } from "~/featured";
-import { getTagValue } from "applesauce-core/helpers";
+import type { Route } from "./+types/sitemap";
+import { getMembers, getArticles } from "~/services/data.server";
+import { getArticlePublished, getTagValue } from "applesauce-core/helpers";
 
 // Generate sitemap XML with proper structure and SEO metadata
 export async function loader({ request }: Route.LoaderArgs) {
@@ -8,7 +8,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const lastModified = new Date().toISOString();
 
   // Get all featured users and their articles
-  const users = await getFeaturedUsers();
+  const users = await getMembers();
   const urls: Array<{
     url: string;
     lastmod: string;
@@ -37,9 +37,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     const articles = await getArticles(user);
     for (const article of articles) {
       const identifier = getTagValue(article, "d");
-      const publishedAt = getTagValue(article, "published_at");
+      const publishedAt = getArticlePublished(article);
       const articleLastMod = publishedAt
-        ? new Date(parseInt(publishedAt) * 1000).toISOString()
+        ? new Date(publishedAt * 1000).toISOString()
         : lastModified;
 
       urls.push({

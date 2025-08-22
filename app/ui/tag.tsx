@@ -1,9 +1,34 @@
-//import { Link } from "react-router";
 import { cn } from "~/lib/utils";
 import { Badge } from "./badge";
+import { HashtagLink } from "./hashtag";
 
-export default function Tag({ tag }: { tag: string }) {
-  return <Badge variant="tag">{tag}</Badge>;
+// TODO: Color
+
+// Size
+
+const sizeClasses = {
+  sm: "text-xs",
+  md: "text-sm",
+  lg: "text-base",
+  xl: "text-lg",
+};
+
+export default function Tag({
+  tag,
+  className,
+  size = "md",
+}: {
+  tag: string;
+  className?: string;
+  size?: "sm" | "md" | "lg" | "xl";
+}) {
+  return (
+    <HashtagLink className={className} hashtag={tag}>
+      <Badge variant="tag" className={sizeClasses[size]}>
+        {tag}
+      </Badge>
+    </HashtagLink>
+  );
 }
 
 export function Tags({

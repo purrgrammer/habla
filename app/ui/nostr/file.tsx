@@ -1,20 +1,20 @@
 import { Link } from "react-router";
 import { type NostrEvent } from "nostr-tools";
 import { getTagValue } from "applesauce-core/helpers";
-import { isImageLink, isVideoLink, isAudioLink } from "~/lib/url";
+import { isImageURL, isVideoURL, isAudioURL } from "applesauce-core/helpers";
 import RichText from "./rich-text";
 import Image from "~/ui/image";
 import Video from "../video";
 import Audio from "../audio";
 
 function FileContent({ link }: { link: string }) {
-  if (isImageLink(link)) {
+  if (isImageURL(link)) {
     return <Image src={link} className="my-0" />;
   }
-  if (isVideoLink(link)) {
+  if (isVideoURL(link)) {
     return <Video src={link} className="my-0" />;
   }
-  if (isAudioLink(link)) {
+  if (isAudioURL(link)) {
     return <Audio src={link} />;
   }
   return (

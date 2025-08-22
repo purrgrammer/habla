@@ -33,12 +33,10 @@ import {
   DropdownMenuTrigger,
 } from "~/ui/dropdown-menu";
 import { useProfile, useRelays, useTimeline } from "~/hooks/nostr.client";
-import { profileLoader, addressLoader } from "~/services/loaders.client";
-import User from "~/ui/nostr/user";
+import { profileLoader } from "~/services/loaders.client";
 import { Button } from "~/ui/button";
 import { useTheme } from "~/ui/theme-provider.client";
-import { getArticlePublished, getArticleTitle } from "applesauce-core/helpers";
-import Timestamp from "./timestamp";
+import { getArticleTitle } from "applesauce-core/helpers";
 
 // TODO: drafts
 
@@ -106,7 +104,6 @@ function LoggedInUser({
         */}
       <Button
         disabled
-        //disabled={!canPublish}
         aria-label="Publish"
         variant="default"
         size="sm"
@@ -118,7 +115,7 @@ function LoggedInUser({
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button aria-label="Menu" variant="ghost" size="sm">
+          <Button aria-label="Menu" variant="ghost" size="sm" disabled>
             <Menu />
             Menu
           </Button>

@@ -67,6 +67,7 @@ export default function PureNip05({
   isVerified,
   className = "text-sm",
 }: PureNip05Props) {
+  const isSupporter = true;
   const [username, domain] = nip05.includes("@")
     ? nip05.split("@")
     : ["_", nip05];

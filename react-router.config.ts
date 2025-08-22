@@ -1,7 +1,6 @@
 import { vercelPreset } from "@vercel/react-router/vite";
 import type { Config } from "@react-router/dev/config";
-import { getFeaturedUsers, getArticles } from "./app/featured";
-//import { fetchArticles, fetchRelays } from "./app/services/nostr.server";
+import { getMembers, getArticles } from "./app/services/data.server";
 import { getTagValue } from "applesauce-core/helpers";
 
 export default {
@@ -9,10 +8,9 @@ export default {
   presets: [vercelPreset()],
   async prerender() {
     let result = ["/", "/sitemap.xml", "/.well-known/nostr.json"];
-    const users = await getFeaturedUsers();
+    const users = await getMembers();
     for (const user of users) {
       result.push(`${user.nip05}`);
-      //const relays = await fetchRelays(user.pubkey)
       const articles = await getArticles(user);
       for (const article of articles) {
         result.push(`/${user.nip05}/${getTagValue(article, "d")}`);

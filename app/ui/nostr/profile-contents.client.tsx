@@ -1,6 +1,12 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Server, Newspaper, Highlighter, CircleSlash2 } from "lucide-react";
+import {
+  Server,
+  Newspaper,
+  Highlighter,
+  CircleSlash2,
+  HandHeart,
+} from "lucide-react";
 import { kinds, type NostrEvent, type Filter } from "nostr-tools";
 import {
   getArticlePublished,
@@ -16,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/ui/tabs";
 import { BOOK } from "~/const";
 import RelayLink from "./relay-link.client";
 import Feed, { type FeedComponent } from "~/ui/nostr/feed.client";
+//import ZapLeaderboard from "../zap-leaderboard.client";
 
 const components: Record<number, FeedComponent> = {
   [kinds.Highlights]: ({ event, profile }) => {
@@ -107,15 +114,21 @@ export default function ProfileContents({
       <TabsList className="my-4 w-full">
         <TabsTrigger value="articles">
           <Newspaper className={icon} />
-          Articles
+          <span className="hidden sm:block">Articles</span>
         </TabsTrigger>
         <TabsTrigger value="highlights">
           <Highlighter className={icon} />
-          Highlights
+          <span className="hidden sm:block">Highlights</span>
         </TabsTrigger>
+        {/*
+        <TabsTrigger value="supporters">
+          <HandHeart className={icon} />
+          <span className="hidden sm:block">Supporters</span>
+        </TabsTrigger>
+        */}
         <TabsTrigger value="relays">
           <Server className={icon} />
-          Relays
+          <span className="hidden sm:block">Relays</span>
         </TabsTrigger>
         {/*
         <TabsTrigger value="books">
@@ -171,6 +184,11 @@ export default function ProfileContents({
       <TabsContent value="relays">
         <Relays relays={relays} />
       </TabsContent>
+      {/*
+      <TabsContent value="supporters">
+        <ZapLeaderboard pubkey={pubkey} />
+      </TabsContent>
+      */}
     </Tabs>
   );
 }

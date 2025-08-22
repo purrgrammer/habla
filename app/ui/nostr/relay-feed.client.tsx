@@ -10,6 +10,7 @@ import { getTagValue, isSafeRelayURL } from "applesauce-core/helpers";
 import NostrCard from "./card";
 import { useRelayInfo } from "~/nostr/queries";
 import Banner from "../banner";
+import ComingSoon from "../coming-soon";
 
 const components: Record<number, FeedComponent> = {
   [kinds.Highlights]: ({ event, profile }) => {
@@ -58,12 +59,17 @@ function UnsafeRelayFeed({ relay }: { relay: string }) {
 function SafeRelayFeed({ relay }: { relay: string }) {
   const { data: info } = useRelayInfo(relay);
   const [values, setValues] = useState(["articles", "highlights"]);
-  const filters = {
-    kinds: [
-      ...(values.includes("articles") ? [kinds.LongFormArticle] : []),
-      ...(values.includes("highlights") ? [kinds.Highlights] : []),
-    ],
-  };
+  const filters =
+    values.length === 0
+      ? {
+          kinds: [kinds.LongFormArticle, kinds.Highlights],
+        }
+      : {
+          kinds: [
+            ...(values.includes("articles") ? [kinds.LongFormArticle] : []),
+            ...(values.includes("highlights") ? [kinds.Highlights] : []),
+          ],
+        };
 
   function onValueChange(newValues: string[]) {
     setValues(newValues);
@@ -95,24 +101,14 @@ function SafeRelayFeed({ relay }: { relay: string }) {
           Highlights
         </ToggleGroupItem>
       </ToggleGroup>
-      {values.length === 0 ? (
-        <div className="w-full flex items-center justify-center p-12">
-          <div>
-            <p className="text-md text-muted-foreground">
-              Try selecting content types to see something here.
-            </p>
-          </div>
-        </div>
-      ) : (
-        <Feed
-          showSeparator
-          id={values.join("-")}
-          relays={[relay]}
-          filters={filters}
-          components={components}
-          className="border rounded-sm gap-0 grid-cols-1 md:grid-cols-1 md:gap-0"
-        />
-      )}
+      <Feed
+        showSeparator
+        id={values.join("-")}
+        relays={[relay]}
+        filters={filters}
+        components={components}
+        className="border rounded-sm gap-0 grid-cols-1 md:grid-cols-1 md:gap-0"
+      />
     </div>
   );
 }

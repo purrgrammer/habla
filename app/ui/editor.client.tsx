@@ -42,6 +42,7 @@ import type {
   AddressPointer,
   ProfilePointer,
 } from "nostr-tools/nip19";
+import ComingSoon from "./coming-soon";
 
 type TextValue = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | undefined;
 
@@ -372,6 +373,8 @@ export default () => {
         onLoad={onLoad}
         onSaveDraft={onSaveDraft}
       />
+      <ComingSoon />
+      {/*
       <div className="w-full flex flex-col gap-1 p-2">
         <div className="">
           <Input
@@ -402,6 +405,7 @@ export default () => {
           <EditorContent className="prose min-h-64" editor={editor} />
         </div>
       </div>
+      */}
     </>
   );
 };

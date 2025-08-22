@@ -58,6 +58,7 @@ This is a **Nostr-based social media application** built with React Router v7. N
 
 - `nostr.ts/client.ts/server.ts` - Main Nostr protocol interactions
 - `loaders.client.ts/server.ts` - Data loading utilities for profiles, events, articles
+- `data.client.ts/server.ts` - Data fetching API with caching for server and client
 - `relay-pool.ts` - WebSocket connection management to Nostr relays
 - `event-store.ts` - Local event caching and management
 

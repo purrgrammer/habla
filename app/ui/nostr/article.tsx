@@ -14,6 +14,8 @@ import Timestamp from "~/ui/timestamp";
 import Blockquote from "../blockquote";
 import ArticleConversation from "./article-conversation.client";
 import ClientOnly from "../client-only";
+import type { Relay } from "~/types";
+import { TagCloud } from "../tag-cloud";
 
 function Author({
   author,
@@ -26,7 +28,7 @@ function Author({
   return (
     <div className="flex flex-row items-center gap-2 sm:gap-4 justify-between select-none w-full">
       <UserLink
-        className="hover:underline"
+        wrapper=""
         name="text-lg sm:text-xl"
         img="size-10 xsm:size-12 flex-shrink-0"
         pubkey={article.pubkey}
@@ -61,7 +63,7 @@ export function PureArticle({
           className="w-full max-h-[320px] rounded-sm object-cover"
         />
       ) : null}
-      <h1 className="font-sans font-normal text-3xl sm:text-4xl lg:text-5xl text-balance mb-4">
+      <h1 className="font-sans font-normal text-4xl text-balance mb-4">
         {title}
       </h1>
       {summary ? (
@@ -70,7 +72,7 @@ export function PureArticle({
           text={summary}
         />
       ) : null}
-      <article className="prose pb-8">
+      <article className="prose pb-4">
         <Markdown>{content}</Markdown>
       </article>
     </div>
@@ -81,11 +83,15 @@ export default function Article(props: {
   author?: ProfileContent;
   event: NostrEvent;
   address: AddressPointer;
+  relays: Relay[];
 }) {
   const { author, event } = props;
   const title = getArticleTitle(event);
   const image = getArticleImage(event);
   const summary = getArticleSummary(event);
+  const tags = [
+    ...new Set(event.tags.filter((t) => t[0] === "t" && t[1]).map((t) => t[1])),
+  ];
   return (
     <div className="flex flex-col gap-4 sm:gap-6 w-full">
       <Author article={event} author={author} />
@@ -95,6 +101,13 @@ export default function Article(props: {
         image={image}
         content={event.content}
       />
+      <div className="pb-6">
+        <TagCloud
+          tags={tags.reduce((acc, t) => {
+            return { ...acc, [t]: 1 };
+          }, {})}
+        />
+      </div>
       <ClientOnly>{() => <ArticleConversation {...props} />}</ClientOnly>
     </div>
   );

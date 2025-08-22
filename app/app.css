@@ -145,6 +145,14 @@ body {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+  mark {
+    @apply bg-orange-200;
+  }
+  .dark {
+    mark {
+      @apply bg-orange-100 text-background;
+    }
+  }
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
@@ -166,7 +174,7 @@ body {
   @apply font-serif text-lg leading-relaxed;
 }
 
-.prose blockquote {
+.prose > blockquote {
   @apply font-serif text-lg border-l-4 border-muted pl-4 py-2 italic text-muted-foreground my-6;
 }
 
@@ -206,6 +214,10 @@ body {
   @apply font-serif text-lg leading-relaxed mb-6 outline-none;
 }
 
+.prose > blockquote > p {
+  @apply mb-0;
+}
+
 .prose ul {
   @apply font-serif text-lg list-disc list-outside mb-6 ml-6 space-y-2;
 }
@@ -239,6 +251,10 @@ body {
 }
 
 .prose > img {
+  @apply w-full rounded my-6;
+}
+
+.prose > p > img {
   @apply w-full rounded my-6;
 }
 

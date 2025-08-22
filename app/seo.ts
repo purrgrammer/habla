@@ -1,4 +1,4 @@
-import { type NostrEvent } from "nostr-tools";
+import { kinds, type NostrEvent } from "nostr-tools";
 import {
   type ProfileContent,
   getDisplayName,
@@ -30,13 +30,15 @@ interface SeoOptions {
   siteName?: string;
 }
 
-const DEFAULT_SITE_NAME = "Habla";
-const DEFAULT_IMAGE = "https://habla.news/family.png";
+export const DEFAULT_SITE_NAME = "Habla";
+export const DEFAULT_SITE_DESCRIPTION =
+  "Read, Highlight, Write, Bookmark, Earn";
+export const DEFAULT_IMAGE = "https://habla.news/family.png";
 
-function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
+export function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
   const {
     title,
-    description,
+    description = DEFAULT_SITE_DESCRIPTION,
     image = DEFAULT_IMAGE,
     url,
     type = "website",
@@ -64,8 +66,6 @@ function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
       content: image ? "summary_large_image" : "summary",
     },
     { name: "twitter:title", content: title },
-    { name: "twitter:site", content: "@habla_news" },
-    { name: "twitter:creator", content: "@habla_news" },
   ];
 
   if (description) {
@@ -102,19 +102,19 @@ const ESSENTIAL = [
   { name: "color-scheme", content: "light dark" },
   { name: "robots", content: "index, follow" },
   { name: "language", content: "en" },
-]
+];
 
 export default [
   { title: DEFAULT_SITE_NAME },
-  { name: "description", content: "read, highlight, write, earn" },
+  { name: "description", content: DEFAULT_SITE_DESCRIPTION },
 
   // Essential meta tags
   ...ESSENTIAL,
-  { name: "author", content: "Habla" },
+  //{ name: "author", content: "Habla" },
 
   // Open Graph tags
   { property: "og:title", content: DEFAULT_SITE_NAME },
-  { property: "og:description", content: "read, highlight, write, earn" },
+  { property: "og:description", content: DEFAULT_SITE_DESCRIPTION },
   { property: "og:type", content: "website" },
   { property: "og:site_name", content: DEFAULT_SITE_NAME },
   { property: "og:image", content: DEFAULT_IMAGE },
@@ -123,7 +123,7 @@ export default [
   // Twitter Cards
   { name: "twitter:card", content: "summary_large_image" },
   { name: "twitter:title", content: DEFAULT_SITE_NAME },
-  { name: "twitter:description", content: "read, highlight, write, earn" },
+  { name: "twitter:description", content: DEFAULT_SITE_DESCRIPTION },
   { name: "twitter:image", content: DEFAULT_IMAGE },
 ];
 
@@ -153,6 +153,7 @@ export function articleMeta(
   const title = `${getArticleTitle(event)} - ${getDisplayName(author)}`;
   const description = getArticleSummary(event);
   const image = getArticleImage(event);
+  // todo: author URL
   const publishedTimeRaw = getArticlePublished(event);
   const publishedTime = publishedTimeRaw
     ? new Date(parseInt(publishedTimeRaw.toString()) * 1000).toISOString()
@@ -191,5 +192,32 @@ export function tagMeta(tag: string, url?: string) {
     description,
     url,
     type: "website",
+  });
+}
+
+const eventKinds: Record<number, any> = {
+  [kinds.ShortTextNote]: {
+    title: "Note",
+  },
+  [kinds.Highlights]: {
+    title: "Highlight",
+  },
+};
+
+export function eventMeta(
+  event: NostrEvent,
+  profile: ProfileContent,
+  url?: string,
+) {
+  const { title } = eventKinds[event.kind] || { title: `Kind ${event.kind}` };
+  const name = getDisplayName(profile);
+  const image = getProfilePicture(profile);
+
+  return buildBaseSeoTags({
+    title: `${title} by ${name}`,
+    description: event.content, // TODO: trim?
+    image,
+    url,
+    //type: ""
   });
 }

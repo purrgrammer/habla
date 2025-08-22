@@ -1,6 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryProfile } from "nostr-tools/nip05";
 import { fetchRelayInformation } from "nostr-tools/nip11";
+import { getUsers } from "~/lib/api.client";
+
+export function useUsers() {
+  return useQuery({
+    queryKey: ["users"],
+    queryFn: () => getUsers(),
+    refetchOnMount: false,
+    retryOnMount: true,
+  });
+}
 
 export function useRelayInfo(relay: string) {
   return useQuery({

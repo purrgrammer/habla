@@ -1,3 +1,7 @@
+DESIGN.md
+.env.local
+.env.prod
+
 .DS_Store
 .vercel
 /node_modules/

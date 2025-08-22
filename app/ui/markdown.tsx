@@ -1,6 +1,5 @@
 import { type ReactNode } from "react";
 import { kinds, nip19 } from "nostr-tools";
-import { Link } from "react-router";
 import { remarkNostrMentions } from "applesauce-content/markdown";
 import {
   default as ReactMarkdown,
@@ -83,6 +82,9 @@ function urlTransform(url: string) {
   if (url.startsWith("nostr:")) return url;
   return defaultUrlTransform(url);
 }
+
+// TODO: hashtags
+// TODO: image styles
 
 export default function Markdown({ children }: { children: string }) {
   return (

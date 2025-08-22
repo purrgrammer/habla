@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { type NostrEvent } from "nostr-tools";
 import { Card, CardContent, CardHeader, CardFooter } from "~/ui/card";
-import { getSeenRelays } from "applesauce-core/helpers";
+import { getSeenRelays, type ProfileContent } from "applesauce-core/helpers";
 import { Server } from "lucide-react";
 import UserLink from "~/ui/nostr/user-link";
 import Timestamp from "~/ui/timestamp";
@@ -57,19 +57,22 @@ export default function NostrCard({
   children,
   className,
   noFooter,
+  profile,
 }: {
   event: NostrEvent;
   children: ReactNode;
   className?: string;
   noFooter?: boolean;
+  profile?: ProfileContent;
 }) {
   const relays = getSeenRelays(event);
   return (
-    <Card className={cn("gap-2 p-2 rounded-sm gap-1", className)}>
+    <Card className={cn("gap-2 p-2 rounded-sm gap-1 w-full", className)}>
       <CardHeader className="py-1 px-2 flex flex-row items-center justify-between gap-2">
         <UserLink
           withNip05
           pubkey={event.pubkey}
+          profile={profile}
           img="size-12 mr-2"
           name="font-sans text-xl"
         />
@@ -78,7 +81,7 @@ export default function NostrCard({
         </span>
       </CardHeader>
 
-      <CardContent className="font-sans text-md p-2">{children}</CardContent>
+      <CardContent className="font-sans text-md px-2">{children}</CardContent>
       {noFooter ? null : (
         <CardFooter className="px-2 pt-0 pb-1 flex justify-end">
           {relays ? (

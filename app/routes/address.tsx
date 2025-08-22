@@ -1,92 +1,56 @@
 import type { Route } from "./+types/address";
 import { kinds, nip19 } from "nostr-tools";
-import { firstValueFrom } from "rxjs";
-import {
-  addressLoader as clientAddressLoader,
-  profileLoader as clientProfileLoader,
-} from "~/services/loaders.client";
-import {
-  addressLoader as serverAddressLoader,
-  profileLoader as serverProfileLoader,
-} from "~/services/loaders.server";
+import { default as clientStore } from "~/services/data.client";
+import { default as serverStore } from "~/services/data.server";
 import Article from "~/ui/nostr/article";
-import ArticleConversation from "~/ui/nostr/article-conversation.client";
-import {
-  getArticleTitle,
-  getArticleSummary,
-  getArticleImage,
-  getArticlePublished,
-  getDisplayName,
-  getProfileContent,
-} from "applesauce-core/helpers";
-import defaults from "~/seo";
-import ClientOnly from "~/ui/client-only";
+import defaults, { articleMeta } from "~/seo";
+import type { DataStore } from "~/services/types";
+import Debug from "~/ui/debug";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData) return defaults;
   const { event, author } = loaderData;
-  const title = `${getArticleTitle(event)} - ${getDisplayName(author)}`;
-  const description = getArticleSummary(event);
-  const image = getArticleImage(event);
-  const publishedAt = getArticlePublished(event);
-
-  return [
-    { title },
-    { name: "og:title", content: title },
-    { name: "og:type", content: "article" },
-    ...(description
-      ? [
-          { name: "description", content: description },
-          { name: "og:description", content: description },
-        ]
-      : []),
-    ...(image ? [{ name: "og:image", content: image }] : []),
-  ];
+  if (event.kind === kinds.LongFormArticle) {
+    return articleMeta(event, author);
+  }
+  return defaults;
 }
 
-// TODO: fail on non long form articles
-export async function loader({ params }: Route.MetaArgs) {
+async function loadData(store: DataStore, { params }: Route.MetaArgs) {
   const { naddr } = params;
   const decoded = nip19.decode(naddr);
   if (decoded?.type === "naddr") {
-    // TODO: might not have relays metadata
-    // TODO: might throw, 404 instead
+    const relays = await store.fetchRelays(decoded.data.pubkey);
     const [author, event] = await Promise.all([
-      firstValueFrom(
-        serverProfileLoader({
-          kind: kinds.Metadata,
-          pubkey: decoded.data.pubkey,
-        }),
-      ).then(getProfileContent),
-      firstValueFrom(serverAddressLoader(decoded.data)),
+      store.fetchProfile({ pubkey: decoded.data.pubkey, relays }),
+      store.fetchAddress(decoded.data),
     ]);
-    return { author, event, address: decoded.data };
+    if (author && event) {
+      return { author, event, relays, address: decoded.data };
+    }
   }
 }
 
-export async function clientLoader({ params }: Route.MetaArgs) {
-  const { naddr } = params;
-  const decoded = nip19.decode(naddr);
-  if (decoded?.type === "naddr") {
-    const [author, event] = await Promise.all([
-      firstValueFrom(
-        clientProfileLoader({
-          kind: kinds.Metadata,
-          pubkey: decoded.data.pubkey,
-        }),
-      ).then(getProfileContent),
-      firstValueFrom(clientAddressLoader(decoded.data)),
-    ]);
-    return { author, event, address: decoded.data };
-  }
+export async function loader(args: Route.MetaArgs) {
+  return loadData(serverStore, args);
+}
+
+export async function clientLoader(args: Route.MetaArgs) {
+  return loadData(clientStore, args);
 }
 
 const components: Record<number, any> = {
   [kinds.LongFormArticle]: Article,
+  //[kinds.BookmarkList]: BookmarksList,
+  //[kinds.Bookmarksets]: BookmarksSet,
 };
 
 export default function Address(props: Route.ComponentProps) {
   if (!props?.loaderData) return null;
   const Component = components[props.loaderData.address.kind];
-  return Component ? <Component {...props.loaderData} /> : <>TODO</>;
+  return Component ? (
+    <Component {...props.loaderData} />
+  ) : (
+    <Debug>{props.loaderData}</Debug>
+  );
 }

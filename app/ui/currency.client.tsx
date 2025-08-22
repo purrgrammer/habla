@@ -1,84 +1,11 @@
+import NumberFlow from "@number-flow/react";
 import { useMemo } from "react";
-import { Euro, DollarSign, Bitcoin, Zap } from "lucide-react";
+import { Euro, DollarSign } from "lucide-react";
 import { cn } from "~/lib/utils";
-import {
-  type Currency,
-  type BTCCurrency,
-  type FiatCurrency,
-  useCurrency,
-  useExchangeRate,
-} from "~/services/currency.client";
-
-type AmountSize = "lg" | "xl";
-type AmountProps = {
-  wrapper: string;
-  icon: string;
-  text: string;
-};
-
-const amounts: Record<AmountSize, AmountProps> = {
-  lg: {
-    wrapper: "flex flex-row items-center gap-1",
-    icon: "size-5 text-muted-foreground",
-    text: "font-mono text-lg",
-  },
-  xl: {
-    wrapper: "flex flex-row items-center gap-2",
-    icon: "size-12 text-muted-foreground",
-    text: "font-mono text-4xl",
-  },
-};
-
-export function SatsAmount({
-  amount,
-  size = "lg",
-  currency = "sats",
-  className,
-}: {
-  amount: number;
-  size?: AmountSize;
-  currency?: BTCCurrency;
-  className?: string;
-}) {
-  const { wrapper, icon, text } = amounts[size];
-  const { nextCurrency } = useCurrency();
-  const formatted = useMemo(() => {
-    if (currency === "sats") {
-      return amount;
-    }
-    const formatter = new Intl.NumberFormat("en", {
-      style: "currency",
-      currency: "XBT",
-      minimumFractionDigits: 8,
-      maximumFractionDigits: 8,
-    });
-    return formatter
-      .format(amount * 1e-8)
-      .replace("XBT", "")
-      .trim();
-  }, [amount, currency]);
-  return (
-    <div className={cn(wrapper, className)}>
-      {currency === "sats" ? (
-        <Zap className={icon} onClick={nextCurrency} />
-      ) : (
-        <Bitcoin className={icon} onClick={nextCurrency} />
-      )}
-      <span className={text}>{formatted}</span>
-    </div>
-  );
-}
-
-export function Amount({
-  amount,
-  size = "lg",
-}: {
-  amount: number;
-  size?: AmountSize;
-}) {
-  const { text } = amounts[size];
-  return <span className={text}>{amount}</span>;
-}
+import { useCurrency, useExchangeRate } from "~/services/currency.client";
+import { type AmountSize, amounts } from "./amount";
+import SatsAmount from "~/ui/sats";
+import Debug from "./debug";
 
 export function FiatAmount({
   amount,
@@ -87,44 +14,37 @@ export function FiatAmount({
   className,
 }: {
   amount: number; // sats
-  currency: "EUR" | "USD";
+  currency?: "EUR" | "USD";
   className?: string;
   size?: AmountSize;
 }) {
   const { data: rate } = useExchangeRate(currency);
-  const { nextCurrency } = useCurrency();
   const { wrapper, icon, text } = amounts[size];
   const fiatAmount = useMemo(() => {
     if (!rate) return null;
-    return rate * (10e-8 * amount);
+    return rate * (amount * 1e-8);
   }, [amount, rate]);
-  const formatted = useMemo(() => {
-    if (!fiatAmount) return null;
-    const formatter = new Intl.NumberFormat("en", {
-      style: "currency",
-      currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-    return formatter
-      .format(fiatAmount)
-      .replace("$", "")
-      .replace("€", "")
-      .trim();
-  }, [amount, rate]);
-  if (formatted) {
-    return (
-      <div className={cn(wrapper, className)}>
-        {currency === "EUR" ? (
-          <Euro className={icon} onClick={nextCurrency} />
-        ) : (
-          <DollarSign className={icon} onClick={nextCurrency} />
-        )}
-        <span className={text}>{formatted}</span>
-      </div>
-    );
-  }
-  return null;
+  if (!rate) return null;
+  return (
+    <div className={cn(wrapper, className)}>
+      {currency === "EUR" ? (
+        <Euro className={icon} />
+      ) : (
+        <DollarSign className={icon} />
+      )}
+      <span className={text}>
+        {fiatAmount !== null ? (
+          <NumberFlow
+            value={fiatAmount}
+            format={{
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 2,
+            }}
+          />
+        ) : null}
+      </span>
+    </div>
+  );
 }
 
 export function CurrencyAmount({
@@ -136,23 +56,18 @@ export function CurrencyAmount({
   className?: string;
   size?: AmountSize;
 }) {
-  const { currency, useFiat } = useCurrency();
-  if (useFiat) {
-    return (
-      <FiatAmount
-        amount={amount}
-        currency={currency as FiatCurrency}
-        size={size}
-        className={className}
-      />
-    );
-  }
+  const { currency } = useCurrency();
   return (
-    <SatsAmount
-      currency={currency as BTCCurrency}
-      amount={amount}
-      size={size}
-      className={className}
-    />
+    <div className={cn("flex flex-col gap-0 items-center", className)}>
+      <SatsAmount amount={amount} size={size} />
+      {currency ? (
+        <FiatAmount
+          amount={amount}
+          className="text-muted-foreground"
+          currency={currency}
+          size="sm"
+        />
+      ) : null}
+    </div>
   );
 }

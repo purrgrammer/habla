@@ -1,7 +1,7 @@
 import type { Route } from "./+types/nip05";
 import { queryProfile } from "nostr-tools/nip05";
-import { fetchProfile as clientFetchProfile } from "~/services/loaders.client";
-import { fetchProfile as serverFetchProfile } from "~/services/loaders.server";
+import { default as clientStore } from "~/services/data.client";
+import { fetchProfile as serverFetchProfile } from "~/services/data.server";
 import Profile from "~/ui/nostr/profile";
 import Debug from "~/ui/debug";
 import defaults, { profileMeta } from "~/seo";
@@ -30,7 +30,7 @@ export async function clientLoader({ params }: Route.MetaArgs) {
   const { nip05 } = params;
   const pointer = await queryProfile(nip05);
   if (pointer) {
-    const profile = await clientFetchProfile(pointer);
+    const profile = await clientStore.fetchProfile(pointer);
     if (profile) {
       return {
         pubkey: pointer.pubkey,
