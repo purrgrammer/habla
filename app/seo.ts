@@ -49,6 +49,8 @@ function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
     { title },
     { name: "description", content: description },
 
+    ...ESSENTIAL,
+
     // Open Graph tags
     { property: "og:title", content: title },
     { property: "og:site_name", content: siteName },
@@ -92,20 +94,22 @@ function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
     tags.push({ property: "article:author", content: author });
   }
 
-  return tags.filter(
-    (tag) => tag.content !== undefined || tag.href !== undefined,
-  );
+  return tags;
 }
+
+const ESSENTIAL = [
+  { name: "theme-color", content: "#7c3aed" },
+  { name: "color-scheme", content: "light dark" },
+  { name: "robots", content: "index, follow" },
+  { name: "language", content: "en" },
+]
 
 export default [
   { title: DEFAULT_SITE_NAME },
   { name: "description", content: "read, highlight, write, earn" },
 
   // Essential meta tags
-  { name: "theme-color", content: "#7c3aed" },
-  { name: "color-scheme", content: "light dark" },
-  { name: "robots", content: "index, follow" },
-  { name: "language", content: "en" },
+  ...ESSENTIAL,
   { name: "author", content: "Habla" },
 
   // Open Graph tags
