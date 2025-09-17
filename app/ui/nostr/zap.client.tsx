@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { match } from "ts-pattern";
 import { kinds, type NostrEvent } from "nostr-tools";
 import { type Action } from "applesauce-actions";
+import QRCode from "react-qr-code";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +13,13 @@ import {
   DialogTitle,
 } from "~/ui/dialog";
 import { Button } from "../button";
-import { PlugZap, Zap as ZapIcon } from "lucide-react";
+import {
+  PlugZap,
+  Zap as ZapIcon,
+  Copy,
+  ExternalLink,
+  ChevronLeft,
+} from "lucide-react";
 import Grid from "../grid";
 import { CurrencyAmount } from "../currency.client";
 import { Input } from "../input";
@@ -188,12 +195,6 @@ export default function ZapDialog({
     error: lnurlError,
   } = useLNURL(lnUrl);
 
-  console.log("LNURL Query State:", {
-    lnUrl,
-    lnurlInfo,
-    lnurlLoading,
-    lnurlError: lnurlError?.message,
-  });
   const { wallet } = useWallet();
   const [message, setMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -323,15 +324,51 @@ export default function ZapDialog({
       )}
     </div>
   );
+  const invoiceStep = (
+    <div className="flex flex-col items-center gap-4">
+      <div className="bg-white p-4 rounded-lg">
+        <QRCode
+          value={`lightning:${invoice}`}
+          size={200}
+          className="h-auto max-w-full"
+        />
+      </div>
+    </div>
+  );
+
+  const invoiceFooter = (
+    <div className="flex flex-col w-full gap-2">
+      <Button onClick={openInWallet} variant="default" className="w-full">
+        <ExternalLink className="w-4 h-4 mr-2" />
+        Open in wallet
+      </Button>
+      <Button onClick={copyInvoice} variant="outline" className="w-full">
+        <Copy className="w-4 h-4 mr-2" />
+        Copy invoice
+      </Button>
+      <Button
+        onClick={() => {
+          setInvoice("");
+          setErrorMessage("");
+        }}
+        variant="ghost"
+        className="w-full"
+      >
+        <ChevronLeft className="w-4 h-4 mr-2" />
+        Back
+      </Button>
+    </div>
+  );
+
   const content = match(state)
-    .with("invoice", () => <Debug>{invoice}</Debug>)
+    .with("invoice", () => invoiceStep)
     .with("amount", () => amountStep)
     .with("paying", () => amountStep)
     .with("error", () => <>error</>)
     .exhaustive();
 
   const footer = match(state)
-    .with("invoice", () => <Debug>{invoice}</Debug>)
+    .with("invoice", () => invoiceFooter)
     .with("amount", () => payFooter)
     .with("paying", () => payFooter)
     .with("error", () => null)
@@ -339,6 +376,23 @@ export default function ZapDialog({
 
   function closeDialog() {
     onOpenChange?.(false);
+  }
+
+  function openInWallet() {
+    if (invoice) {
+      window.open(`lightning:${invoice}`, "_blank");
+    }
+  }
+
+  async function copyInvoice() {
+    if (invoice) {
+      try {
+        await navigator.clipboard.writeText(invoice);
+        info("Invoice copied to clipboard");
+      } catch (err) {
+        console.error("Failed to copy invoice:", err);
+      }
+    }
   }
 
   async function onZap() {
@@ -379,21 +433,26 @@ export default function ZapDialog({
       if (!invoice) return;
 
       if (wallet) {
-        const result = await wallet.payInvoice(invoice, Number(mSatsAmount));
-        queryClient.invalidateQueries({
-          queryKey: queries.balance(wallet),
-        });
-        queryClient.invalidateQueries({
-          queryKey: queries.transactions(wallet),
-        });
-        // notification
-        info(
-          `⚡ Zapped ${amount} sats to ${profile?.display_name || profile?.name || pubkey}`,
-        );
-        closeDialog();
-      } else {
-        setInvoice(invoice);
+        try {
+          const result = await wallet.payInvoice(invoice, Number(mSatsAmount));
+          queryClient.invalidateQueries({
+            queryKey: queries.balance(wallet),
+          });
+          queryClient.invalidateQueries({
+            queryKey: queries.transactions(wallet),
+          });
+          // notification
+          info(
+            `⚡ Zapped ${amount} sats to ${profile?.display_name || profile?.name || pubkey}`,
+          );
+          closeDialog();
+          return;
+        } catch (error) {
+          console.error("Zap failed:", error);
+        }
       }
+
+      setInvoice(invoice);
     } catch (err) {
       console.error("Zap failed:", err);
       setErrorMessage(err instanceof Error ? err.message : "Zap failed");

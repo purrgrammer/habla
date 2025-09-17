@@ -214,14 +214,17 @@ const initialUsers = [
 await (async function main() {
   for (const user of initialUsers) {
     try {
-      await addUser(user);
+      await addUser({
+        pubkey: HABLA_PUBKEY,
+        username: "_",
+      });
       console.log(`[users] added ${user.username} with pubkey ${user.pubkey}`);
     } catch (error) {
       console.error(`[users] failed to add ${user.username}: ${error}`);
     }
   }
 
-  await syncUsers();
+  //await syncUsers();
 })()
   .then(() => {
     process.exit(0);
