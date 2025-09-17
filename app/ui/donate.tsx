@@ -192,7 +192,7 @@ export function DonateButton() {
       onOpenChange={setIsDonating}
       pubkey={HABLA_PUBKEY}
       trigger={
-        <Button size="lg">
+        <Button size="lg" className="w-full">
           <HandHeart />
           <span className="dark:text-foreground">Donate</span>
         </Button>
