@@ -33,7 +33,7 @@ interface SeoOptions {
 export const DEFAULT_SITE_NAME = "Habla";
 export const DEFAULT_SITE_DESCRIPTION =
   "Read, Highlight, Write, Bookmark, Earn";
-export const DEFAULT_IMAGE = "https://habla.news/family.png";
+export const DEFAULT_IMAGE = "https://habla.news/og.png";
 
 export function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
   const {
