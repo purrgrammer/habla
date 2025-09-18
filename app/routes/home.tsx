@@ -24,6 +24,7 @@ import {
   Speech,
   EyeOff,
   Brush,
+  HandHeart,
 } from "lucide-react";
 import type { Route } from "./+types/home";
 import {
@@ -56,6 +57,11 @@ import ClientOnly from "~/ui/client-only";
 import Logo from "~/ui/logo";
 import { cn } from "~/lib/utils";
 import { TagCloud } from "~/ui/tag-cloud";
+import { parseZap, useProfileZaps, type Zap } from "~/hooks/nostr.client";
+import { HABLA_PUBKEY, HABLA_REPO_URL } from "~/const";
+import Debug from "~/ui/debug";
+import { ZapPill } from "~/ui/zaps.client";
+import Donate, { DonateButton } from "~/ui/donate";
 
 export function meta({}: Route.MetaArgs) {
   return defaults;
@@ -125,6 +131,35 @@ function Features() {
         </span>
       </li>
     </ul>
+  );
+}
+
+function Donations() {
+  const { timeline } = useProfileZaps(HABLA_PUBKEY);
+  const zaps = timeline?.map((ev) => parseZap(ev)).filter(Boolean) as Zap[];
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-row items-center gap-2">
+        <HandHeart className="size-6 text-muted-foreground" />
+        <h3 className="text-2xl uppercase font-light">Donations</h3>
+      </div>
+      <p>
+        Habla is a free,{" "}
+        <Link
+          target="_blank"
+          className="hover:underline decoration-dotted text-primary"
+          to={HABLA_REPO_URL}
+        >
+          open-source
+        </Link>{" "}
+        tool for reading, writing, <mark>highlighting</mark>, bookmarking and
+        earning.
+      </p>
+      {zaps?.map((zap) => {
+        return <ZapPill key={zap.id} zap={zap} />;
+      })}
+      <Donate />
+    </div>
   );
 }
 
@@ -428,7 +463,7 @@ function FeaturedUser({ user }: { user: User }) {
     >
       <img
         src={user.profile.picture || "/favicon.ico"}
-        className="size-24 rounded-full object-cover"
+        className="size-18 sm:size-24 rounded-full object-cover"
       />
       <div className="flex flex-col gap-0 items-center justify-center">
         <h3 className="font-sans text-2xl line-clamp-1">
@@ -484,13 +519,13 @@ function FeaturedUsers({ featured }: { featured: User[] }) {
         <Heart className="size-6 text-red-400 dark:text-red-200" />
         <h3 className="text-2xl uppercase font-light">Community</h3>
       </div>
-      <Grid className="grid-cols-1 xsm:grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
         {featured
           .filter((user) => user.username !== "_")
           .map((user) => (
             <FeaturedUser key={user.pubkey} user={user} />
           ))}
-      </Grid>
+      </div>
     </div>
   );
 }
@@ -584,10 +619,11 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
       <FeaturedUsers featured={featured} />
 
+      <ClientOnly>{() => <Donations />}</ClientOnly>
       {/*
-      <Tags featured={articles} />
-      <JoinNow />
-      */}
+        <Tags featured={articles} />
+        <JoinNow />
+       */}
     </div>
   );
 }

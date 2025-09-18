@@ -215,8 +215,9 @@ await (async function main() {
   for (const user of initialUsers) {
     try {
       await addUser({
-        pubkey: HABLA_PUBKEY,
-        username: "_",
+        username: "verbiricha",
+        pubkey:
+          "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
       });
       console.log(`[users] added ${user.username} with pubkey ${user.pubkey}`);
     } catch (error) {

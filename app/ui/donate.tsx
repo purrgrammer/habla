@@ -105,17 +105,13 @@ function DonateClient() {
             Donate to Habla
           </div>{" "}
         </CardTitle>
-
-        <CardDescription>
-          Habla is a free, open-source tool for reading, writing, highlighting,
-          bookmarking and earning.
-        </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <p className="text-md">
-          Make a contribution to support the project, get{" "}
-          <strong>featured on the home page</strong> and earn exclusive perks.
+          Make a contribution to support the project and get{" "}
+          <strong>featured on the home page</strong>.
         </p>
+        {/*
         <ol className="pl-2">
           {features.map((f, index) => (
             <li className="flex flex-row items-center gap-1" key={index}>
@@ -124,7 +120,10 @@ function DonateClient() {
             </li>
           ))}
         </ol>
-        <ZapDialog pubkey={HABLA_PUBKEY} trigger={donateButton} />
+         */}
+        <CardFooter>
+          <ZapDialog pubkey={HABLA_PUBKEY} trigger={donateButton} />
+        </CardFooter>
       </CardContent>
     </Card>
   );
@@ -157,15 +156,12 @@ export default function Donate() {
           </div>{" "}
         </CardTitle>
 
-        <CardDescription>
-          Habla is a free, open-source tool for reading, writing, highlighting,
-          bookmarking and earning.
-        </CardDescription>
+        <CardDescription></CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         <p className="text-md">
           Make a contribution to support the project, get{" "}
-          <strong>featured on the home page</strong> and earn exclusive perks.
+          <strong>featured on the home page</strong>.
         </p>
         <ol className="pl-2">
           {features.map((f, index) => (

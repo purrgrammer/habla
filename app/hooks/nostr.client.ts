@@ -31,6 +31,7 @@ import { getArticlePublished } from "applesauce-core/helpers";
 import { isReplaceableKind } from "nostr-tools/kinds";
 import { AGGREGATOR_RELAYS } from "~/const";
 import { ProfileModel } from "applesauce-core/models";
+import type { Pubkey } from "~/types";
 
 export function useProfile(pubkey: string): ProfileContent | undefined {
   const relays = useRelays(pubkey);
@@ -163,7 +164,7 @@ export type Zap = NostrEvent & {
   amount: number;
 };
 
-function parseZap(event: NostrEvent): Zap | null {
+export function parseZap(event: NostrEvent): Zap | null {
   const amount = getZapPayment(event)?.amount;
   if (!amount) return null;
   return { ...event, amount: amount / 1000 };
@@ -260,6 +261,7 @@ export function useZaps(event: NostrEvent) {
     const realtimeSubscription = pool
       .subscription(AGGREGATOR_RELAYS.concat(relays), zapFilters)
       .subscribe((zapEvent) => {
+        if (zapEvent === "EOSE") return;
         eventStore.add(zapEvent);
       });
 
@@ -285,4 +287,17 @@ export function useZaps(event: NostrEvent) {
       }),
     );
   }, [event.id]);
+}
+
+export function useProfileZaps(pubkey: Pubkey) {
+  const relays = useRelays(pubkey);
+  const eventStore = useEventStore();
+  return useTimeline(
+    `${pubkey}-zaps`,
+    {
+      kinds: [kinds.Zap],
+      "#p": [pubkey],
+    },
+    relays,
+  );
 }
