@@ -214,9 +214,9 @@ const initialUsers = [
 await (async function main() {
   try {
     await addUser({
-      username: "laeserin",
+      username: "hodlbod",
       pubkey:
-        "dd664d5e4016433a8cd69f005ae1480804351789b59de5af06276de65633d319",
+        "97c70a44366a6535c145b333f973ea86dfdc2d7a99da618c40c64705ad98e322",
     });
   } catch (error) {
     console.error(`[users] failed to add: ${error}`);

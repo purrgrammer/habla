@@ -72,9 +72,7 @@ function Transaction({ t }: { t: Tx }) {
               ? "Pending receive"
               : zapRequest?.content
                 ? zapRequest.content
-                : identifier
-                  ? identifier
-                  : "";
+                : "";
 
   return (
     <div
@@ -84,42 +82,42 @@ function Transaction({ t }: { t: Tx }) {
       )}
     >
       <div className="flex flex-row items-center gap-2">
-        {/* todo: pending state */}
-        {isOnChain ? <Bitcoin className={icon} /> : <Zap className={icon} />}
-        {pubkey ? <UserLink name="line-clamp-1" pubkey={pubkey} /> : null}
-        {isOnChain ? (
-          <div className="flex flex-row items-center gap-3">
-            <span className="text-lg line-clamp-1">{text}</span>
-            <Link
-              className="flex flex-row items-center gap-1"
-              to={`https://mempool.space/tx/${t.preimage}`}
-              target="_blank"
-            >
-              <ExternalLink className="size-5 text-muted-foreground" />
-              <img
-                src="https://mempool.space/resources/favicons/favicon-32x32.png"
-                className="size-5 inline-block"
-              />
-            </Link>
-          </div>
-        ) : (
-          <span className="text-lg line-clamp-1 text-muted-foreground">
-            {text}
-          </span>
-        )}
-      </div>
-      <div>
-        <div className="flex flex-row items-center gap-0.5">
-          <CurrencyAmount amount={t.amount / 1000} className="items-end" />
+        <div className="flex flex-col gap-1">
+          {pubkey ? (
+            <UserLink name="line-clamp-1" pubkey={pubkey} />
+          ) : identifier ? (
+            <span>{identifier}</span>
+          ) : null}
+          {isOnChain ? (
+            <div className="flex flex-row items-center gap-3">
+              <span className="text-lg lnine-clamp-1">{text}</span>
+              <Link
+                className="flex flex-row items-center gap-1"
+                to={`https://mempool.space/tx/${t.preimage}`}
+                target="_blank"
+              >
+                <ExternalLink className="size-5 text-muted-foreground" />
+                <img
+                  src="https://mempool.space/resources/favicons/favicon-32x32.png"
+                  className="size-5 inline-block"
+                />
+              </Link>
+            </div>
+          ) : (
+            <span className="ml-2.5 border-l-2 pl-2 text-md leading-tight text-muted-foreground">
+              {text}
+            </span>
+          )}
         </div>
       </div>
+      <CurrencyAmount amount={t.amount / 1000} className="items-end" />
     </div>
   );
 }
 
 function Transactions({ transactions }: { transactions: Tx[] }) {
   return (
-    <ScrollArea className="flex flex-col gap-0 w-full h-[80dvh] px-2">
+    <ScrollArea>
       {transactions.map((t) => (
         <Transaction t={t} key={t.preimage} />
       ))}
