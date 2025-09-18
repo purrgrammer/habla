@@ -155,9 +155,13 @@ function Donations() {
         tool for reading, writing, <mark>highlighting</mark>, bookmarking and
         earning.
       </p>
-      {zaps?.map((zap) => {
-        return <ZapPill key={zap.id} zap={zap} />;
-      })}
+      <div className="flex flex-row flex-wrap gap-2">
+        {zaps
+          ?.sort((a, b) => b.amount - a.amount)
+          .map((zap) => {
+            return <ZapPill key={zap.id} zap={zap} />;
+          })}
+      </div>
       <Donate />
     </div>
   );

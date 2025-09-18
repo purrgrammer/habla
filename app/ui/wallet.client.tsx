@@ -38,12 +38,29 @@ function Transaction({ t }: { t: Tx }) {
   const isPending = !t.preimage && !isOnChain;
   const icon = `size-8 flex-shrink-0 ${t.type === "outgoing" ? (isPending ? "text-red-100" : "text-red-700") : "text-green-800 dark:text-green-500"}`;
   const invoiceDescription = parsedInvoice?.description;
+  const isMetadataDescription =
+    t.description &&
+    t.description.startsWith("[[") &&
+    t.description?.endsWith("]]");
+  const metadata =
+    isMetadataDescription && t.description ? safeParse(t.description) : null;
+  const identifier = metadata
+    ?.find((t: string[]) => {
+      if (t.at(0) === "text/identifier") {
+        return t.at(1);
+      }
+    })
+    ?.at(1);
+  const isZapDescription =
+    t.description &&
+    t.description.startsWith("{") &&
+    t.description?.endsWith("}");
+  const zapRequest =
+    isZapDescription && t.description ? safeParse(t.description) : null;
   const text =
     event?.kind === kinds.ZapRequest && event?.content
       ? event.content
-      : t.description &&
-          !t.description.startsWith("{") &&
-          !t.description.startsWith("[[")
+      : t.description && !isMetadataDescription && !isZapDescription
         ? t.description
         : invoiceDescription
           ? invoiceDescription
@@ -53,7 +70,11 @@ function Transaction({ t }: { t: Tx }) {
               : "Payment"
             : isPending
               ? "Pending receive"
-              : "Received";
+              : zapRequest?.content
+                ? zapRequest.content
+                : identifier
+                  ? identifier
+                  : "";
 
   return (
     <div
@@ -89,9 +110,6 @@ function Transaction({ t }: { t: Tx }) {
       </div>
       <div>
         <div className="flex flex-row items-center gap-0.5">
-          <span className="text-muted-foreground">
-            {t.type === "outgoing" ? "-" : "+"}
-          </span>
           <CurrencyAmount amount={t.amount / 1000} className="items-end" />
         </div>
       </div>
@@ -112,6 +130,9 @@ function Transactions({ transactions }: { transactions: Tx[] }) {
 export default function Wallet() {
   const { wallet, setWallet } = useWallet();
   const { data: walletBalance } = useWalletBalance();
+  const { data: transactions } = useWalletTransactions({
+    limit: 20,
+  });
   const navigate = useNavigate();
 
   function disconnect() {
@@ -146,6 +167,9 @@ export default function Wallet() {
       <Button onClick={disconnect}>
         <Unplug /> Disconnect
       </Button>
+      {transactions ? (
+        <Transactions transactions={transactions?.transactions} />
+      ) : null}
     </div>
   );
 }

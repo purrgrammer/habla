@@ -212,14 +212,15 @@ const initialUsers = [
 ];
 
 await (async function main() {
-    try {
-      await addUser({
-        username: "laeserin",
-        pubkey: "dd664d5e4016433a8cd69f005ae1480804351789b59de5af06276de65633d319"
-      });
-    } catch (error) {
-      console.error(`[users] failed to add: ${error}`);
-    }
+  try {
+    await addUser({
+      username: "laeserin",
+      pubkey:
+        "dd664d5e4016433a8cd69f005ae1480804351789b59de5af06276de65633d319",
+    });
+  } catch (error) {
+    console.error(`[users] failed to add: ${error}`);
+  }
 
   await syncUsers();
 })()
