@@ -1,6 +1,112 @@
 import { type NostrEvent } from "nostr-tools";
 import { getArticlePublished } from "applesauce-core/helpers";
 
+export const testimonials = [
+  {
+    content: "Awesome",
+    created_at: 1758187230,
+    id: "4bf7e9c5130fb0dd07cc999f1f74f930e99ed197bf03294a9a4c26aa3a0b263c",
+    kind: 1,
+    pubkey: "1bda7e1f7396bda2d1ef99033da8fd2dc362810790df9be62f591038bb97c4d9",
+    sig: "5fd5bc69e83147bbec6b4f4b108d04aa920f7eb4d6925f8e3cc448b41cbfc9efaaec19e30a64681a7c402626da48c24d45bc376a56d9e53177a9b9c80c9c1f74",
+    tags: [
+      ["alt", "A short note: Awesome"],
+      [
+        "e",
+        "939773e9e7addcb91d3a38c55debeff1e5eb506f9d35ff1cb48dec7e7b64ee65",
+        "wss://pyramid.fiatjaf.com/",
+        "root",
+        "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+      ],
+      [
+        "p",
+        "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+        "wss://frens.nostr1.com/",
+      ],
+    ],
+  },
+  {
+    content: "Nice! Love jt",
+    created_at: 1758122472,
+    id: "e7d668bfaa38b2aef14886857eccbe57808af8a219760dcd5670a8ec1a738fdc",
+    kind: 1,
+    pubkey: "e771af0b05c8e95fcdf6feb3500544d2fb1ccd384788e9f490bb3ee28e8ed66f",
+    sig: "3a3140e22b6c752ad5a6f6e35173bf680503f02ce1c84e8e120300458f81dc77b36b6a84b5cdabbe64c2669280a16655f98546bb3632b0ea45b5988d7bcfadcb",
+    tags: [
+      ["alt", "A short note: Nice! Love jt"],
+      [
+        "e",
+        "c542660e1c9cbe6ae654642dd00a1852bfa3a6256685c37e51d04658301e24b7",
+        "wss://pyramid.fiatjaf.com/",
+        "root",
+        "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+      ],
+      [
+        "p",
+        "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+        "wss://frens.nostr1.com/",
+      ],
+    ],
+  },
+  {
+    content: "clean ❤️‍🔥",
+    created_at: 1758229915,
+    id: "fe9f412e2f048862ff52ee237b4e187ecf948d2f1797a4545447be1d1a3516d8",
+    kind: 1,
+    pubkey: "53a91e3a64d1f658e983ac1e4f9e0c697f8f33e01d8debe439f4c1a92113f592",
+    sig: "d1577ac7479b9de36839903e10c47a4935f7f6919e97b31d377e15e61d8b8c309764894846e7b2997ee917cd879f29994f762e6520892d8ebac59cb2672c296c",
+    tags: [
+      ["alt", "A short note: clean ❤️‍🔥"],
+      [
+        "e",
+        "c542660e1c9cbe6ae654642dd00a1852bfa3a6256685c37e51d04658301e24b7",
+        "wss://pyramid.fiatjaf.com/",
+        "root",
+        "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+      ],
+      [
+        "p",
+        "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+        "wss://frens.nostr1.com/",
+      ],
+    ],
+  },
+  {
+    kind: 1,
+    id: "092140faa96a84084bc221f9b8080354cfa657c5b5b4bcce73d20eef5ceb8016",
+    pubkey: "958b754a1d3de5b5eca0fe31d2d555f451325f8498a83da1997b7fcd5c39e88c",
+    created_at: 1758123045,
+    tags: [
+      [
+        "e",
+        "c542660e1c9cbe6ae654642dd00a1852bfa3a6256685c37e51d04658301e24b7",
+        "",
+        "root",
+      ],
+      ["p", "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194"],
+    ],
+    content: "CLEAN ASF!!!",
+    sig: "7242e56da2ddc8f869b4dfdbcd7838dc54062156147aa3baa25098a1356a613c0f717b85fb3f336c0671d4bd25ea7b1030769f1a9a7110114c9f1fbfa72253e2",
+  },
+  {
+    content:
+      "Finally, a longform client for the 90s:\n\nnostr:nevent1qvzqqqqqqypzqla9dawkjc4trc7dgf88trpsq2uxvhmmpkxua607nc5g6a634sv5qy2hwumn8ghj7un9d3shjtnyv9kh2uewd9hj7qgwwaehxw309ahx7uewd3hkctcqyrz5yeswrjwtu6hx23jzm5q2rpftlgaxy4ngtsm728gyvkpsrcjtwj379cr",
+    created_at: 1758226092,
+    id: "90d7d1e98ccd48ac1d29081b87df5500a9c553c971741c27bda714cb857973b3",
+    kind: 1,
+    pubkey: "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d",
+    sig: "e1b4b7bea8bb5f8f32364706ab0d7379001e41e8b35cc295fd4bbfeeae5d8ef0fdbe9a296621627c948c45efc88f28060a34ce30dfbdb7acd97bc7a709521948",
+    tags: [
+      [
+        "q",
+        "c542660e1c9cbe6ae654642dd00a1852bfa3a6256685c37e51d04658301e24b7",
+        "wss://relay.damus.io/",
+      ],
+      ["p", "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194"],
+    ],
+  },
+];
+
 export const faq = {
   pubkey: "7f5c2b4e48a0e9feca63a46b13cdb82489f4020398d60a2070a968caa818d75d",
   content:

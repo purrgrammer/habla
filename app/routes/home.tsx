@@ -33,6 +33,7 @@ import {
   getArticlesByCategory,
   getFeaturedArticles,
   getFeaturedHighlights,
+  testimonials,
 } from "~/featured";
 import defaults from "~/seo";
 import ArticleCard from "~/ui/nostr/article-card";
@@ -59,9 +60,11 @@ import { cn } from "~/lib/utils";
 import { TagCloud } from "~/ui/tag-cloud";
 import { parseZap, useProfileZaps, type Zap } from "~/hooks/nostr.client";
 import { HABLA_PUBKEY, HABLA_REPO_URL } from "~/const";
-import Debug from "~/ui/debug";
 import { ZapPill } from "~/ui/zaps.client";
-import Donate, { DonateButton } from "~/ui/donate";
+import Donate from "~/ui/donate";
+import Note from "~/ui/nostr/note";
+import Blockquote from "~/ui/blockquote";
+import UserLink from "~/ui/nostr/user-link";
 
 export function meta({}: Route.MetaArgs) {
   return defaults;
@@ -131,6 +134,41 @@ function Features() {
         </span>
       </li>
     </ul>
+  );
+}
+
+function Testimonials() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-row items-center gap-2">
+        <Speech className="size-6 text-muted-foreground" />
+        <h3 className="text-2xl uppercase font-light">Testimonials</h3>
+      </div>
+      <p>What people are saying about us</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center sm:gap-8 w-full">
+        {testimonials
+          .sort((a, b) => b.created_at - a.created_at)
+          .map((ev) => {
+            return (
+              <div className="flex flex-col gap-2 p-2 flex-1 items-center justify-center w-full">
+                <Blockquote
+                  text={ev.content
+                    .replace(/nostr:nevent[^\s]+/g, "")
+                    .trim()
+                    .replace(/:$/, "")}
+                  className="w-full"
+                />
+                <UserLink
+                  pubkey={ev.pubkey}
+                  wrapper="w-full flex-col gap-2"
+                  img="size-8"
+                  name="text-lg"
+                />
+              </div>
+            );
+          })}
+      </div>
+    </div>
   );
 }
 
@@ -624,6 +662,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <FeaturedUsers featured={featured} />
 
       <ClientOnly>{() => <Donations />}</ClientOnly>
+
+      <Testimonials />
       {/*
         <Tags featured={articles} />
         <JoinNow />
