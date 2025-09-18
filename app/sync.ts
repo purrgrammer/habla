@@ -212,20 +212,16 @@ const initialUsers = [
 ];
 
 await (async function main() {
-  for (const user of initialUsers) {
     try {
       await addUser({
-        username: "verbiricha",
-        pubkey:
-          "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+        username: "laeserin",
+        pubkey: "dd664d5e4016433a8cd69f005ae1480804351789b59de5af06276de65633d319"
       });
-      console.log(`[users] added ${user.username} with pubkey ${user.pubkey}`);
     } catch (error) {
-      console.error(`[users] failed to add ${user.username}: ${error}`);
+      console.error(`[users] failed to add: ${error}`);
     }
-  }
 
-  //await syncUsers();
+  await syncUsers();
 })()
   .then(() => {
     process.exit(0);
