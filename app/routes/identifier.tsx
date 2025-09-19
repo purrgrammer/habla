@@ -6,10 +6,12 @@ import defaults, { articleMeta } from "~/seo";
 import Article from "~/ui/nostr/article";
 import { type DataStore } from "~/services/types";
 import Debug from "~/ui/debug";
+import { Card as CardSkeleton } from "~/ui/skeleton";
+import { notFound } from "~/lib/http";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData) return defaults;
-  return articleMeta(loaderData.event, loaderData.profile);
+  return articleMeta(loaderData.event, loaderData.profile || {});
 }
 
 async function loadData(store: DataStore, { params }: Route.MetaArgs) {
@@ -18,21 +20,31 @@ async function loadData(store: DataStore, { params }: Route.MetaArgs) {
   const pointer = users.find((u) => u.nip05 === username);
   if (pointer) {
     const pubkey = pointer.pubkey;
-    const address = { kind: kinds.LongFormArticle, pubkey, identifier };
-    const [profile, relays, event] = await Promise.all([
-      store.fetchProfile(pointer),
-      store.fetchRelays(pointer.pubkey),
-      store.fetchAddress(address),
-    ]);
-    if (profile && event && relays) {
-      return {
+    try {
+      const address = {
+        kind: kinds.LongFormArticle,
         pubkey,
-        event,
-        relays,
-        profile,
-        address,
+        identifier,
       };
+      const [profile, event] = await Promise.all([
+        store.fetchProfile(pointer),
+        store.fetchAddress(address),
+      ]);
+      if (event) {
+        return {
+          pubkey,
+          event,
+          relays: [],
+          profile,
+          address,
+        };
+      }
+      notFound();
+    } catch (error) {
+      notFound();
     }
+  } else {
+    notFound();
   }
 }
 
@@ -44,13 +56,6 @@ export async function clientLoader(args: Route.MetaArgs) {
   return loadData(clientStore, args);
 }
 
-export default function Identifier({
-  loaderData,
-  params,
-}: Route.ComponentProps) {
-  return loaderData?.profile ? (
-    <Article {...loaderData} />
-  ) : (
-    <Debug>{{ loaderData, params }}</Debug>
-  );
+export default function Identifier({ loaderData }: Route.ComponentProps) {
+  return loaderData ? <Article {...loaderData} /> : <CardSkeleton />;
 }

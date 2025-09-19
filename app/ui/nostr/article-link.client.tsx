@@ -9,9 +9,9 @@ function useArticleLink(article: NostrEvent, address: AddressPointer) {
   const { data: users } = useUsers();
   const user = users?.find((u) => u.pubkey === article.pubkey);
   const identifier = getTagValue(article, "d");
-  //if (user && identifier) {
-  //  return `/${user.username}/${encodeURIComponent(identifier)}`;
-  //}
+  if (user && identifier) {
+    return `/${user.username}/${encodeURIComponent(identifier)}`;
+  }
   return `/a/${nip19.naddrEncode(address)}`;
 }
 

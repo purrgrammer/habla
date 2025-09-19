@@ -148,9 +148,12 @@ function Testimonials() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-center sm:gap-8 w-full">
         {testimonials
           .sort((a, b) => b.created_at - a.created_at)
-          .map((ev) => {
+          .map((ev, index) => {
             return (
-              <div className="flex flex-col gap-2 p-2 flex-1 items-center justify-center w-full">
+              <div
+                key={index}
+                className="flex flex-col gap-2 p-2 flex-1 items-center justify-center w-full"
+              >
                 <Blockquote
                   text={ev.content
                     .replace(/nostr:nevent[^\s]+/g, "")

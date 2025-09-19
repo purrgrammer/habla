@@ -1,4 +1,4 @@
-import { lastValueFrom, map, timeout, toArray } from "rxjs";
+import { firstValueFrom, lastValueFrom, map, timeout, toArray } from "rxjs";
 import { completeOnEose } from "applesauce-relay/operators";
 import {
   getProfileContent,
@@ -558,7 +558,7 @@ async function fetchNostrProfile(
 
 function fetchNostrAddress(pointer: AddressPointer): Promise<NostrEvent> {
   const { kind, pubkey, relays, identifier } = pointer;
-  return lastValueFrom(
+  return firstValueFrom(
     pool
       .req(AGGREGATOR_RELAYS.concat(relays || []), {
         kinds: [kind],
