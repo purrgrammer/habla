@@ -212,16 +212,15 @@ const initialUsers = [
 ];
 
 await (async function main() {
-  try {
-    await addUser({
-      username: "hodlbod",
-      pubkey:
-        "97c70a44366a6535c145b333f973ea86dfdc2d7a99da618c40c64705ad98e322",
-    });
-  } catch (error) {
-    console.error(`[users] failed to add: ${error}`);
-  }
-
+  //try {
+  //  await addUser({
+  //    username: "hodlbod",
+  //    pubkey:
+  //      "97c70a44366a6535c145b333f973ea86dfdc2d7a99da618c40c64705ad98e322",
+  //  });
+  //} catch (error) {
+  //  console.error(`[users] failed to add: ${error}`);
+  //}
   await syncUsers();
 })()
   .then(() => {
