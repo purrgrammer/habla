@@ -15,13 +15,14 @@ import {
   ExternalLink,
   Wallet as WalletIcon,
   Unplug,
+  Cog,
 } from "lucide-react";
 import { CurrencyAmount } from "./currency.client";
 import { ScrollArea } from "./scroll-area";
 import { parseBolt11, safeParse } from "applesauce-core/helpers";
 import UserLink from "./nostr/user-link.client";
 import { cn } from "~/lib/utils";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Transaction as Tx } from "applesauce-wallet-connect/helpers";
 
 function Transaction({ t }: { t: Tx }) {
@@ -75,42 +76,50 @@ function Transaction({ t }: { t: Tx }) {
                 : "";
 
   return (
-    <div
-      className={cn(
-        "flex flex-row items-center justify-between py-1",
-        isPending ? "animate-pulse" : "",
-      )}
-    >
-      <div className="flex flex-row items-center gap-2">
-        <div className="flex flex-col gap-1">
-          {pubkey ? (
-            <UserLink name="line-clamp-1" pubkey={pubkey} />
-          ) : identifier ? (
-            <span>{identifier}</span>
-          ) : null}
-          {isOnChain ? (
-            <div className="flex flex-row items-center gap-3">
-              <span className="text-lg lnine-clamp-1">{text}</span>
-              <Link
-                className="flex flex-row items-center gap-1"
-                to={`https://mempool.space/tx/${t.preimage}`}
-                target="_blank"
-              >
-                <ExternalLink className="size-5 text-muted-foreground" />
-                <img
-                  src="https://mempool.space/resources/favicons/favicon-32x32.png"
-                  className="size-5 inline-block"
-                />
-              </Link>
-            </div>
-          ) : (
-            <span className="ml-2.5 border-l-2 pl-2 text-md leading-tight text-muted-foreground">
-              {text}
-            </span>
-          )}
+    <div>
+      <div
+        className={cn(
+          "flex flex-row items-start justify-between py-1",
+          isPending ? "animate-pulse" : "",
+        )}
+      >
+        <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-col gap-1">
+            {pubkey ? (
+              <UserLink name="line-clamp-1" pubkey={pubkey} />
+            ) : identifier ? (
+              <span>{identifier}</span>
+            ) : null}
+            {isOnChain ? (
+              <div className="flex flex-row items-center gap-3">
+                <span className="text-lg lnine-clamp-1">{text}</span>
+                <Link
+                  className="flex flex-row items-center gap-1"
+                  to={`https://mempool.space/tx/${t.preimage}`}
+                  target="_blank"
+                >
+                  <ExternalLink className="size-5 text-muted-foreground" />
+                  <img
+                    src="https://mempool.space/resources/favicons/favicon-32x32.png"
+                    className="size-5 inline-block"
+                  />
+                </Link>
+              </div>
+            ) : null}
+          </div>
         </div>
+        <CurrencyAmount
+          amount={t.amount / 1000}
+          className="flex-row items-center gap-2"
+        />
       </div>
-      <CurrencyAmount amount={t.amount / 1000} className="items-end" />
+      {text ? (
+        <div className="ml-2.5 border-l-2 pl-2 py-1">
+          <span className="text-md leading-tight text-muted-foreground">
+            {text}
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -128,12 +137,22 @@ function Transactions({ transactions }: { transactions: Tx[] }) {
 export default function Wallet() {
   const { wallet, setWallet } = useWallet();
   const { data: walletBalance } = useWalletBalance();
-  const { data: transactions } = useWalletTransactions({
+  const { data: transactionsData } = useWalletTransactions({
     limit: 20,
   });
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const { transactions, supportsTransactions } = transactionsData || {
+    supportsTransactions: true,
+    transactions: [],
+  };
   const navigate = useNavigate();
 
+  function settings() {
+    setShowSettingsModal(true);
+  }
+
   function disconnect() {
+    // TODO: alert "are you sure?"
     navigate("/");
     setWallet();
   }
@@ -162,12 +181,23 @@ export default function Wallet() {
       {walletBalance ? (
         <CurrencyAmount amount={walletBalance} size="xl" />
       ) : null}
-      <Button onClick={disconnect}>
-        <Unplug /> Disconnect
-      </Button>
       {transactions ? (
-        <Transactions transactions={transactions?.transactions} />
-      ) : null}
+        <Transactions transactions={transactions} />
+      ) : supportsTransactions ? (
+        <Transactions transactions={[]} />
+      ) : (
+        <span className="text-xs text-muted-foreground">
+          Transaction list not supported
+        </span>
+      )}
+      <div className="py-4 flex flex-row gap-4 justify-between w-full">
+        <Button disabled variant="outline" onClick={settings}>
+          <Cog /> Settings
+        </Button>
+        <Button variant="destructive" onClick={disconnect}>
+          <Unplug /> Disconnect
+        </Button>
+      </div>
     </div>
   );
 }
