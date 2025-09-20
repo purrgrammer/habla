@@ -65,15 +65,17 @@ function Transaction({ t }: { t: Tx }) {
         ? t.description
         : invoiceDescription
           ? invoiceDescription
-          : t.type === "outgoing"
-            ? isPending
-              ? "Pending payment"
-              : "Payment"
-            : isPending
-              ? "Pending receive"
-              : zapRequest?.content
-                ? zapRequest.content
-                : "";
+          : zapRequest?.content
+            ? zapRequest.content
+            : "";
+  const header =
+    t.type === "outgoing"
+      ? isPending
+        ? "Pending payment"
+        : "Payment"
+      : isPending
+        ? "Pending receive"
+        : "Received";
 
   return (
     <div>
@@ -89,7 +91,9 @@ function Transaction({ t }: { t: Tx }) {
               <UserLink name="line-clamp-1" pubkey={pubkey} />
             ) : identifier ? (
               <span>{identifier}</span>
-            ) : null}
+            ) : (
+              <span>{header}</span>
+            )}
             {isOnChain ? (
               <div className="flex flex-row items-center gap-3">
                 <span className="text-lg lnine-clamp-1">{text}</span>
@@ -110,7 +114,7 @@ function Transaction({ t }: { t: Tx }) {
         </div>
         <CurrencyAmount
           amount={t.amount / 1000}
-          className="flex-row items-center gap-2"
+          className={`flex-row items-center gap-2 ${t.type === "outgoing" ? "" : "text-green-700 dark:text-green-400"}`}
         />
       </div>
       {text ? (

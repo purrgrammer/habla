@@ -27,20 +27,22 @@ export default function SatsAmount({
   size = "lg",
   currency = "sats",
   className,
+  iconClassname,
 }: {
   amount: number;
   size?: AmountSize;
   currency?: "sats" | "BTC";
   className?: string;
+  iconClassname?: string;
 }) {
   const { wrapper, icon, text } = amounts[size];
   const value = currency === "sats" ? formatSats(amount) : formatBTC(amount);
   return (
     <div className={cn(wrapper, className)}>
       {currency === "sats" ? (
-        <Zap className={icon} />
+        <Zap className={cn(icon, iconClassname)} />
       ) : (
-        <Bitcoin className={icon} />
+        <Bitcoin className={cn(icon, iconClassname)} />
       )}
       <span className={text}>
         <NumberFlow value={Number(value)} />
