@@ -140,7 +140,7 @@ function Features() {
 
 function Testimonials() {
   return (
-    <div className="flex flex-col gap-6">
+    <div id="testimonials" className="flex flex-col gap-6">
       <div className="flex flex-row items-center gap-2">
         <Speech className="size-6 text-muted-foreground" />
         <h3 className="text-2xl uppercase font-light">Testimonials</h3>
@@ -180,7 +180,7 @@ function Donations() {
   const { timeline } = useProfileZaps(HABLA_PUBKEY);
   const zaps = timeline?.map((ev) => parseZap(ev)).filter(Boolean) as Zap[];
   return (
-    <div className="flex flex-col gap-6">
+    <div id="donations" className="flex flex-col gap-6">
       <div className="flex flex-row items-center gap-2">
         <HandHeart className="size-6 text-muted-foreground" />
         <h3 className="text-2xl uppercase font-light">Donations</h3>
@@ -225,7 +225,10 @@ function CategorySection({
   if (articles.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div
+      id={title.toLowerCase().replace(/\s+/g, "-")}
+      className="flex flex-col gap-6"
+    >
       <div className="flex flex-row items-center gap-2">
         <div className={`size-6 ${iconColor}`}>{icon}</div>
         <h3 className="text-2xl uppercase font-light">{title}</h3>
@@ -250,7 +253,7 @@ function CategorySection({
 
 function FeaturedHighlights({ highlights }: { highlights: NostrEvent[] }) {
   return (
-    <div className="flex flex-col gap-6">
+    <div id="highlights" className="flex flex-col gap-6">
       <div className="flex flex-row items-center gap-2">
         <Highlighter className="size-6 text-orange-200 dark:text-orange-100" />
         <h3 className="text-2xl uppercase font-light">Highlights</h3>
@@ -560,7 +563,7 @@ function Values() {
 
 function FeaturedUsers({ featured }: { featured: User[] }) {
   return (
-    <div className="flex flex-col gap-8">
+    <div id="community" className="flex flex-col gap-8">
       <div className="flex flex-row items-center gap-2">
         <Heart className="size-6 text-red-400 dark:text-red-200" />
         <h3 className="text-2xl uppercase font-light">Community</h3>
