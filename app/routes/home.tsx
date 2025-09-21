@@ -25,6 +25,7 @@ import {
   EyeOff,
   Brush,
   HandHeart,
+  Baby,
 } from "lucide-react";
 import type { Route } from "./+types/home";
 import {
@@ -658,6 +659,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         articles={categorizedArticles.art}
         featured={featured}
         iconColor="text-amber-600 dark:text-amber-400"
+      />
+
+      <CategorySection
+        title="Parenting"
+        icon={<Baby />}
+        articles={categorizedArticles.parenting}
+        featured={featured}
       />
 
       <FeaturedHighlights {...loaderData} />
