@@ -3,6 +3,33 @@ import { getArticlePublished } from "applesauce-core/helpers";
 
 export const testimonials = [
   {
+    content:
+      "This is looking incredibly nice in mobile. Loading is so much smoother now. ",
+    created_at: 1758464009,
+    id: "ef44ba52735804a3812f876efbf8d674c20ccd99476d3f5d10bfc911e7483c9c",
+    kind: 1,
+    pubkey: "c230edd34ca5c8318bf4592ac056cde37519d395c0904c37ea1c650b8ad4a712",
+    sig: "1b3b4a5fbc7e2745e06349b52492b73c36e7798442ab501796fa833b6c259b5ff63cf795e8acbac8cc99c2b1456f678f19569532772a208606edf267df144fbb",
+    tags: [
+      [
+        "alt",
+        "A short note: This is looking incredibly nice in mobile. Loading...",
+      ],
+      [
+        "e",
+        "611d0e4b7d8b8855b47f4c9a6132451c71d3ca9f52ac3439a770b8eb8b895f4b",
+        "wss://jellyfish.land/",
+        "root",
+        "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+      ],
+      [
+        "p",
+        "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+        "wss://frens.nostr1.com/",
+      ],
+    ],
+  },
+  {
     content: "Awesome",
     created_at: 1758187230,
     id: "4bf7e9c5130fb0dd07cc999f1f74f930e99ed197bf03294a9a4c26aa3a0b263c",

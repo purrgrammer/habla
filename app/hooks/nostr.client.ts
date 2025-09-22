@@ -121,6 +121,7 @@ export function useTimeline(
   const { limit } = options;
   const eventStore = useEventStore();
   const [isLoading, setIsLoading] = useState(false);
+  console.log("useTimeline", { id, filters, relays, options });
 
   useEffect(() => {
     if (relays.length === 0) return;

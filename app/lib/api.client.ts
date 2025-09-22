@@ -4,7 +4,7 @@ export async function getMembers(): Promise<Nip05Pointer[]> {
   return fetch(`/api/users`)
     .then((r) => r.json())
     .then((users) =>
-      users.map((user) => ({
+      users.map((user: { username: string; pubkey: string }) => ({
         ...user,
         nip05: user.username,
       })),

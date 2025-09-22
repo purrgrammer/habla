@@ -195,10 +195,15 @@ export default function Wallet() {
         </span>
       )}
       <div className="py-4 flex flex-row gap-4 justify-between w-full">
-        <Button disabled variant="outline" onClick={settings}>
+        <Button
+          className="flex-1"
+          disabled
+          variant="outline"
+          onClick={settings}
+        >
           <Cog /> Settings
         </Button>
-        <Button variant="destructive" onClick={disconnect}>
+        <Button className="flex-1" variant="destructive" onClick={disconnect}>
           <Unplug /> Disconnect
         </Button>
       </div>

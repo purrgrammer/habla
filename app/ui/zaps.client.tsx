@@ -7,21 +7,14 @@ import { getZapRequest, getZapSender } from "applesauce-core/helpers";
 import { Button } from "~/ui/button";
 import ZapDialog from "~/ui/nostr/zap.client";
 import { useState } from "react";
+import { Reply } from "./nostr/reply.client";
 
 export function ZapReply({ zap }: { zap: Zap }) {
   const sender = getZapSender(zap);
   const req = getZapRequest(zap);
   const comment = req?.content;
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-row items-center justify-between">
-        <UserLink img="size-8" name="text-xl" pubkey={sender} />
-        <CurrencyAmount amount={zap.amount} />
-      </div>
-      {comment && comment.length < 42 ? (
-        <p className="text-xl p-2 text-muted-foreground">{comment}</p>
-      ) : null}
-    </div>
+    <Reply author={sender} amount={zap.amount} comment={comment} event={zap} />
   );
 }
 
@@ -41,6 +34,33 @@ export function ZapPill({ zap }: { zap: Zap }) {
         ) : null}
       </div>
     </Badge>
+  );
+}
+
+export function ZapButton({
+  pubkey,
+  total,
+  event,
+}: {
+  pubkey: string;
+  total: number;
+  event?: NostrEvent;
+}) {
+  const [showDialog, setShowDialog] = useState(false);
+  return (
+    <ZapDialog
+      open={showDialog}
+      onOpenChange={setShowDialog}
+      pubkey={pubkey}
+      event={event}
+      trigger={
+        <Button variant="outline" className="rounded-xl" size="xl">
+          <div className="flex flex-col items-center gap-3">
+            <CurrencyAmount amount={total} size="xl" />
+          </div>
+        </Button>
+      }
+    ></ZapDialog>
   );
 }
 
