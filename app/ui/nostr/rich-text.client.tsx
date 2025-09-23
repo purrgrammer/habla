@@ -28,8 +28,9 @@ const components: ComponentMap = {
         <UserLink
           pubkey={node.decoded.data}
           wrapper="inline-block"
-          name="text-primary"
-          img="size-6 -mt-1"
+          className="gap-0.5"
+          name="text-primary text-md"
+          img="size-5"
         />
       );
     }
@@ -39,8 +40,9 @@ const components: ComponentMap = {
           pubkey={node.decoded.data.pubkey}
           relays={node.decoded.data.relays}
           wrapper="inline-block"
-          name="text-primary"
-          img="size-6 -mt-1"
+          className="gap-0.5"
+          name="text-primary text-md"
+          img="size-5"
         />
       );
     }
@@ -58,8 +60,9 @@ export default function RichText({
   content?: string;
 }) {
   if (!event && !content) return null;
-  return useRenderedContent(
+  const p = useRenderedContent(
     content && event ? { ...event, content } : event ? event : content || "",
     components,
   );
+  return <p>{p}</p>;
 }
