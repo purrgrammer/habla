@@ -1,4 +1,5 @@
 import { cn } from "~/lib/utils";
+import { Avatar as BaseAvatar, AvatarFallback, AvatarImage } from "~/ui/avatar";
 import {
   type ProfileContent,
   getDisplayName,
@@ -28,7 +29,10 @@ export function Avatar({
 }) {
   const picture = getProfilePicture(profile) || "/favicon.ico";
   return (
-    <img src={picture} className={cn("rounded-full object-cover", className)} />
+    <BaseAvatar className={className}>
+      <AvatarImage src={picture} />
+      <AvatarFallback>{profile?.name || profile?.display_name}</AvatarFallback>
+    </BaseAvatar>
   );
 }
 

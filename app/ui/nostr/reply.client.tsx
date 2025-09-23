@@ -9,7 +9,7 @@ import Note from "./note";
 import RichText from "./rich-text.client";
 import Timestamp from "../timestamp";
 import { isReplaceableKind } from "nostr-tools/kinds";
-import { useRelays, useTimeline } from "~/hooks/nostr.client";
+import { useProfile, useRelays, useTimeline } from "~/hooks/nostr.client";
 import Debug from "../debug";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import {
@@ -29,6 +29,8 @@ import {
   StickyNote,
 } from "lucide-react";
 import Blockquote from "../blockquote";
+import { Avatar } from "./user";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/ui/hover-card";
 
 export function EventReply({
   event,
@@ -74,6 +76,64 @@ export function EventReply({
   );
 }
 
+function PubkeyAvatar({
+  pubkey,
+  className,
+}: {
+  pubkey: Pubkey;
+  className?: string;
+}) {
+  const profile = useProfile(pubkey);
+  return (
+    <HoverCard>
+      <HoverCardTrigger>
+        <Avatar profile={profile} className={className} />
+      </HoverCardTrigger>
+      <HoverCardContent>
+        <div className="flex flex-col gap-2">
+          <UserLink
+            pubkey={pubkey}
+            profile={profile}
+            withNip05
+            nip05="line-clamp-1 text-xs"
+            img="size-12"
+            className="gap-1"
+          />
+          <p className="text-muted-foreground text-sm line-clamp-5">
+            {profile?.about}
+          </p>
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
+function Pubkeys({ pubkeys, max = 5 }: { pubkeys: Pubkey[]; max?: number }) {
+  const shownPubkeys = pubkeys.slice(0, max);
+  const restPubkeys = pubkeys.slice(max);
+  if (restPubkeys.length > 0) {
+    return (
+      <div className="flex flex-row items-center gap-1">
+        <div className="*:data-[slot=avatar]:ring-background flex -space-x-1 *:data-[slot=avatar]:ring-2">
+          {shownPubkeys.map((pubkey) => (
+            <PubkeyAvatar key={pubkey} pubkey={pubkey} className="size-6" />
+          ))}
+        </div>
+        <span className="text-sm text-muted-foreground">
+          & {restPubkeys.length} more
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="*:data-[slot=avatar]:ring-background flex -space-x-1 *:data-[slot=avatar]:ring-2">
+      {shownPubkeys.map((pubkey) => (
+        <PubkeyAvatar key={pubkey} pubkey={pubkey} className="size-6" />
+      ))}
+    </div>
+  );
+}
+
 const iconCls = "size-5 text-muted-foreground";
 const icons: Record<number, ReactElement> = {
   [kinds.Highlights]: <Highlighter className={iconCls} />,
@@ -110,20 +170,7 @@ function Repliers({ replies }: { replies: NostrEvent[] }) {
             {showReplies ? <Minus /> : <Plus />}
           </Button>
         )}
-        <motion.div
-          className="flex flex-row gap-0"
-          animate={{ opacity: showReplies ? 0.5 : 1 }}
-        >
-          {repliers.map((pubkey) => (
-            <UserLink
-              key={pubkey}
-              className="gap-0"
-              img="size-5"
-              name="hidden"
-              pubkey={pubkey}
-            />
-          ))}
-        </motion.div>
+        <Pubkeys pubkeys={repliers} />
       </div>
       <AnimatePresence>
         {showReplies ? (
@@ -163,8 +210,8 @@ function Replies({ author, event }: { author: Pubkey; event?: NostrEvent }) {
       ...(event ? { "#k": [String(event.kind)] } : {}),
     },
     {
-      kinds: [kinds.Zap, kinds.Highlights, kinds.ShortTextNote],
-      //"#p": [author],
+      kinds: [kinds.Zap, kinds.ShortTextNote],
+      "#p": [author],
       ...tagFilter,
     },
   ];
