@@ -42,7 +42,7 @@ export default function A({
 
   return (
     <Link
-      className="hover:underline hover:decoration-dotted break-all text-primary"
+      className="hover:underline hover:decoration-dotted text-primary"
       to={href}
     >
       {typeof value === "string" ? prettify(value) : value}

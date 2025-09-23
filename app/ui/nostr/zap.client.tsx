@@ -402,7 +402,6 @@ export default function ZapDialog({
     try {
       setIsZapping(true);
 
-      console.log("ZAPUR", lnurlInfo);
       const url = new URL(lnurlInfo.callback);
 
       // add amount

@@ -30,7 +30,7 @@ const components: ComponentMap = {
           wrapper="inline-block"
           className="gap-0.5"
           name="text-primary text-md"
-          img="size-5"
+          img="size-5 -mb-1"
         />
       );
     }
@@ -42,7 +42,7 @@ const components: ComponentMap = {
           wrapper="inline-block"
           className="gap-0.5"
           name="text-primary text-md"
-          img="size-5"
+          img="size-5 -mb-1"
         />
       );
     }

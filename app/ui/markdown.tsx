@@ -42,7 +42,7 @@ function MarkdownLink({
               pubkey={parsed.data}
               wrapper="inline-block"
               name="font-serif text-primary"
-              img="size-6 -mt-1"
+              img="size-6 -mb-1"
             />
           );
         case "nprofile":
@@ -52,7 +52,7 @@ function MarkdownLink({
               relays={parsed.data.relays}
               wrapper="inline-block"
               name="font-serif text-primary"
-              img="size-6 -mt-1"
+              img="size-6 -mb-1"
             />
           );
 
