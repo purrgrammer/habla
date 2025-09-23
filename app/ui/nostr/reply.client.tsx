@@ -13,6 +13,7 @@ import { useProfile, useRelays, useTimeline } from "~/hooks/nostr.client";
 import Debug from "../debug";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import {
+  getSeenRelays,
   getTagValue,
   getZapPayment,
   getZapRequest,
@@ -31,6 +32,7 @@ import {
   Plus,
   StickyNote,
   Share,
+  ExternalLink,
 } from "lucide-react";
 import Blockquote from "../blockquote";
 import { Avatar } from "./user";
@@ -45,7 +47,9 @@ import {
   DropdownMenuTrigger,
 } from "~/ui/dropdown-menu";
 import ZapDialog from "./zap.client";
-import { profile } from "node:console";
+import { COMMENT } from "~/const";
+import { use } from "marked";
+import { useNavigate } from "react-router";
 
 export function EventReply({
   event,
@@ -153,19 +157,19 @@ const iconCls = "size-5 text-muted-foreground";
 const icons: Record<number, ReactElement> = {
   [kinds.Highlights]: <Highlighter className={iconCls} />,
   [kinds.ShortTextNote]: <StickyNote className={iconCls} />,
-  [1111]: <MessageCircle className={iconCls} />,
+  [COMMENT]: <MessageCircle className={iconCls} />,
   [kinds.Zap]: <ZapIcon className={iconCls} />,
 };
 const verbs: Record<number, string> = {
   [kinds.Highlights]: "highlighted",
   [kinds.ShortTextNote]: "noted",
-  [1111]: "commented",
+  [COMMENT]: "commented",
   [kinds.Zap]: "zapped",
 };
 const kindNames: Record<number, string> = {
   [kinds.Highlights]: "Highlight",
   [kinds.ShortTextNote]: "Note",
-  [1111]: "Comment",
+  [COMMENT]: "Comment",
   [kinds.Zap]: "Zap",
 };
 
@@ -261,35 +265,49 @@ export function Reply({
   includeReplies?: boolean;
 }) {
   const [showZapDialog, setShowZapDialog] = useState(false);
-  const canShare = "share";
-  const profile = useProfile(author);
+  const profile = useProfile(
+    event?.kind === kinds.Zap ? getZapSender(event) : author,
+  );
+  const navigate = useNavigate();
+  const canShare = typeof window !== "undefined" && window.navigator.share;
+  const seenRelays = event ? getSeenRelays(event) : [];
+  const bech32 = useMemo(() => {
+    if (!event) return null;
+    return isReplaceableKind(event.kind)
+      ? `/a/${nip19.naddrEncode({
+          kind: event.kind,
+          pubkey: event.pubkey,
+          identifier: getTagValue(event, "d") || "",
+          relays: seenRelays ? [...seenRelays] : [],
+        })}`
+      : `/e/${nip19.neventEncode({
+          id: event.id,
+          author: event.pubkey,
+          kind: event.kind,
+          relays: seenRelays ? [...seenRelays] : [],
+        })}`;
+  }, [event]);
+
+  async function open() {
+    if (event && bech32) {
+      navigate(bech32);
+    }
+  }
+
   async function share() {
-    if (event) {
+    if (event && bech32) {
       try {
-        const bech32 = isReplaceableKind(event.kind)
-          ? `/a/${nip19.naddrEncode({
-              kind: event.kind,
-              pubkey: event.pubkey,
-              identifier: getTagValue(event, "d") || "",
-            })}`
-          : `/e/${nip19.neventEncode({
-              id: event.id,
-              author: event.pubkey,
-              kind: event.kind,
-            })}`;
         const shareData = {
           title: profile
             ? `${kindNames[event.kind]} - ${profile?.name || profile?.display_name}`
             : `${kindNames[event.kind]}`,
           text: event.content,
-          url: `https://habla.news/${bech32}`,
+          url: `https://habla.news${bech32}`,
         };
-        console.log("SHARE URL", shareData);
         await navigator.share(shareData);
       } catch (error) {
         console.error("Error sharing:", error);
       }
-    } else {
     }
   }
   return (
@@ -324,11 +342,27 @@ export function Reply({
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>
-                  <div className="flex flex-row items-center gap-1">
-                    {icons[event.kind]}
+                  <div className="flex flex-row items-center gap-1 justify-between">
                     {kindNames[event.kind]}
+                    {icons[event.kind]}
                   </div>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={open}>
+                  <div className="flex flex-row items-center gap-1">
+                    <ExternalLink />
+                    <span>Open</span>
+                  </div>
+                </DropdownMenuItem>
+                {bech32 && canShare ? (
+                  <DropdownMenuItem onClick={share}>
+                    <div className="flex flex-row items-center gap-1">
+                      <Share />
+                      <span>Share</span>
+                    </div>
+                  </DropdownMenuItem>
+                ) : null}
+                {/*
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <div className="flex flex-row items-center gap-1">
@@ -336,21 +370,13 @@ export function Reply({
                     <span>Comment</span>
                   </div>
                 </DropdownMenuItem>
-                {/*
                 <DropdownMenuItem onClick={() => setShowZapDialog(true)}>
                   <div className="flex flex-row items-center gap-1">
                     <ZapIcon />
                     <span>Zap</span>
                   </div>
                 </DropdownMenuItem>
-                */}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={share}>
-                  <div className="flex flex-row items-center gap-1">
-                    <Share />
-                    <span>Share</span>
-                  </div>
-                </DropdownMenuItem>
+                 */}
               </DropdownMenuContent>
             </DropdownMenu>
           </>

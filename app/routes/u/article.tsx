@@ -41,7 +41,6 @@ export async function clientLoader(args: Route.MetaArgs) {
 
 export default function Identifier({ loaderData }: Route.ComponentProps) {
   if (!loaderData?.event) return null;
-  console.log("LOADERDATA", loaderData);
   return (
     <div>
       <Article {...loaderData} />

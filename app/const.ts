@@ -13,3 +13,5 @@ export const AGGREGATOR_RELAYS = [
 ];
 
 export const BIG_ZAP_AMOUNT = 21_000;
+
+export const COMMENT = 1111;

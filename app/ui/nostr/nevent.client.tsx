@@ -7,9 +7,9 @@ import { getTagValue } from "applesauce-core/helpers";
 import { Card as SkeletonCard } from "~/ui/skeleton";
 import File from "~/ui/nostr/file";
 import NostrCard from "./card";
-import UnknownKind from "./unknown-kind";
 import { PureHighlight } from "./highlight";
 import type { ReactNode } from "react";
+import { EventReply } from "./reply.client";
 
 interface ComponentProps {
   event: NostrEvent;
@@ -50,9 +50,5 @@ export default function NEvent(props: EventPointer) {
   }
 
   const Component = components[event?.kind];
-  return Component ? (
-    <Component event={event} />
-  ) : (
-    <UnknownKind event={event} />
-  );
+  return Component ? <Component event={event} /> : <EventReply event={event} />;
 }

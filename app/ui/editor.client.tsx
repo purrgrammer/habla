@@ -246,10 +246,10 @@ async function markdownToHTML(markdown: string): Promise<string> {
 
 const DEFAULT_CONTENT = `
     <p>This document demonstrates the key features available in Markdown formatting.</p>
-    
+
     <h2>Text Formatting</h2>
     <p>You can make text <strong>bold</strong>, <em>italic</em>, or <strong><em>both</em></strong>. You can also add <code>inline code</code> and <s>strikethrough</s> text.</p>
-    
+
     <h2>Lists</h2>
     <h3>Unordered List</h3>
     <ul>
@@ -257,17 +257,17 @@ const DEFAULT_CONTENT = `
         <li>Second item</li>
         <li>Third item with <strong>formatting</strong></li>
     </ul>
-    
+
     <h3>Ordered List</h3>
     <ol>
         <li>Step one</li>
         <li>Step two</li>
         <li>Step three</li>
     </ol>
-    
+
     <h2>Links and Code</h2>
     <p>Here's a <a href="https://example.com">link to example.com</a> and some code:</p>
-    
+
     <pre><code>function hello() {
     console.log("Hello, world!");
 }</code></pre>

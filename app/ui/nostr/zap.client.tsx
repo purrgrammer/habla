@@ -140,16 +140,13 @@ function useLNURL(url?: string) {
   return useQuery({
     queryKey: ["lnurl", url],
     queryFn: async () => {
-      console.log("LNURL Query starting for:", url);
       if (!url) throw new Error(`Missing URL`);
 
       const lnurl = parseLNURLOrAddress(url);
-      console.log("Parsed LNURL:", lnurl);
       if (lnurl) {
         try {
           const response = await fetch(lnurl);
           const data = await response.json();
-          console.log("LNURL Response:", data);
           return data;
         } catch (error) {
           console.error("LNURL Fetch Error:", error);
@@ -410,20 +407,12 @@ export default function ZapDialog({
 
       // add nostr param if it supports nostr and we have an active account
       if (lnurlInfo.allowsNostr && activeAccount) {
-        console.log(
-          "Creating zap request with active account:",
-          activeAccount.id,
-        );
         const zapRequest = await firstValueFrom(
           hub.exec(ZapRequest, { amount: mSatsAmount, pubkey, event, message }),
         );
         if (zapRequest) {
           url?.searchParams.set("nostr", JSON.stringify(zapRequest));
         }
-      } else if (lnurlInfo.allowsNostr && !activeAccount) {
-        console.log(
-          "LNURL supports Nostr but no active account - skipping zap request",
-        );
       } else if (!lnurlInfo.allowsNostr) {
         console.log("LNURL does not support Nostr - skipping zap request");
       }

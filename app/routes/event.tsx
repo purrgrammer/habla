@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import Debug from "~/ui/debug";
 import UnknownKind from "~/ui/nostr/unknown-kind";
 import Zaps from "~/ui/zaps.client";
+import { EventReply } from "~/ui/nostr/reply.client";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData) return defaults;
@@ -82,6 +83,6 @@ export default function Event({ loaderData, params }: Route.ComponentProps) {
       <Zaps event={event} />
     </div>
   ) : (
-    <UnknownKind event={event} />
+    <EventReply event={event} />
   );
 }

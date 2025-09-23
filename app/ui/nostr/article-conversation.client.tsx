@@ -95,6 +95,7 @@ function isReply(event: NostrEvent): boolean {
   );
 }
 
+// TODO: generalize to conversation to use for all kinds of events
 export default function ArticleConversation({
   event,
   relays,
