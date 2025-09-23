@@ -3,7 +3,7 @@ import { map } from "rxjs";
 import { type FeedComponent, PureFeed } from "~/ui/nostr/feed.client";
 import Highlight from "./highlight";
 import NostrCard from "./card";
-import { useTimeline, useZaps } from "~/hooks/nostr.client";
+import { parseZap, useTimeline, useZaps, type Zap } from "~/hooks/nostr.client";
 import Note from "./note";
 import {
   getReplaceableAddress,
@@ -102,7 +102,7 @@ export default function ArticleConversation({
   event: NostrEvent;
   relays: string[];
 }) {
-  const { total } = useZaps(event) || { total: 0 };
+  useZaps(event);
   const a = getReplaceableAddress(event);
   const filters = [
     {
@@ -119,13 +119,28 @@ export default function ArticleConversation({
     limit: 200,
   });
   const eventStore = useEventStore();
+  const total = useObservableMemo(() => {
+    return eventStore
+      .timeline({
+        kinds: [kinds.Zap],
+        "#a": [a],
+      })
+      .pipe(
+        map((events) => {
+          return events
+            .map(parseZap)
+            .filter(Boolean)
+            .reduce((acc, ev) => acc + (ev as Zap).amount, 0);
+        }),
+      );
+  }, [a]);
   const eventsStored = useObservableMemo(() => {
     return eventStore.timeline(filters, false);
   }, [a]);
   return (
     <div className="flex flex-col gap-12 pb-16 items-center w-full">
       <div className="flex flex-col">
-        <ZapButton pubkey={event.pubkey} event={event} total={total} />
+        <ZapButton pubkey={event.pubkey} event={event} total={total || 0} />
       </div>
       <div className="flex flex-col w-full gap-3">
         {eventsStored
