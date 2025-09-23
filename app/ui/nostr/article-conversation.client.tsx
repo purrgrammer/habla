@@ -3,7 +3,13 @@ import { map } from "rxjs";
 import { type FeedComponent, PureFeed } from "~/ui/nostr/feed.client";
 import Highlight from "./highlight";
 import NostrCard from "./card";
-import { parseZap, useTimeline, useZaps, type Zap } from "~/hooks/nostr.client";
+import {
+  parseZap,
+  useRelays,
+  useTimeline,
+  useZaps,
+  type Zap,
+} from "~/hooks/nostr.client";
 import Note from "./note";
 import {
   getReplaceableAddress,
@@ -16,6 +22,7 @@ import Debug from "../debug";
 import { EventReply, Reply } from "./reply.client";
 import { useMemo } from "react";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
+import { isReplaceableKind } from "nostr-tools/kinds";
 
 const components: Record<number, FeedComponent> = {
   [kinds.Highlights]: ({ event, profile }) => {
@@ -95,8 +102,7 @@ function isReply(event: NostrEvent): boolean {
   );
 }
 
-// TODO: generalize to conversation to use for all kinds of events
-export default function ArticleConversation({
+export default function EventConversation({
   event,
   relays,
 }: {
@@ -104,19 +110,21 @@ export default function ArticleConversation({
   relays: string[];
 }) {
   useZaps(event);
-  const a = getReplaceableAddress(event);
+  const id = isReplaceableKind(event.kind)
+    ? getReplaceableAddress(event)
+    : event.id;
   const filters = [
     {
       kinds: [1111],
-      "#A": [a],
-      "#K": [String(kinds.LongFormArticle)],
+      ...(isReplaceableKind(event.kind) ? { "#A": [id] } : { "#E": [id] }),
+      "#K": [String(event.kind)],
     },
     {
       kinds: [kinds.Highlights, kinds.Zap, kinds.ShortTextNote],
-      "#a": [a],
+      ...(isReplaceableKind(event.kind) ? { "#a": [id] } : { "#e": [id] }),
     },
   ];
-  useTimeline(`${a}-comments`, filters, relays, {
+  useTimeline(`${id}-comments`, filters, relays, {
     limit: 200,
   });
   const eventStore = useEventStore();
@@ -124,7 +132,7 @@ export default function ArticleConversation({
     return eventStore
       .timeline({
         kinds: [kinds.Zap],
-        "#a": [a],
+        ...(isReplaceableKind(event.kind) ? { "#a": [id] } : { "#e": [id] }),
       })
       .pipe(
         map((events) => {
@@ -134,10 +142,10 @@ export default function ArticleConversation({
             .reduce((acc, ev) => acc + (ev as Zap).amount, 0);
         }),
       );
-  }, [a]);
+  }, [id]);
   const eventsStored = useObservableMemo(() => {
     return eventStore.timeline(filters, false);
-  }, [a]);
+  }, [id]);
   return (
     <div className="flex flex-col gap-12 pb-16 items-center w-full">
       <div className="flex flex-col">
@@ -150,28 +158,11 @@ export default function ArticleConversation({
             <EventReply key={ev.id} event={ev} includeReplies />
           ))}
       </div>
-      {/*
-      <Tabs defaultValue="highlights" className="w-full">
-        <TabsList className="w-full mb-4">
-          <TabsTrigger value="highlights">
-            <div className={trigger}>
-              <Highlighter className={icon} />
-            </div>
-          </TabsTrigger>
-          <TabsTrigger value="comments">
-            <div className={trigger}>
-              <MessageCircle className={icon} />
-            </div>
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="highlights">
-          <Highlights event={event} relays={relays} />
-        </TabsContent>
-        <TabsContent value="comments">
-          <Comments event={event} relays={relays} />
-        </TabsContent>
-      </Tabs>
-      */}
     </div>
   );
+}
+
+export function Conversation({ event }: { event: NostrEvent }) {
+  const relays = useRelays(event.pubkey);
+  return <EventConversation event={event} relays={relays} />;
 }

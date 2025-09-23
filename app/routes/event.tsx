@@ -9,10 +9,9 @@ import { default as serverStore } from "~/services/data.server";
 import { type DataStore } from "~/services/types";
 import type { ProfileContent } from "applesauce-core/helpers";
 import type { ReactNode } from "react";
-import Debug from "~/ui/debug";
-import UnknownKind from "~/ui/nostr/unknown-kind";
-import Zaps from "~/ui/zaps.client";
 import { EventReply } from "~/ui/nostr/reply.client";
+import { Conversation } from "~/ui/nostr/article-conversation.client";
+import ClientOnly from "~/ui/client-only";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData) return defaults;
@@ -27,16 +26,14 @@ async function loadData(store: DataStore, { params }: Route.MetaArgs) {
       store.fetchProfile({ pubkey: decoded.data.author }),
       store.fetchEvent(decoded.data),
     ]);
-    if (event && profile) {
-      return { profile, event };
+    if (event) {
+      return { event, profile };
     }
   } else if (decoded?.type === "note") {
     const event = await store.fetchEvent({ id: decoded.data });
     if (event) {
       const profile = await store.fetchProfile({ pubkey: event.pubkey });
-      if (profile) {
-        return { profile, event };
-      }
+      return { profile, event };
     }
   }
 }
@@ -80,9 +77,12 @@ export default function Event({ loaderData, params }: Route.ComponentProps) {
       >
         <Component profile={profile} event={event} />
       </NostrCard>
-      <Zaps event={event} />
+      <ClientOnly>{() => <Conversation event={event} />}</ClientOnly>
     </div>
   ) : (
-    <EventReply event={event} />
+    <>
+      <EventReply event={event} />
+      <ClientOnly>{() => <Conversation event={event} />}</ClientOnly>
+    </>
   );
 }
