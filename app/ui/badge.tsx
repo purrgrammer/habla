@@ -21,6 +21,8 @@ const badgeVariants = cva(
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         pill: "text-foreground border-dotted [a&]:hover:bg-accent [a&]:hover:text-accent-foreground rounded-full",
+        golden:
+          "text-foreground bg-orange-100 dark:text-background border-none rounded-full",
       },
     },
     defaultVariants: {

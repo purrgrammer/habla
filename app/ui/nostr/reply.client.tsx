@@ -31,6 +31,7 @@ import {
 import Blockquote from "../blockquote";
 import { Avatar } from "./user";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/ui/hover-card";
+import Zaps, { ZapPills } from "../zaps.client";
 
 export function EventReply({
   event,
@@ -210,7 +211,7 @@ function Replies({ author, event }: { author: Pubkey; event?: NostrEvent }) {
       ...(event ? { "#k": [String(event.kind)] } : {}),
     },
     {
-      kinds: [kinds.Zap, kinds.ShortTextNote],
+      kinds: [kinds.ShortTextNote],
       "#p": [author],
       ...tagFilter,
     },
@@ -253,7 +254,7 @@ export function Reply({
         {amount ? <CurrencyAmount amount={amount} size="lg" /> : null}
       </div>
       {comment ? (
-        <div className="ml-3 border-l-4 p-2 pl-4">
+        <div className="flex flex-col gap-2 ml-3 border-l-4 p-2 pl-4">
           {event?.kind === kinds.Highlights ? (
             <>
               <span>{event.tags.find((t) => t[0] === "comment")?.[1]}</span>
@@ -262,6 +263,7 @@ export function Reply({
           ) : (
             <RichText content={comment} />
           )}
+          {event ? <ZapPills event={event} size="sm" className="pt-1" /> : null}
         </div>
       ) : null}
       {includeReplies ? <Replies author={author} event={event} /> : null}

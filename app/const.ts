@@ -11,3 +11,5 @@ export const AGGREGATOR_RELAYS = [
   "wss://relay.nostr.band",
   "wss://relay.primal.net",
 ];
+
+export const BIG_ZAP_AMOUNT = 21_000;

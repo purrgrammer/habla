@@ -8,6 +8,8 @@ import { Button } from "~/ui/button";
 import ZapDialog from "~/ui/nostr/zap.client";
 import { useState } from "react";
 import { Reply } from "./nostr/reply.client";
+import { cn } from "~/lib/utils";
+import { BIG_ZAP_AMOUNT } from "~/const";
 
 export function ZapReply({ zap }: { zap: Zap }) {
   const sender = getZapSender(zap);
@@ -18,17 +20,53 @@ export function ZapReply({ zap }: { zap: Zap }) {
   );
 }
 
-export function ZapPill({ zap }: { zap: Zap }) {
+const pillSizes: Record<
+  "sm" | "lg",
+  { text: string; amount: string; icon: string; avatar: string }
+> = {
+  sm: {
+    text: "text-sm",
+    icon: "size-4",
+    amount: "text-sm",
+    avatar: "size-4",
+  },
+  lg: {
+    text: "text-lg",
+    icon: "",
+    amount: "",
+    avatar: "size-5",
+  },
+};
+
+export function ZapPill({
+  zap,
+  size = "lg",
+}: {
+  zap: Zap;
+  size?: "sm" | "lg";
+}) {
+  const { avatar, text, amount, icon } = pillSizes[size];
   const sender = getZapSender(zap);
+  const isBig = zap.amount >= BIG_ZAP_AMOUNT;
   const req = getZapRequest(zap);
   const comment = req?.content;
   return (
-    <Badge variant="pill">
+    <Badge variant={isBig ? "golden" : "pill"}>
       <div className="flex flex-row items-center flex-wrap gap-3">
-        <UserLink img="size-5" name="text-lg" pubkey={sender} />
-        <CurrencyAmount amount={zap.amount} className="flex-row" />
+        <UserLink img={avatar} name={text} pubkey={sender} />
+        <CurrencyAmount
+          iconClassname={icon}
+          amount={zap.amount}
+          amountClassname={amount}
+          className={text}
+        />
         {comment && comment.length < 42 ? (
-          <p className="text-lg max-w-[80dvw] overflow-hidden overflow-x-scroll no-scrollbar font-light text-muted-foreground line-clamp-1">
+          <p
+            className={cn(
+              "max-w-[80dvw] overflow-hidden overflow-x-scroll no-scrollbar font-light line-clamp-1",
+              text,
+            )}
+          >
             {comment}
           </p>
         ) : null}
@@ -62,6 +100,28 @@ export function ZapButton({
       }
     ></ZapDialog>
   );
+}
+
+export function ZapPills({
+  event,
+  size = "sm",
+  className,
+}: {
+  event: NostrEvent;
+  size?: "sm" | "lg";
+  className?: string;
+}) {
+  const { zaps, total } = useZaps(event) ?? {
+    total: 0,
+    zaps: [],
+  };
+  return zaps.length > 0 ? (
+    <div className={`flex flex-row flex-wrap w-full gap-1 ${className}`}>
+      {zaps?.map((zap) => (
+        <ZapPill key={zap.id} zap={zap} size={size} />
+      ))}
+    </div>
+  ) : null;
 }
 
 export default function Zaps({ event }: { event: NostrEvent }) {

@@ -13,11 +13,13 @@ export function FiatAmount({
   size = "lg",
   className,
   iconClassname,
+  amountClassname,
 }: {
   amount: number; // sats
   currency?: "EUR" | "USD";
   className?: string;
   iconClassname?: string;
+  amountClassname?: string;
   size?: AmountSize;
 }) {
   const { data: rate } = useExchangeRate(currency);
@@ -34,7 +36,7 @@ export function FiatAmount({
       ) : (
         <DollarSign className={cn(icon, iconClassname)} />
       )}
-      <span className={text}>
+      <span className={cn(text, amountClassname)}>
         {fiatAmount !== null ? (
           <NumberFlow
             value={fiatAmount}
@@ -53,21 +55,29 @@ export function CurrencyAmount({
   amount,
   size = "lg",
   className,
+  amountClassname,
   iconClassname,
 }: {
   amount: number; // sats
   className?: string;
   iconClassname?: string;
+  amountClassname?: string;
   size?: AmountSize;
 }) {
   const { currency } = useCurrency();
   return (
     <div className={cn("flex flex-col gap-0 items-center", className)}>
-      <SatsAmount amount={amount} size={size} iconClassname={iconClassname} />
+      <SatsAmount
+        amount={amount}
+        amountClassname={amountClassname}
+        size={size}
+        iconClassname={iconClassname}
+      />
       {currency ? (
         <FiatAmount
           amount={amount}
           className="text-muted-foreground"
+          amountClassname={amountClassname}
           currency={currency}
           iconClassname={iconClassname}
           size="sm"
