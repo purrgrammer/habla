@@ -8,6 +8,7 @@ import {
   getArticleSummary,
   getArticlePublished,
 } from "applesauce-core/helpers";
+import { COMMENT } from "./const";
 
 interface MetaTag {
   title?: string;
@@ -199,18 +200,24 @@ const eventKinds: Record<number, any> = {
   [kinds.ShortTextNote]: {
     title: "Note",
   },
+  [kinds.Zap]: {
+    title: "Zap",
+  },
   [kinds.Highlights]: {
     title: "Highlight",
+  },
+  [COMMENT]: {
+    title: "Comment",
   },
 };
 
 export function eventMeta(
   event: NostrEvent,
-  profile: ProfileContent,
+  profile?: ProfileContent,
   url?: string,
 ) {
   const { title } = eventKinds[event.kind] || { title: `Kind ${event.kind}` };
-  const name = getDisplayName(profile);
+  const name = getDisplayName(profile) || event.pubkey;
   const image = getProfilePicture(profile);
 
   return buildBaseSeoTags({

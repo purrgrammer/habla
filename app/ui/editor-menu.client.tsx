@@ -46,6 +46,7 @@ function LoggedInUser({
   onPublish,
   onLoad,
   onSaveDraft,
+  onNew,
 }: {
   pubkey: string;
 } & EditorMenuProps) {
@@ -103,7 +104,6 @@ function LoggedInUser({
         </Button>
         */}
       <Button
-        disabled
         aria-label="Publish"
         variant="default"
         size="sm"
@@ -115,12 +115,14 @@ function LoggedInUser({
       </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button aria-label="Menu" variant="ghost" size="sm" disabled>
+          <Button aria-label="Menu" variant="ghost" size="sm">
             <Menu />
             Menu
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuItem onClick={onNew}>New Article</DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuLabel>Save</DropdownMenuLabel>
           <DropdownMenuItem disabled>
             <div
@@ -142,6 +144,7 @@ function LoggedInUser({
                     Articles
                   </div>
                 </DropdownMenuSubTrigger>
+
                 <DropdownMenuSubContent>
                   {timeline?.map((article) => {
                     return (
@@ -173,6 +176,7 @@ export interface EditorMenuProps {
   canPublish: boolean;
   onPublish: () => void;
   onLoad: (ev: NostrEvent) => void;
+  onNew: () => void;
   onSaveDraft: () => void;
 }
 

@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import type { Pubkey } from "~/types";
+import { CircleQuestionMark, Newspaper } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { kinds, nip19, type NostrEvent } from "nostr-tools";
 import { map, distinctUntilChanged } from "rxjs";
@@ -22,8 +23,6 @@ import {
 import { useMemo, useState } from "react";
 import { Button } from "../button";
 import {
-  ChevronDown,
-  ChevronUp,
   Code,
   Highlighter,
   MessageCircle,
@@ -33,11 +32,12 @@ import {
   StickyNote,
   Share,
   ExternalLink,
+  Copy,
 } from "lucide-react";
 import Blockquote from "../blockquote";
 import { Avatar } from "./user";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/ui/hover-card";
-import Zaps, { ZapPills } from "../zaps.client";
+import { ZapPills } from "../zaps.client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,9 +47,10 @@ import {
   DropdownMenuTrigger,
 } from "~/ui/dropdown-menu";
 import ZapDialog from "./zap.client";
-import { COMMENT } from "~/const";
-import { use } from "marked";
+import { AGGREGATOR_RELAYS, COMMENT } from "~/const";
 import { useNavigate } from "react-router";
+import { info } from "~/services/notifications.client";
+import { Dialog, DialogContent, DialogTitle } from "../dialog";
 
 export function EventReply({
   event,
@@ -155,18 +156,21 @@ function Pubkeys({ pubkeys, max = 5 }: { pubkeys: Pubkey[]; max?: number }) {
 
 const iconCls = "size-5 text-muted-foreground";
 const icons: Record<number, ReactElement> = {
+  [kinds.LongFormArticle]: <Newspaper className={iconCls} />,
   [kinds.Highlights]: <Highlighter className={iconCls} />,
   [kinds.ShortTextNote]: <StickyNote className={iconCls} />,
   [COMMENT]: <MessageCircle className={iconCls} />,
   [kinds.Zap]: <ZapIcon className={iconCls} />,
 };
 const verbs: Record<number, string> = {
+  [kinds.LongFormArticle]: "wrote",
   [kinds.Highlights]: "highlighted",
   [kinds.ShortTextNote]: "noted",
   [COMMENT]: "commented",
   [kinds.Zap]: "zapped",
 };
 const kindNames: Record<number, string> = {
+  [kinds.LongFormArticle]: "Article",
   [kinds.Highlights]: "Highlight",
   [kinds.ShortTextNote]: "Note",
   [COMMENT]: "Comment",
@@ -251,6 +255,47 @@ function Replies({ author, event }: { author: Pubkey; event?: NostrEvent }) {
   return replies ? <Repliers replies={replies} /> : null;
 }
 
+function EventDialog({
+  viewEvent,
+  setViewEvent,
+  event,
+}: {
+  viewEvent: boolean;
+  setViewEvent: (open: boolean) => void;
+  event: NostrEvent;
+}) {
+  async function copyJSON() {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(event, null, 2));
+      info("Copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy to clipboard:", err);
+    }
+  }
+  return (
+    <Dialog open={viewEvent} onOpenChange={setViewEvent}>
+      <DialogContent>
+        <DialogTitle>
+          <div className="flex flex-row gap-2 items-center">
+            {icons[event.kind] || <CircleQuestionMark className={iconCls} />}
+            {kindNames[event.kind] || `Kind ${event.kind}`}
+          </div>
+        </DialogTitle>
+        <UserLink
+          pubkey={event.kind === kinds.Zap ? getZapSender(event) : event.pubkey}
+        />
+        <pre className="text-xs font-mono overflow-scroll">
+          {JSON.stringify(event, null, 2)}
+        </pre>
+        <Button variant="secondary" onClick={copyJSON}>
+          <Copy />
+          Copy
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function Reply({
   author,
   comment,
@@ -268,41 +313,56 @@ export function Reply({
   const profile = useProfile(
     event?.kind === kinds.Zap ? getZapSender(event) : author,
   );
+  const [viewEvent, setViewEvent] = useState(false);
   const navigate = useNavigate();
   const canShare = typeof window !== "undefined" && window.navigator.share;
-  const seenRelays = event ? getSeenRelays(event) : [];
+  const seenRelays = event ? getSeenRelays(event) : AGGREGATOR_RELAYS;
   const bech32 = useMemo(() => {
     if (!event) return null;
     return isReplaceableKind(event.kind)
-      ? `/a/${nip19.naddrEncode({
+      ? nip19.naddrEncode({
           kind: event.kind,
           pubkey: event.pubkey,
           identifier: getTagValue(event, "d") || "",
-          relays: seenRelays ? [...seenRelays] : [],
-        })}`
-      : `/e/${nip19.neventEncode({
+          relays: seenRelays ? [...seenRelays] : AGGREGATOR_RELAYS,
+        })
+      : nip19.neventEncode({
           id: event.id,
           author: event.pubkey,
           kind: event.kind,
-          relays: seenRelays ? [...seenRelays] : [],
-        })}`;
+          relays: seenRelays ? [...seenRelays] : AGGREGATOR_RELAYS,
+        });
   }, [event]);
+  const bech32Link = useMemo(() => {
+    if (!event || !bech32) return null;
+    return isReplaceableKind(event.kind) ? `/a/${bech32}` : `/e/${bech32}`;
+  }, [bech32]);
 
   async function open() {
-    if (event && bech32) {
-      navigate(bech32);
+    if (event && bech32Link) {
+      navigate(bech32Link);
+    }
+  }
+
+  async function copyBech32() {
+    try {
+      if (!bech32) return;
+      await navigator.clipboard.writeText(bech32);
+      info("Copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy to clipboard:", err);
     }
   }
 
   async function share() {
-    if (event && bech32) {
+    if (event && bech32Link) {
       try {
         const shareData = {
           title: profile
-            ? `${kindNames[event.kind]} - ${profile?.name || profile?.display_name}`
-            : `${kindNames[event.kind]}`,
+            ? `${kindNames[event.kind] || event.kind} - ${profile?.name || profile?.display_name}`
+            : `${kindNames[event.kind] || event.kind}`,
           text: event.content,
-          url: `https://habla.news${bech32}`,
+          url: `https://habla.news${bech32Link}`,
         };
         await navigator.share(shareData);
       } catch (error) {
@@ -331,6 +391,13 @@ export function Reply({
           />
         ) : null}
         {event ? (
+          <EventDialog
+            viewEvent={viewEvent}
+            setViewEvent={setViewEvent}
+            event={event}
+          />
+        ) : null}
+        {event ? (
           <>
             <DropdownMenu>
               <DropdownMenuTrigger>
@@ -342,36 +409,61 @@ export function Reply({
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>
-                  <div className="flex flex-row items-center gap-1 justify-between">
-                    {kindNames[event.kind]}
-                    {icons[event.kind]}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-row items-center gap-1.5">
+                      {icons[event.kind] || (
+                        <CircleQuestionMark className={iconCls} />
+                      )}
+                      <span>
+                        {kindNames[event.kind] || `Kind ${event.kind}`}
+                      </span>
+                    </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={open}>
-                  <div className="flex flex-row items-center gap-1">
+                  <div className="flex flex-row items-center gap-1.5">
                     <ExternalLink />
                     <span>Open</span>
                   </div>
                 </DropdownMenuItem>
-                {bech32 && canShare ? (
-                  <DropdownMenuItem onClick={share}>
-                    <div className="flex flex-row items-center gap-1">
-                      <Share />
-                      <span>Share</span>
-                    </div>
-                  </DropdownMenuItem>
+                {bech32Link && canShare ? (
+                  <>
+                    <DropdownMenuItem onClick={share}>
+                      <div className="flex flex-row items-center gap-1.5">
+                        <Share />
+                        <span>Share</span>
+                      </div>
+                    </DropdownMenuItem>
+                  </>
                 ) : null}
+                {bech32Link && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={copyBech32}>
+                      <div className="flex flex-row items-center gap-1.5">
+                        <Copy />
+                        <span>Copy event id</span>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setViewEvent(true)}>
+                      <div className="flex flex-row items-center gap-1.5">
+                        <Code />
+                        <span>View event</span>
+                      </div>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 {/*
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <div className="flex flex-row items-center gap-1">
+                  <div className="flex flex-row items-center gap-1.5">
                     <MessageCircle />
                     <span>Comment</span>
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setShowZapDialog(true)}>
-                  <div className="flex flex-row items-center gap-1">
+                  <div className="flex flex-row items-center gap-1.5">
                     <ZapIcon />
                     <span>Zap</span>
                   </div>
