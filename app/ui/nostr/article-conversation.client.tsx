@@ -12,6 +12,7 @@ import {
 } from "~/hooks/nostr.client";
 import Note from "./note";
 import {
+  getAddressPointerForEvent,
   getReplaceableAddress,
   getZapPayment,
   getZapRequest,
@@ -20,9 +21,15 @@ import {
 import Zaps, { ZapButton } from "../zaps.client";
 import Debug from "../debug";
 import { EventReply, Reply } from "./reply.client";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import { isReplaceableKind } from "nostr-tools/kinds";
+import { Bookmark, MessageCircle, Share } from "lucide-react";
+import { Button } from "../button";
+import { COMMENT } from "~/const";
+import CommentDialog from "./comment-dialog.client";
+import ArticleCard from "./article-card";
+import NumberFlow from "@number-flow/react";
 
 const components: Record<number, FeedComponent> = {
   [kinds.Highlights]: ({ event, profile }) => {
@@ -110,6 +117,7 @@ export default function EventConversation({
   relays: string[];
 }) {
   useZaps(event);
+  const [showCommentDialog, setShowCommentDialog] = useState(false);
   const id = isReplaceableKind(event.kind)
     ? getReplaceableAddress(event)
     : event.id;
@@ -146,10 +154,49 @@ export default function EventConversation({
   const eventsStored = useObservableMemo(() => {
     return eventStore.timeline(filters, false);
   }, [id]);
+  const comments = useObservableMemo(() => {
+    return eventStore.timeline({
+      kinds: [COMMENT, kinds.ShortTextNote],
+      ...(isReplaceableKind(event.kind) ? { "#a": [id] } : { "#e": [id] }),
+    });
+  }, [id]);
   return (
     <div className="flex flex-col gap-12 pb-16 items-center w-full">
-      <div className="flex flex-col">
+      <div className="flex flex-row gap-2">
+        <CommentDialog
+          event={event}
+          showCommentDialog={showCommentDialog}
+          setShowCommentDialog={setShowCommentDialog}
+          trigger={
+            <Button variant="outline" className="rounded-xl" size="xl">
+              <div className="flex flex-row gap-3">
+                <MessageCircle className="size-12 text-muted-foreground" />
+                <span className="text-4xl font-mono">
+                  <NumberFlow value={comments?.length || 0} />
+                </span>
+              </div>
+            </Button>
+          }
+        >
+          {event.kind === kinds.LongFormArticle ? (
+            <ArticleCard
+              noHeader
+              address={getAddressPointerForEvent(event)}
+              article={event}
+            />
+          ) : (
+            <EventReply event={event} includeReplies={false} />
+          )}
+        </CommentDialog>
         <ZapButton pubkey={event.pubkey} event={event} total={total || 0} />
+        {/*
+        <Button variant="outline" className="rounded-xl" size="xl">
+          <Bookmark className="size-12 text-muted-foreground" />
+        </Button>
+        <Button variant="outline" className="rounded-xl" size="xl">
+          <Share className="size-12 text-muted-foreground" />
+        </Button>
+         */}
       </div>
       <div className="flex flex-col w-full gap-3">
         {eventsStored

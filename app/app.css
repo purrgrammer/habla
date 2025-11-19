@@ -145,6 +145,21 @@ body {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+  .pretty-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sidebar-accent) var(--sidebar);
+  }
+  .pretty-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .pretty-scrollbar::-webkit-scrollbar-track {
+    background: var(--sidebar);
+  }
+  .pretty-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--sidebar-accent);
+    border-radius: 10px;
+  }
   mark {
     @apply bg-orange-200;
   }

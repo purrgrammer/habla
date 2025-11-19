@@ -5,7 +5,6 @@ import { cn } from "~/lib/utils";
 import { useCurrency, useExchangeRate } from "~/services/currency.client";
 import { type AmountSize, amounts } from "./amount";
 import SatsAmount from "~/ui/sats";
-import Debug from "./debug";
 
 export function FiatAmount({
   amount,

@@ -1,7 +1,6 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { match } from "ts-pattern";
-import { kinds, type NostrEvent } from "nostr-tools";
-import { type Action } from "applesauce-actions";
+import { type NostrEvent } from "nostr-tools";
 import QRCode from "react-qr-code";
 import {
   Dialog,
@@ -28,31 +27,17 @@ import { ConnectWallet } from "./nwc.client";
 import { queries, useWallet } from "~/services/wallet.client";
 import { WalletName } from "../wallet.client";
 import { useProfile } from "~/hooks/nostr.client";
-import {
-  getAddressPointerForEvent,
-  getInboxes,
-  getInvoice,
-  isReplaceable,
-  parseLNURLOrAddress,
-} from "applesauce-core/helpers";
+import { getInvoice, parseLNURLOrAddress } from "applesauce-core/helpers";
 import type { Pubkey } from "~/types";
 import { Avatar, Username } from "./user";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useActionHub } from "applesauce-react/hooks";
-import {
-  addAddressTag,
-  addEventTag,
-  addPubkeyTag,
-  setSingletonTag,
-} from "applesauce-factory/operations/tag";
-import { modifyPublicTags } from "applesauce-factory/operations";
-import type { ProfilePointer } from "nostr-tools/nip19";
 import { firstValueFrom } from "rxjs";
 import type { DialogProps } from "@radix-ui/react-dialog";
 import Debug from "../debug";
-import NumberFlow from "@number-flow/react";
 import { info } from "~/services/notifications.client";
 import { useActiveAccount } from "applesauce-react/hooks";
+import { ZapRequest } from "~/nostr/actions";
 
 const amounts = [
   {
@@ -80,61 +65,6 @@ const amounts = [
     text: "🍱",
   },
 ];
-
-function ZapRequest({
-  amount,
-  pubkey,
-  event,
-  lnurl,
-  message,
-}: {
-  amount: string; // in msats
-  pubkey: string;
-  event?: NostrEvent;
-  lnurl?: string;
-  message?: string;
-}): Action {
-  return async function* ({ events, factory, self }) {
-    const otherRelayList = events.getReplaceable(kinds.RelayList, pubkey);
-    const otherRelays = otherRelayList ? getInboxes(otherRelayList) : [];
-    const myRelaysList =
-      self === pubkey
-        ? otherRelayList
-        : events.getReplaceable(kinds.RelayList, self);
-    const myRelays =
-      self === pubkey
-        ? otherRelays
-        : myRelaysList
-          ? getInboxes(myRelaysList)
-          : [];
-    const relays = otherRelays.concat(myRelays);
-    const pointer = {
-      pubkey,
-      relays: otherRelays,
-    };
-    const draft = await factory.build(
-      {
-        kind: kinds.ZapRequest,
-        content: message,
-      },
-      modifyPublicTags(
-        ...[
-          addPubkeyTag(pointer),
-          setSingletonTag(["amount", amount]),
-          setSingletonTag(["relays", ...relays]),
-          ...(lnurl ? [setSingletonTag(["lnurl", lnurl])] : []),
-          ...(event
-            ? [addEventTag(event), setSingletonTag(["k", String(event.kind)])]
-            : []),
-          ...(event && isReplaceable(event.kind)
-            ? [addAddressTag(getAddressPointerForEvent(event))]
-            : []),
-        ],
-      ),
-    );
-    yield await factory.sign(draft);
-  };
-}
 
 function useLNURL(url?: string) {
   return useQuery({
@@ -167,6 +97,7 @@ export default function ZapDialog({
   onOpenChange,
   trigger,
   title,
+  hideTitle,
   description,
   event,
   pubkey,
@@ -174,6 +105,7 @@ export default function ZapDialog({
   placeholder = "Send a message with your zap",
 }: {
   title?: string;
+  hideTitle?: boolean;
   placeholder?: string;
   event?: NostrEvent;
   pubkey: Pubkey;
@@ -454,20 +386,22 @@ export default function ZapDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>
-            {title || (
-              <div className="flex flex-row gap-2 w-full flex-1">
-                <Avatar profile={profile} className="size-9" />
-                <div className="flex flex-row items-center justify-between flex-1">
-                  <Username
-                    pubkey={pubkey}
-                    profile={profile}
-                    className="text-xl"
-                  />
+          {!hideTitle ? (
+            <DialogTitle>
+              {title || (
+                <div className="flex flex-row gap-2 w-full flex-1">
+                  <Avatar profile={profile} className="size-9" />
+                  <div className="flex flex-row items-center justify-between flex-1">
+                    <Username
+                      pubkey={pubkey}
+                      profile={profile}
+                      className="text-xl"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
-          </DialogTitle>
+              )}
+            </DialogTitle>
+          ) : null}
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         {children}

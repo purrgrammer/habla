@@ -3,15 +3,12 @@ import type { Pubkey } from "~/types";
 import { CircleQuestionMark, Newspaper } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { kinds, nip19, type NostrEvent } from "nostr-tools";
-import { map, distinctUntilChanged } from "rxjs";
+import { map } from "rxjs";
 import { CurrencyAmount } from "../currency.client";
 import UserLink from "./user-link.client";
-import Note from "./note";
 import RichText from "./rich-text.client";
-import Timestamp from "../timestamp";
 import { isReplaceableKind } from "nostr-tools/kinds";
 import { useProfile, useRelays, useTimeline } from "~/hooks/nostr.client";
-import Debug from "../debug";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import {
   getSeenRelays,
@@ -51,6 +48,7 @@ import { AGGREGATOR_RELAYS, COMMENT } from "~/const";
 import { useNavigate } from "react-router";
 import { info } from "~/services/notifications.client";
 import { Dialog, DialogContent, DialogTitle } from "../dialog";
+import CommentDialog from "~/ui/nostr/comment-dialog.client";
 
 export function EventReply({
   event,
@@ -284,7 +282,7 @@ function EventDialog({
         <UserLink
           pubkey={event.kind === kinds.Zap ? getZapSender(event) : event.pubkey}
         />
-        <pre className="text-xs font-mono overflow-scroll">
+        <pre className="text-xs bg-muted/40 p-2 rounded-sm font-mono overflow-scroll pretty-scrollbar">
           {JSON.stringify(event, null, 2)}
         </pre>
         <Button variant="secondary" onClick={copyJSON}>
@@ -310,10 +308,11 @@ export function Reply({
   includeReplies?: boolean;
 }) {
   const [showZapDialog, setShowZapDialog] = useState(false);
+  const [showCommentDialog, setShowCommentDialog] = useState(false);
+  const [viewEvent, setViewEvent] = useState(false);
   const profile = useProfile(
     event?.kind === kinds.Zap ? getZapSender(event) : author,
   );
-  const [viewEvent, setViewEvent] = useState(false);
   const navigate = useNavigate();
   const canShare = typeof window !== "undefined" && window.navigator.share;
   const seenRelays = event ? getSeenRelays(event) : AGGREGATOR_RELAYS;
@@ -381,14 +380,28 @@ export function Reply({
             </span>
           ) : null}
         </div>
+        {event && showCommentDialog ? (
+          <CommentDialog
+            showCommentDialog={showCommentDialog}
+            setShowCommentDialog={setShowCommentDialog}
+            event={event}
+          >
+            <EventReply event={event} includeReplies={false} />
+          </CommentDialog>
+        ) : null}
         {event && showZapDialog ? (
           <ZapDialog
             open={showZapDialog}
             onOpenChange={setShowZapDialog}
-            pubkey={event.pubkey}
+            pubkey={
+              event.kind === kinds.Zap ? getZapSender(event) : event.pubkey
+            }
             event={event}
+            //hideTitle
             trigger={null}
-          />
+          >
+            {/*<EventReply event={event} includeReplies={false} />*/}
+          </ZapDialog>
         ) : null}
         {event ? (
           <EventDialog
@@ -454,9 +467,8 @@ export function Reply({
                     </DropdownMenuItem>
                   </>
                 )}
-                {/*
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowCommentDialog(true)}>
                   <div className="flex flex-row items-center gap-1.5">
                     <MessageCircle />
                     <span>Comment</span>
@@ -468,7 +480,6 @@ export function Reply({
                     <span>Zap</span>
                   </div>
                 </DropdownMenuItem>
-                 */}
               </DropdownMenuContent>
             </DropdownMenu>
           </>
