@@ -45,6 +45,7 @@ export default function User({
   wrapper,
   withNip05,
   nip05,
+  onlyAvatar,
 }: {
   pubkey: string;
   profile?: ProfileContent;
@@ -54,10 +55,13 @@ export default function User({
   wrapper?: string;
   withNip05?: boolean;
   nip05?: string;
+  onlyAvatar?: boolean;
 }) {
   const username = getDisplayName(profile) || pubkey.slice(0, 8);
   const picture = getProfilePicture(profile) || "/favicon.ico";
-  return (
+  return onlyAvatar ? (
+    <Avatar profile={profile} className={img} />
+  ) : (
     <div className={wrapper}>
       <div className={cn("flex flex-row items-center gap-2", className)}>
         <Avatar profile={profile} className={img} />

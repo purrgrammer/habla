@@ -114,13 +114,8 @@ function LoggedInUser({ pubkey }: { pubkey: string }) {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <User
-                img="size-9"
-                name="hidden"
-                pubkey={pubkey}
-                profile={profile}
-              />
+            <Button variant="link" size="icon">
+              <User onlyAvatar img="size-7" pubkey={pubkey} profile={profile} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
