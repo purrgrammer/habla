@@ -9,8 +9,23 @@ import {
   syncProfile,
   syncArticles,
 } from "./services/data.server";
+import { nip19 } from "nostr-tools";
 import { type Nip05Pointer } from "~/services/types";
 import { HABLA_PUBKEY } from "./const";
+
+async function addNpub({ npub, username }: { npub: string; username: string }) {
+  const decoded = nip19.decode(npub);
+  if (decoded.type === "npub") {
+    await addUser({ username, pubkey: decoded.data });
+    return;
+  }
+  if (decoded.type === "nprofile") {
+    await addUser({ username, pubkey: decoded.data.pubkey });
+    return;
+  }
+
+  console.error("Invalid npub/nprofile");
+}
 
 async function addUser({
   pubkey,
@@ -19,6 +34,14 @@ async function addUser({
   pubkey: string;
   username: string;
 }) {
+  if (pubkey.length !== 64) {
+    console.error(`Invalid pubkey ${pubkey}`);
+    return;
+  }
+  if (username.length < 2) {
+    console.error(`Invalid username ${username}`);
+    return;
+  }
   const relays = await fetchRelays(pubkey);
   const profile = await syncProfile(pubkey, relays);
   await saveUser({ pubkey, username, relays });
@@ -212,15 +235,14 @@ const initialUsers = [
 ];
 
 await (async function main() {
-  //try {
-  //  await addUser({
-  //    username: "hodlbod",
-  //    pubkey:
-  //      "97c70a44366a6535c145b333f973ea86dfdc2d7a99da618c40c64705ad98e322",
-  //  });
-  //} catch (error) {
-  //  console.error(`[users] failed to add: ${error}`);
-  //}
+  try {
+    await addNpub({
+      username: "hakkadaikon",
+      npub: "npub1zqdnpm5gcfap8hngha7gcp3k363786phvs2etsvxw4nh6x9ydfzsuyk6mn",
+    });
+  } catch (error) {
+    console.error(`[users] failed to add: ${error}`);
+  }
   await syncUsers();
 })()
   .then(() => {
