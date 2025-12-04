@@ -68,7 +68,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     if (!isValidIdentifier(user.nip05)) continue;
 
     urls.push({
-      url: `${origin}/${encodeURIComponent(user.nip05)}`,
+      url: `${origin}/${user.nip05}`,
       lastmod: lastModified,
       changefreq: "weekly",
       priority: "0.8",
@@ -85,7 +85,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         const articleLastMod = getValidTimestamp(publishedAt, lastModified);
 
         urls.push({
-          url: `${origin}/${encodeURIComponent(user.nip05)}/${encodeURIComponent(identifier)}`,
+          url: `${origin}/${user.nip05}/${identifier}`,
           lastmod: articleLastMod,
           changefreq: "monthly",
           priority: "0.9",
