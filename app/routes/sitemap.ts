@@ -2,6 +2,45 @@ import type { Route } from "./+types/sitemap";
 import { getMembers, getArticles } from "~/services/data.server";
 import { getArticlePublished, getTagValue } from "applesauce-core/helpers";
 
+// Escape special XML characters in URLs
+function escapeXml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+// Validate and convert Unix timestamp to ISO string
+function getValidTimestamp(timestamp: number | undefined, fallback: string): string {
+  if (!timestamp) return fallback;
+
+  // Unix timestamps are in seconds, should be positive and reasonable
+  // Valid range: after 2000-01-01 (946684800) and before 2100-01-01 (4102444800)
+  if (timestamp < 946684800 || timestamp > 4102444800) {
+    return fallback;
+  }
+
+  try {
+    const date = new Date(timestamp * 1000);
+    // Verify the date is valid
+    if (isNaN(date.getTime())) {
+      return fallback;
+    }
+    return date.toISOString();
+  } catch {
+    return fallback;
+  }
+}
+
+// Validate identifier and URL components
+function isValidIdentifier(identifier: string | undefined): identifier is string {
+  if (!identifier || typeof identifier !== "string") return false;
+  // Check for reasonable length and no control characters
+  return identifier.length > 0 && identifier.length < 500 && !/[\x00-\x1F\x7F]/.test(identifier);
+}
+
 // Generate sitemap XML with proper structure and SEO metadata
 export async function loader({ request }: Route.LoaderArgs) {
   const origin = new URL(request.url).origin;
@@ -26,28 +65,35 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   // Add user profile pages
   for (const user of users) {
+    if (!isValidIdentifier(user.nip05)) continue;
+
     urls.push({
-      url: `${origin}/${user.nip05}`,
+      url: `${origin}/${encodeURIComponent(user.nip05)}`,
       lastmod: lastModified,
       changefreq: "weekly",
       priority: "0.8",
     });
 
     // Add user's articles
-    const articles = await getArticles(user);
-    for (const article of articles) {
-      const identifier = getTagValue(article, "d");
-      const publishedAt = getArticlePublished(article);
-      const articleLastMod = publishedAt
-        ? new Date(publishedAt * 1000).toISOString()
-        : lastModified;
+    try {
+      const articles = await getArticles(user);
+      for (const article of articles) {
+        const identifier = getTagValue(article, "d");
+        if (!isValidIdentifier(identifier)) continue;
 
-      urls.push({
-        url: `${origin}/${user.nip05}/${identifier}`,
-        lastmod: articleLastMod,
-        changefreq: "monthly",
-        priority: "0.9", // Articles get high priority
-      });
+        const publishedAt = getArticlePublished(article);
+        const articleLastMod = getValidTimestamp(publishedAt, lastModified);
+
+        urls.push({
+          url: `${origin}/${encodeURIComponent(user.nip05)}/${encodeURIComponent(identifier)}`,
+          lastmod: articleLastMod,
+          changefreq: "monthly",
+          priority: "0.9",
+        });
+      }
+    } catch (error) {
+      // Skip articles if there's an error fetching them
+      console.error(`Error fetching articles for ${user.nip05}:`, error);
     }
   }
 
@@ -59,13 +105,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     priority: "0.5",
   });
 
-  // Generate XML sitemap
+  // Generate XML sitemap with proper escaping
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
   .map(
     ({ url, lastmod, changefreq, priority }) => `  <url>
-    <loc>${url}</loc>
+    <loc>${escapeXml(url)}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
@@ -77,7 +123,7 @@ ${urls
   return new Response(sitemap, {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
-      "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+      "Cache-Control": "public, max-age=3600",
     },
   });
 }
