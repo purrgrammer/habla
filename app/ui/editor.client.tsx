@@ -204,17 +204,31 @@ export default () => {
         if (target.tagName === "IMG") {
           event.preventDefault();
 
-          const $pos = view.state.doc.resolve(pos);
-          const node = $pos.parent.nodeAt($pos.parentOffset);
+          // Find the image node at the clicked position
+          let imageNode: any = null;
+          let imagePos = -1;
 
-          if (node && node.type.name === "image") {
-            const src = node.attrs.src || "";
-            const alt = node.attrs.alt || "";
+          view.state.doc.descendants((node, nodePos) => {
+            if (node.type.name === "image" && node.attrs.src) {
+              // Check if this position is near the click
+              if (nodePos <= pos && nodePos + node.nodeSize >= pos) {
+                imageNode = node;
+                imagePos = nodePos;
+                return false; // Stop searching
+              }
+            }
+          });
+
+          if (imageNode && imagePos >= 0) {
+            const src = (imageNode.attrs.src as string) || "";
+            const alt = (imageNode.attrs.alt as string) || "";
+
+            console.log("[editor] Image clicked:", { src, alt, pos: imagePos });
 
             setSelectedImageData({
               src,
               alt,
-              pos: $pos.pos - $pos.parentOffset - 1,
+              pos: imagePos,
             });
             setImageDetailsOpen(true);
             return true;
@@ -326,18 +340,38 @@ export default () => {
   function handleImageAltSave(newAlt: string) {
     if (!editor || !selectedImageData) return;
 
+    console.log("[editor] Saving alt text:", {
+      newAlt,
+      pos: selectedImageData.pos,
+    });
+
     // Update the image node's alt attribute
-    editor
-      .chain()
-      .focus()
-      .command(({ tr }) => {
-        tr.setNodeMarkup(selectedImageData.pos, undefined, {
-          ...tr.doc.nodeAt(selectedImageData.pos)?.attrs,
-          alt: newAlt,
-        });
-        return true;
-      })
-      .run();
+    const node = editor.state.doc.nodeAt(selectedImageData.pos);
+    console.log("[editor] Node at position:", node);
+
+    if (node && node.type.name === "image") {
+      editor
+        .chain()
+        .focus()
+        .command(({ tr, state }) => {
+          const nodeAttrs = state.doc.nodeAt(selectedImageData.pos)?.attrs;
+          console.log("[editor] Current node attrs:", nodeAttrs);
+
+          tr.setNodeMarkup(selectedImageData.pos, undefined, {
+            ...nodeAttrs,
+            alt: newAlt,
+          });
+
+          console.log("[editor] Alt text updated in transaction");
+          return true;
+        })
+        .run();
+    } else {
+      console.error(
+        "[editor] No image node found at position:",
+        selectedImageData.pos,
+      );
+    }
   }
 
   function handleLinkClick() {
