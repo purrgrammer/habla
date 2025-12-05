@@ -51,12 +51,19 @@ export default function ImageUploadDialog({
     console.log("[dialog] isUploading:", isUploading);
   }, [servers, serversLoading, file, isUploading]);
 
-  // Initialize with all servers selected by default
+  // Initialize with first server selected by default
   useEffect(() => {
     if (servers.length > 0 && selectedServers.length === 0) {
       setSelectedServers([servers[0]]); // Default to first server only
     }
   }, [servers]);
+
+  // Ensure at least one server is always selected
+  useEffect(() => {
+    if (selectedServers.length === 0 && servers.length > 0) {
+      setSelectedServers([servers[0]]);
+    }
+  }, [selectedServers, servers]);
 
   // Handle initial file if provided
   useEffect(() => {
@@ -102,11 +109,19 @@ export default function ImageUploadDialog({
   }
 
   function toggleServer(server: string) {
-    setSelectedServers((prev) =>
-      prev.includes(server)
+    setSelectedServers((prev) => {
+      const isSelected = prev.includes(server);
+      const newSelection = isSelected
         ? prev.filter((s) => s !== server)
-        : [...prev, server],
-    );
+        : [...prev, server];
+
+      // Prevent deselecting the last server
+      if (newSelection.length === 0) {
+        return prev;
+      }
+
+      return newSelection;
+    });
   }
 
   async function handleUpload() {
@@ -255,7 +270,7 @@ export default function ImageUploadDialog({
           {file && !isUploading && (
             <div className="flex flex-col gap-2">
               <Label>Upload to Blossom Servers:</Label>
-              <div className="flex flex-col gap-2 max-h-32 overflow-y-auto">
+              <div className="flex flex-col gap-1 max-h-32 overflow-y-auto">
                 {serversLoading ? (
                   <p className="text-sm text-muted-foreground">
                     Loading servers...
@@ -264,7 +279,7 @@ export default function ImageUploadDialog({
                   servers.map((server) => (
                     <label
                       key={server}
-                      className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-accent"
+                      className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-accent"
                     >
                       <input
                         type="checkbox"
