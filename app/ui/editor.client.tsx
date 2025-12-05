@@ -397,7 +397,7 @@ export default () => {
         />
       )}
       <div
-        className="relative w-full flex flex-col gap-1 p-2"
+        className="relative w-full flex flex-col items-center gap-1 p-2"
         onClick={(e) => {
           const target = e.target as HTMLElement;
           if (target.tagName === "A" || target.closest("a")) {
