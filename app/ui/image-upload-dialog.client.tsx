@@ -105,10 +105,13 @@ export default function ImageUploadDialog({
     setUploadProgress(null);
 
     try {
+      // Create a simple signer function from account.signer
+      const signerFn = (event: any) => account.signer.signEvent(event);
+
       const metadata = await uploadToBlossomServers(
         file,
         selectedServers,
-        account.signer,
+        signerFn,
         (progress) => {
           setUploadProgress(progress);
         },

@@ -1,4 +1,4 @@
-import { Actions } from "blossom-client-sdk";
+import { Actions, createUploadAuth } from "blossom-client-sdk";
 import type { EventTemplate, NostrEvent } from "nostr-tools";
 import type { BlossomFileMetadata } from "./metadata-store.client";
 import { blossomMetadataStore } from "./metadata-store.client";
@@ -52,14 +52,14 @@ function getExtensionFromType(type: string): string {
  * Upload a file to multiple Blossom servers
  * @param file - File to upload
  * @param servers - Array of server URLs to upload to
- * @param signer - Nostr signer for authentication
+ * @param signer - Nostr signer function (EventTemplate => Promise<NostrEvent>)
  * @param onProgress - Callback for upload progress updates
  * @returns Promise with metadata of uploaded file
  */
 export async function uploadToBlossomServers(
   file: File,
   servers: string[],
-  signer: { signEvent: (event: EventTemplate) => Promise<NostrEvent> },
+  signer: (event: EventTemplate) => Promise<NostrEvent>,
   onProgress?: (progress: UploadProgress) => void,
 ): Promise<BlossomFileMetadata> {
   // Calculate file hash
@@ -97,21 +97,10 @@ export async function uploadToBlossomServers(
       updateProgress();
 
       // Upload blob using blossom-client-sdk
-      // The SDK requires onAuth callback that returns a signed event
+      // Use createUploadAuth to generate the auth event
       const blob = await uploadBlob(server, file, {
         onAuth: async (srv, sha256, authType) => {
-          // Create auth event template for upload
-          const authEvent: EventTemplate = {
-            kind: 24242, // Blossom auth event kind
-            created_at: Math.floor(Date.now() / 1000),
-            tags: [
-              ["t", authType],
-              ["x", sha256],
-            ],
-            content: "",
-          };
-          // Sign the event using the signer
-          return await signer.signEvent(authEvent);
+          return await createUploadAuth(signer, sha256, { type: authType });
         },
       });
 
