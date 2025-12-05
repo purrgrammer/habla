@@ -324,3 +324,24 @@ body {
     @apply bg-muted;
   }
 }
+
+/* Reset prose styles for embedded content */
+.prose .not-prose {
+  @apply font-sans text-base leading-normal;
+}
+
+.prose .not-prose * {
+  @apply font-sans;
+}
+
+.prose .not-prose img {
+  @apply my-0;
+}
+
+.prose .not-prose p {
+  @apply text-base leading-normal mb-0;
+}
+
+.prose .not-prose a {
+  @apply break-normal;
+}

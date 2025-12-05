@@ -80,8 +80,8 @@ export async function publishToRelays(
     }
   });
 
-  // Wait for all publishes to complete
-  await Promise.all(publishPromises);
+  // Wait for all publishes to complete or timeout
+  await Promise.allSettled(publishPromises);
 
   // Calculate final counts
   const successCount = statuses.filter((s) => s.status === "success").length;
