@@ -34,13 +34,16 @@ export function useBlossomServers(pubkey?: string) {
         // Extract server tags: ["server", "https://..."]
         const serverTags = event.tags
           .filter((tag) => tag[0] === "server" && tag[1])
-          .map((tag) => tag[1]);
+          .map((tag) => tag[1].replace(/\/$/, "")); // Remove trailing slash
 
         console.log("[blossom] Server tags:", serverTags);
 
+        // Deduplicate servers
+        const uniqueServers = Array.from(new Set(serverTags));
+
         // Return servers or default if none found
         const result =
-          serverTags.length > 0 ? serverTags : [DEFAULT_BLOSSOM_SERVER];
+          uniqueServers.length > 0 ? uniqueServers : [DEFAULT_BLOSSOM_SERVER];
         console.log("[blossom] Returning servers:", result);
         return result;
       }),
