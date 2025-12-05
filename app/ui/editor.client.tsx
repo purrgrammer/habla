@@ -158,7 +158,7 @@ export default () => {
       openOnClick: false, // Prevent default link opening
     }),
     Image.configure({
-      inline: true,
+      inline: false,
       allowBase64: false,
     }),
     Highlight,
