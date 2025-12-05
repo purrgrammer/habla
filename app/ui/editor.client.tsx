@@ -6,7 +6,7 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 
 import Typography from "@tiptap/extension-typography";
-import { Placeholder } from "@tiptap/extensions";
+import Placeholder from "@tiptap/extension-placeholder";
 import { type NostrEvent, kinds } from "nostr-tools";
 import { marked } from "marked";
 import { useActiveAccount } from "applesauce-react/hooks";
