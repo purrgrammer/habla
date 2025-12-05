@@ -26,7 +26,13 @@ import {
   Send,
   FilePlus,
   FolderOpen,
+  Trash2,
 } from "lucide-react";
+import {
+  getDrafts,
+  clearAllDrafts,
+  formatRelativeTime,
+} from "~/services/drafts.client";
 import { ToggleGroup, ToggleGroupItem } from "~/ui/toggle-group";
 import {
   DropdownMenu,
@@ -49,6 +55,9 @@ interface EditorToolbarProps {
   onNew: () => void;
   onSaveDraft: () => void;
   onLoad: (ev: any) => void;
+  onLoadDraft: (draftId: string) => void;
+  onDeleteDraft: (draftId: string) => void;
+  currentDraftId: string;
   timeline?: any[];
 }
 
@@ -91,9 +100,13 @@ export default function EditorToolbar({
   onNew,
   onSaveDraft,
   onLoad,
+  onLoadDraft,
+  onDeleteDraft,
+  currentDraftId,
   timeline,
 }: EditorToolbarProps) {
   const state = useToolbarState(editor);
+  const drafts = getDrafts();
 
   if (!state) return null;
 
@@ -373,18 +386,68 @@ export default function EditorToolbar({
                   New
                 </div>
               </DropdownMenuItem>
-              {/* <DropdownMenuItem disabled onClick={onSaveDraft}>
-                <div className="flex flex-row items-center gap-2">
-                  <HardDriveUpload className="size-4 text-muted-foreground" />
-                  Save Draft
-                </div>
-              </DropdownMenuItem> */}
+
+              {/* Drafts submenu */}
+              {drafts.length > 0 && (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <div className="flex flex-row items-center gap-2">
+                      <FileText className="size-4" />
+                      Drafts ({drafts.length})
+                    </div>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {drafts.map((draft) => (
+                      <div key={draft.id} className="flex items-center group">
+                        <DropdownMenuItem
+                          onClick={() => onLoadDraft(draft.id)}
+                          className="flex-1"
+                          disabled={draft.id === currentDraftId}
+                        >
+                          <div className="flex flex-col items-start">
+                            <span className="text-sm">
+                              {draft.title || "Untitled"}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {formatRelativeTime(draft.updatedAt)}
+                            </span>
+                          </div>
+                        </DropdownMenuItem>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteDraft(draft.id);
+                          }}
+                          className="p-2 opacity-0 group-hover:opacity-100 hover:bg-destructive/10"
+                          aria-label="Delete draft"
+                        >
+                          <Trash2 className="size-3 text-destructive" />
+                        </button>
+                      </div>
+                    ))}
+                    <DropdownMenuItem
+                      onClick={() => {
+                        if (confirm("Clear all drafts?")) {
+                          clearAllDrafts();
+                          onNew();
+                        }
+                      }}
+                      className="text-destructive"
+                    >
+                      <Trash2 className="size-4 mr-2" />
+                      Clear all drafts
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              )}
+
+              {/* Published articles submenu */}
               {timeline && timeline.length > 0 && (
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger>
                     <div className="flex flex-row items-center gap-2">
                       <FolderOpen className="size-4" />
-                      Load
+                      Load Published
                     </div>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>

@@ -57,6 +57,14 @@ import { useNavigate } from "react-router";
 import { nip19 } from "nostr-tools";
 import { useProfile } from "~/hooks/nostr.client";
 import store from "~/services/data.client";
+import {
+  getDraft,
+  saveDraft as saveDraftToStorage,
+  deleteDraft,
+  generateDraftId,
+  hasMeaningfulContent,
+  type Draft,
+} from "~/services/drafts.client";
 
 type TextValue = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | undefined;
 
@@ -85,52 +93,30 @@ function NAddr(props: NodeViewRendererProps) {
 async function markdownToHTML(markdown: string): Promise<string> {
   return await marked.parse(markdown);
 }
+
 const DEFAULT_CONTENT = `
 <h1>An article title</h1>
 `;
 
-const LOCAL_DRAFT = `habla:draft`;
-
-function saveLocalDraft({
-  title,
-  json,
-  article,
-}: {
-  title: string;
-  json: JSONContent;
-  article?: NostrEvent;
-}) {
-  localStorage.setItem(
-    LOCAL_DRAFT,
-    JSON.stringify({ title, json, article }, null, 2),
-  );
-}
-
-function loadLocalDraft() {
-  const item = localStorage.getItem(LOCAL_DRAFT);
-  if (item) {
-    try {
-      const json = JSON.parse(item);
-      return json;
-    } catch {}
-  }
-}
-
-function removeLocalDraft() {
-  localStorage.removeItem(LOCAL_DRAFT);
-}
-
 export default () => {
-  const draft = useMemo(() => {
-    return loadLocalDraft();
-  }, []);
-  const [title, setTitle] = useState(draft?.title || "");
+  // Initialize with a draft ID
+  const [currentDraftId, setCurrentDraftId] = useState<string>(() => {
+    return generateDraftId();
+  });
+
+  // Load initial draft
+  const initialDraft = useMemo(() => {
+    return getDraft(currentDraftId);
+  }, [currentDraftId]);
+
+  const [title, setTitle] = useState(initialDraft?.title || "");
   const [article, setArticle] = useState<NostrEvent | undefined>(
-    draft?.article,
+    initialDraft?.article,
   );
+
   const content = useMemo(() => {
-    return draft?.json || DEFAULT_CONTENT;
-  }, [article?.id]);
+    return initialDraft?.json || DEFAULT_CONTENT;
+  }, [currentDraftId]);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [initialImageFile, setInitialImageFile] = useState<File | null>(null);
 
@@ -209,10 +195,24 @@ export default () => {
     extensions,
     content,
     onUpdate: ({ editor }: { editor: Editor }) => {
-      if (title) {
-        const json = editor.getJSON();
-        saveLocalDraft({ title, json, article });
-      }
+      const json = editor.getJSON();
+
+      // Extract title from first H1 heading in document
+      const firstNode = json.content?.[0];
+      const draftTitle =
+        firstNode?.type === "heading" && firstNode?.attrs?.level === 1
+          ? firstNode.content?.[0]?.text || "Untitled"
+          : "Untitled";
+
+      const draft: Draft = {
+        id: currentDraftId,
+        title: draftTitle,
+        json,
+        article,
+        createdAt: initialDraft?.createdAt || Date.now(),
+        updatedAt: Date.now(),
+      };
+      saveDraftToStorage(draft);
     },
     editorProps: {
       handleClick: (view, pos, event) => {
@@ -403,7 +403,17 @@ export default () => {
 
       // Update the article state with the published event
       setArticle(signedEvent);
-      removeLocalDraft();
+
+      // Update draft with published article reference
+      const draft: Draft = {
+        id: currentDraftId,
+        title,
+        json: editor.getJSON(),
+        article: signedEvent,
+        createdAt: initialDraft?.createdAt || Date.now(),
+        updatedAt: Date.now(),
+      };
+      saveDraftToStorage(draft);
 
       // Navigate to the published article
       // Check if user is a Habla member first
@@ -455,10 +465,36 @@ export default () => {
   async function onNew() {
     if (!editor) return;
 
+    // Generate new draft ID and switch to it
+    const newDraftId = generateDraftId();
+    setCurrentDraftId(newDraftId);
+
+    // Reset editor state
     setArticle(undefined);
     setTitle("");
     editor.commands.setContent(DEFAULT_CONTENT);
-    removeLocalDraft();
+  }
+
+  function onLoadDraft(draftId: string) {
+    if (!editor) return;
+
+    const draft = getDraft(draftId);
+    if (!draft) return;
+
+    // Switch to this draft
+    setCurrentDraftId(draftId);
+    setTitle(draft.title);
+    setArticle(draft.article);
+    editor.commands.setContent(draft.json);
+  }
+
+  function onDeleteDraft(draftId: string) {
+    deleteDraft(draftId);
+
+    // If deleting current draft, create a new one
+    if (draftId === currentDraftId) {
+      onNew();
+    }
   }
 
   function handleImageClick() {
@@ -534,6 +570,9 @@ export default () => {
           onNew={onNew}
           onSaveDraft={onSaveDraft}
           onLoad={onLoad}
+          onLoadDraft={onLoadDraft}
+          onDeleteDraft={onDeleteDraft}
+          currentDraftId={currentDraftId}
           timeline={timeline?.map((ev) => ({
             ...ev,
             title: getArticleTitle(ev),

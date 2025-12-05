@@ -163,7 +163,7 @@ export default function EventConversation({
   return (
     <div className="flex flex-col gap-12 pb-16 items-center w-full">
       <div className="flex flex-row gap-2">
-        <CommentDialog
+        {/* <CommentDialog
           event={event}
           showCommentDialog={showCommentDialog}
           setShowCommentDialog={setShowCommentDialog}
@@ -187,7 +187,7 @@ export default function EventConversation({
           ) : (
             <EventReply event={event} includeReplies={false} />
           )}
-        </CommentDialog>
+        </CommentDialog> */}
         <ZapButton pubkey={event.pubkey} event={event} total={total || 0} />
         {/*
         <Button variant="outline" className="rounded-xl" size="xl">
