@@ -23,11 +23,7 @@ export function useBlossomServers(pubkey?: string) {
 
     return eventStore.replaceable(BLOSSOM_SERVER_LIST_KIND, pubkey).pipe(
       map((event) => {
-        console.log("[blossom] useBlossomServers - event:", event);
-        console.log("[blossom] useBlossomServers - pubkey:", pubkey);
-
         if (!event) {
-          console.log("[blossom] No event, returning default server");
           return [DEFAULT_BLOSSOM_SERVER];
         }
 
@@ -36,16 +32,13 @@ export function useBlossomServers(pubkey?: string) {
           .filter((tag) => tag[0] === "server" && tag[1])
           .map((tag) => tag[1].replace(/\/$/, "")); // Remove trailing slash
 
-        console.log("[blossom] Server tags:", serverTags);
-
         // Deduplicate servers
         const uniqueServers = Array.from(new Set(serverTags));
 
         // Return servers or default if none found
-        const result =
-          uniqueServers.length > 0 ? uniqueServers : [DEFAULT_BLOSSOM_SERVER];
-        console.log("[blossom] Returning servers:", result);
-        return result;
+        return uniqueServers.length > 0
+          ? uniqueServers
+          : [DEFAULT_BLOSSOM_SERVER];
       }),
     );
   }, [pubkey]);

@@ -43,15 +43,6 @@ export default function ImageUploadDialog({
     account?.pubkey,
   );
 
-  // Debug logging
-  useEffect(() => {
-    console.log("[dialog] servers:", servers);
-    console.log("[dialog] selectedServers:", selectedServers);
-    console.log("[dialog] serversLoading:", serversLoading);
-    console.log("[dialog] file:", file);
-    console.log("[dialog] isUploading:", isUploading);
-  }, [servers, selectedServers, serversLoading, file, isUploading]);
-
   // Initialize with first server selected by default and normalize selectedServers
   useEffect(() => {
     if (servers.length > 0 && selectedServers.length === 0) {
@@ -140,8 +131,6 @@ export default function ImageUploadDialog({
     setUploadProgress(null);
 
     try {
-      console.log("[dialog] Uploading to selected servers:", selectedServers);
-
       // Create a simple signer function from account.signer
       const signerFn = (event: any) => account.signer.signEvent(event);
 
