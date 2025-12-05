@@ -34,7 +34,12 @@ import EditorToolbar from "./editor-toolbar.client";
 import ImageUploadDialog from "./image-upload-dialog.client";
 import ImageDetailsDialog from "./image-details-dialog.client";
 import LinkDialog from "./link-dialog.client";
-import { getArticleImage, getArticleTitle } from "applesauce-core/helpers";
+import PublishDialog from "./publish-dialog.client";
+import {
+  getArticleImage,
+  getArticleTitle,
+  getArticleSummary,
+} from "applesauce-core/helpers";
 import type {
   EventPointer,
   AddressPointer,
@@ -43,6 +48,15 @@ import type {
 
 import { Label } from "./label";
 import { Button } from "./button";
+import { PublishArticle, generateIdentifier } from "~/nostr/publish-article";
+import { useActionHub } from "applesauce-react/hooks";
+import { firstValueFrom } from "rxjs";
+import { toast } from "sonner";
+import { publishToRelays } from "~/services/publish-article.client";
+import { useNavigate } from "react-router";
+import { nip19 } from "nostr-tools";
+import { useProfile } from "~/hooks/nostr.client";
+import store from "~/services/data.client";
 
 type TextValue = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | undefined;
 
@@ -134,6 +148,7 @@ export default () => {
     from: number;
     to: number;
   } | null>(null);
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
 
   // Get user's published articles for loading
   const account = useActiveAccount();
@@ -147,6 +162,9 @@ export default () => {
     },
     relays,
   );
+  const hub = useActionHub();
+  const navigate = useNavigate();
+  const profile = useProfile(pubkey || "");
 
   const extensions = [
     CustomDocument,
@@ -280,15 +298,139 @@ export default () => {
     return renderToMarkdown({ content: json, extensions }).trim();
   }
 
+  // Track whether document has a main heading (H1) reactively
+  const hasMainHeading = useEditorState({
+    editor,
+    selector: (ctx) => {
+      if (!ctx.editor) return false;
+      const json = ctx.editor.getJSON();
+      // Check if first content node is a heading level 1
+      return (
+        json.content?.[0]?.type === "heading" &&
+        json.content[0]?.attrs?.level === 1
+      );
+    },
+  });
+
   function onPublish() {
-    // todo: double \n line separator
     const markdown = asMarkdown();
-    if (markdown) {
-      console.log("TODO:PUBLISH", markdown, markdown === article?.content, {
-        markdown,
-        article: article?.content,
+    if (!markdown) {
+      toast.error("Cannot publish empty article");
+      return;
+    }
+    if (!hasMainHeading) {
+      toast.error("Article must have a main heading (H1)");
+      return;
+    }
+    setPublishDialogOpen(true);
+  }
+
+  async function handlePublish({
+    title,
+    content,
+    image,
+    summary,
+    relays,
+  }: {
+    title: string;
+    content: string;
+    image?: string;
+    summary?: string;
+    relays: string[];
+  }) {
+    if (!pubkey) {
+      toast.error("Please connect your account to publish");
+      return;
+    }
+
+    const identifier = article
+      ? article.tags.find((t) => t[0] === "d")?.[1]
+      : generateIdentifier(title);
+
+    if (!identifier) {
+      toast.error("Failed to generate article identifier");
+      return;
+    }
+
+    // Extract hashtags from content
+    const hashtagMatches = content.match(/#(\w+)/g) || [];
+    const hashtags = hashtagMatches.map((tag) => tag.slice(1));
+
+    try {
+      // Create and sign the event
+      const signedEvent = await firstValueFrom(
+        hub.exec(PublishArticle, {
+          identifier,
+          title,
+          content,
+          image,
+          summary,
+          hashtags,
+          relays,
+          existingEvent: article,
+        }),
+      );
+
+      if (!signedEvent) {
+        throw new Error("Failed to sign event");
+      }
+
+      // Publish to relays with progress tracking
+      const publishResult = await publishToRelays(
+        signedEvent,
+        relays,
+        (progress) => {
+          // Show error toast for each failed relay
+          progress.statuses.forEach((status) => {
+            if (status.status === "error" && status.message) {
+              toast.error(`Failed to publish to ${status.relay}`, {
+                description: status.message,
+              });
+            }
+          });
+        },
+      );
+
+      // Check if at least one relay succeeded
+      if (publishResult.successCount === 0) {
+        throw new Error("Failed to publish to any relay");
+      }
+
+      // Show success toast
+      toast.success("Article published successfully!", {
+        description: `Published to ${publishResult.successCount} of ${relays.length} relay${relays.length > 1 ? "s" : ""}`,
       });
+
+      // Update the article state with the published event
+      setArticle(signedEvent);
       removeLocalDraft();
+
+      // Navigate to the published article
+      // Check if user is a Habla member first
+      const members = await store.getMembers();
+      const member = members.find((m) => m.pubkey === pubkey);
+
+      let articleUrl: string;
+      if (member) {
+        // Habla member: /:username/:identifier
+        const username = member.nip05;
+        articleUrl = `/${username}/${identifier}`;
+      } else {
+        // Non-member: /u/:nip05 or /u/:npub
+        const nip05 = profile?.nip05;
+        articleUrl = nip05
+          ? `/u/${nip05}/${identifier}`
+          : `/u/${nip19.npubEncode(pubkey!)}/${identifier}`;
+      }
+
+      navigate(articleUrl);
+    } catch (error) {
+      console.error("[editor] Failed to publish article:", error);
+      toast.error("Failed to publish article", {
+        description:
+          error instanceof Error ? error.message : "Please try again",
+      });
+      throw error;
     }
   }
 
@@ -315,7 +457,8 @@ export default () => {
 
     setArticle(undefined);
     setTitle("");
-    editor.commands.clearContent(true);
+    editor.commands.setContent(DEFAULT_CONTENT);
+    removeLocalDraft();
   }
 
   function handleImageClick() {
@@ -387,6 +530,7 @@ export default () => {
           onImageClick={handleImageClick}
           onLinkClick={handleLinkClick}
           onPublish={onPublish}
+          canPublish={hasMainHeading}
           onNew={onNew}
           onSaveDraft={onSaveDraft}
           onLoad={onLoad}
@@ -447,6 +591,17 @@ export default () => {
         initialText={linkEditData?.text}
         initialFrom={linkEditData?.from}
         initialTo={linkEditData?.to}
+      />
+      <PublishDialog
+        open={publishDialogOpen}
+        onOpenChange={setPublishDialogOpen}
+        markdown={asMarkdown()}
+        onPublish={handlePublish}
+        existingImage={article ? getArticleImage(article) : undefined}
+        existingSummary={article ? getArticleSummary(article) : undefined}
+        existingIdentifier={
+          article ? article.tags.find((t) => t[0] === "d")?.[1] : undefined
+        }
       />
     </>
   );

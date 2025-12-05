@@ -189,7 +189,7 @@ body {
   @apply font-serif text-lg leading-relaxed;
 }
 
-.prose > blockquote {
+.prose blockquote {
   @apply font-serif text-lg border-l-4 border-muted pl-4 py-2 italic text-muted-foreground my-6;
 }
 
@@ -198,6 +198,14 @@ body {
 }
 
 .prose > p > a {
+  @apply text-primary hover:underline hover:decoration-dotted break-all;
+}
+
+.prose li > a {
+  @apply text-primary hover:underline hover:decoration-dotted break-all;
+}
+
+.prose li > p > a {
   @apply text-primary hover:underline hover:decoration-dotted break-all;
 }
 
@@ -229,7 +237,7 @@ body {
   @apply font-serif text-lg leading-relaxed mb-6 outline-none;
 }
 
-.prose > blockquote > p {
+.prose blockquote > p {
   @apply mb-0;
 }
 

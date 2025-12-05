@@ -16,6 +16,13 @@ import {
 import { modifyPublicTags } from "applesauce-factory/operations";
 import { COMMENT } from "~/const";
 
+export {
+  PublishArticle,
+  extractTitle,
+  extractContent,
+  generateIdentifier,
+} from "./publish-article";
+
 export function ZapRequest({
   amount,
   pubkey,

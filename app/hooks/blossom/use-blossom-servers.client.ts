@@ -3,9 +3,9 @@ import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import { map } from "rxjs";
 import { useRelays } from "~/hooks/nostr.client";
 import { blossomServerListLoader } from "~/services/loaders.client";
+import { BLOSSOM_SERVER_LIST_KIND } from "~/const";
 
 const DEFAULT_BLOSSOM_SERVER = "https://blossom.band";
-const BLOSSOM_SERVER_LIST_KIND = 10063;
 
 /**
  * Hook to fetch the user's Blossom server list from kind:10063 events

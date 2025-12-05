@@ -49,12 +49,11 @@ await (async function main() {
       console.error("Example: npm run add-npub alice npub1...");
       process.exit(1);
     }
-
     const [username, npub] = args;
-
     await addNpub({ username, npub });
   } catch (error) {
-    console.error(`[users] failed to add: ${error}`);
+    console.error(`[add-npub] failed to add npub`);
+    console.error(error);
   }
 })()
   .then(() => {

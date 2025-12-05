@@ -45,6 +45,7 @@ interface EditorToolbarProps {
   onImageClick: () => void;
   onLinkClick: () => void;
   onPublish: () => void;
+  canPublish?: boolean;
   onNew: () => void;
   onSaveDraft: () => void;
   onLoad: (ev: any) => void;
@@ -86,6 +87,7 @@ export default function EditorToolbar({
   onImageClick,
   onLinkClick,
   onPublish,
+  canPublish = true,
   onNew,
   onSaveDraft,
   onLoad,
@@ -359,7 +361,7 @@ export default function EditorToolbar({
               </ToggleGroupItem>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onPublish}>
+              <DropdownMenuItem onClick={onPublish} disabled={!canPublish}>
                 <div className="flex flex-row items-center gap-2">
                   <Send className="size-4" />
                   Publish
@@ -368,7 +370,7 @@ export default function EditorToolbar({
               <DropdownMenuItem onClick={onNew}>
                 <div className="flex flex-row items-center gap-2">
                   <FilePlus className="size-4" />
-                  New Article
+                  New
                 </div>
               </DropdownMenuItem>
               {/* <DropdownMenuItem disabled onClick={onSaveDraft}>
@@ -382,7 +384,7 @@ export default function EditorToolbar({
                   <DropdownMenuSubTrigger>
                     <div className="flex flex-row items-center gap-2">
                       <FolderOpen className="size-4" />
-                      Load Article
+                      Load
                     </div>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>

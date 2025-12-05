@@ -17,3 +17,4 @@ export const AGGREGATOR_RELAYS = [
 export const BIG_ZAP_AMOUNT = 21_000;
 
 export const COMMENT = 1111;
+export const BLOSSOM_SERVER_LIST_KIND = 10063;
