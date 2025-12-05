@@ -3,51 +3,12 @@ import WebSocket from "ws";
 
 import {
   default as store,
-  saveUser,
-  fetchRelays,
   syncRelays,
   syncProfile,
   syncArticles,
 } from "./services/data.server";
-import { nip19 } from "nostr-tools";
 import { type Nip05Pointer } from "~/services/types";
 import { HABLA_PUBKEY } from "./const";
-
-async function addNpub({ npub, username }: { npub: string; username: string }) {
-  const decoded = nip19.decode(npub);
-  if (decoded.type === "npub") {
-    await addUser({ username, pubkey: decoded.data });
-    return;
-  }
-  if (decoded.type === "nprofile") {
-    await addUser({ username, pubkey: decoded.data.pubkey });
-    return;
-  }
-
-  console.error("Invalid npub/nprofile");
-}
-
-async function addUser({
-  pubkey,
-  username,
-}: {
-  pubkey: string;
-  username: string;
-}) {
-  if (pubkey.length !== 64) {
-    console.error(`Invalid pubkey ${pubkey}`);
-    return;
-  }
-  if (username.length < 2) {
-    console.error(`Invalid username ${username}`);
-    return;
-  }
-  const relays = await fetchRelays(pubkey);
-  const profile = await syncProfile(pubkey, relays);
-  await saveUser({ pubkey, username, relays });
-  console.log(`user ${username} added successfully!`);
-  return profile;
-}
 
 async function syncUser(pointer: Nip05Pointer) {
   const { pubkey, nip05, relays } = pointer;
@@ -236,14 +197,10 @@ const initialUsers = [
 
 await (async function main() {
   try {
-    await addNpub({
-      username: "hakkadaikon",
-      npub: "npub1zqdnpm5gcfap8hngha7gcp3k363786phvs2etsvxw4nh6x9ydfzsuyk6mn",
-    });
-  } catch (error) {
-    console.error(`[users] failed to add: ${error}`);
+    await syncUsers();
+  } catch (err) {
+    console.error(err);
   }
-  await syncUsers();
 })()
   .then(() => {
     process.exit(0);

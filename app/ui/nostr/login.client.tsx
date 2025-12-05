@@ -235,6 +235,7 @@ export default function Login() {
     const loadUser = merge(
       profileLoader({ kind: kinds.Metadata, pubkey }),
       profileLoader({ kind: kinds.RelayList, pubkey }),
+      profileLoader({ kind: 10063, pubkey }),
     );
     const sub = loadUser.subscribe();
     // Add account & set as active

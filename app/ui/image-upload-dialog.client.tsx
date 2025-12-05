@@ -13,6 +13,7 @@ import { useBlossomServers } from "~/hooks/blossom/use-blossom-servers.client";
 import { uploadToBlossomServers } from "~/services/blossom/upload.client";
 import type { UploadProgress } from "~/services/blossom/upload.client";
 import { useActiveAccount } from "applesauce-react/hooks";
+import { toast } from "sonner";
 
 interface ImageUploadDialogProps {
   open: boolean;
@@ -39,6 +40,14 @@ export default function ImageUploadDialog({
 
   const { servers, isLoading: serversLoading } = useBlossomServers();
   const account = useActiveAccount();
+
+  // Debug logging
+  useEffect(() => {
+    console.log("[dialog] servers:", servers);
+    console.log("[dialog] serversLoading:", serversLoading);
+    console.log("[dialog] file:", file);
+    console.log("[dialog] isUploading:", isUploading);
+  }, [servers, serversLoading, file, isUploading]);
 
   // Initialize with all servers selected by default
   useEffect(() => {
@@ -114,15 +123,32 @@ export default function ImageUploadDialog({
         signerFn,
         (progress) => {
           setUploadProgress(progress);
+
+          // Show error toasts for failed uploads
+          progress.statuses.forEach((status) => {
+            if (status.status === "error" && status.error) {
+              toast.error(`Failed to upload to ${status.server}`, {
+                description: status.error,
+              });
+            }
+          });
         },
       );
+
+      // Show success toast
+      toast.success("Image uploaded successfully", {
+        description: `Uploaded to ${metadata.servers.length} server${metadata.servers.length > 1 ? "s" : ""}`,
+      });
 
       // Return the primary Blossom URL
       onUpload(metadata.url);
       handleClose();
     } catch (error) {
       console.error("[blossom] Upload failed:", error);
-      alert("Failed to upload image. Please try again.");
+      toast.error("Failed to upload image", {
+        description:
+          error instanceof Error ? error.message : "Please try again",
+      });
     } finally {
       setIsUploading(false);
     }

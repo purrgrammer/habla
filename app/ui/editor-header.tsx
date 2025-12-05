@@ -1,12 +1,12 @@
 import { Link } from "react-router";
-import EditorMenu, { type EditorMenuProps } from "~/ui/editor-menu.client";
 import ClientOnly from "~/ui/client-only";
 import { Avatar as AvatarSkeleton } from "~/ui/skeleton";
 import Logo from "./logo";
+import EditorMenu, { type EditorMenuProps } from "./editor-menu.client";
 
 export default function EditorHeader(props: EditorMenuProps) {
   return (
-    <header className="flex flex-row justify-between w-full p-2">
+    <header className="flex flex-row justify-between items-center w-full p-2">
       <Link to="/">
         <Logo />
       </Link>

@@ -24,22 +24,32 @@ export function useBlossomServers() {
   );
 
   const servers = useMemo(() => {
+    console.log("[blossom] useBlossomServers - timeline:", timeline);
+    console.log("[blossom] useBlossomServers - pubkey:", pubkey);
+
     if (!timeline || timeline.length === 0) {
       // Return default server if no configuration found
+      console.log("[blossom] No timeline, returning default server");
       return [DEFAULT_BLOSSOM_SERVER];
     }
 
     // Get the most recent event (timeline is already sorted by created_at desc)
     const latestEvent = timeline[0];
+    console.log("[blossom] Latest event:", latestEvent);
 
     // Extract server tags: ["server", "https://..."]
     const serverTags = latestEvent.tags
       .filter((tag) => tag[0] === "server" && tag[1])
       .map((tag) => tag[1]);
 
+    console.log("[blossom] Server tags:", serverTags);
+
     // Return servers or default if none found
-    return serverTags.length > 0 ? serverTags : [DEFAULT_BLOSSOM_SERVER];
-  }, [timeline]);
+    const result =
+      serverTags.length > 0 ? serverTags : [DEFAULT_BLOSSOM_SERVER];
+    console.log("[blossom] Returning servers:", result);
+    return result;
+  }, [timeline, pubkey]);
 
   return {
     servers,

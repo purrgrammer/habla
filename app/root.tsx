@@ -9,6 +9,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { Toaster } from "sonner";
 
 function googleFont(font: string) {
   return {
@@ -58,6 +59,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex flex-col items-center min-h-[100dvh]">
         {children}
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>

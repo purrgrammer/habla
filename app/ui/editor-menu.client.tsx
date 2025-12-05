@@ -91,28 +91,6 @@ function LoggedInUser({
 
   return (
     <div className="flex flex-row items-center gap-1 sm:gap-4">
-      {/*
-      <Button
-        disabled={!canPublish}
-        aria-label="Save draft"
-        variant="secondary"
-        size="sm"
-        //onClick={onSaveDraft}
-      >
-        <HardDriveUpload className="size-5" />
-        <span className="hidden sm:inline">Save</span>
-        </Button>
-        */}
-      <Button
-        aria-label="Publish"
-        variant="default"
-        size="sm"
-        onClick={onPublish}
-        className="text-background dark:text-foreground"
-      >
-        <Logo className="size-5" />
-        <span className="hidden sm:inline">Publish</span>
-      </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button aria-label="Menu" variant="ghost" size="sm">
