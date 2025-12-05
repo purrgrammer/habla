@@ -47,6 +47,7 @@
     "applesauce-relay": "^3.0.0",
     "applesauce-signers": "^3.0.0",
     "applesauce-wallet-connect": "^3.0.0",
+    "blossom-client-sdk": "^4.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "ioredis": "^5.7.0",

@@ -117,6 +117,7 @@ export default () => {
     return draft?.json || DEFAULT_CONTENT;
   }, [article?.id]);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [initialImageFile, setInitialImageFile] = useState<File | null>(null);
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkEditData, setLinkEditData] = useState<{
     href: string;
@@ -158,39 +159,18 @@ export default () => {
       onDrop: (currentEditor: Editor, files: File[], pos: number) => {
         files.forEach((file) => {
           if (file.type.startsWith("image/")) {
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file);
-            fileReader.onload = () => {
-              currentEditor
-                .chain()
-                .insertContentAt(pos, {
-                  type: "image",
-                  attrs: {
-                    src: fileReader.result,
-                    alt: file.name,
-                  },
-                })
-                .focus()
-                .run();
-            };
+            // Open dialog with preselected image instead of direct upload
+            setInitialImageFile(file);
+            setImageDialogOpen(true);
           }
         });
       },
       onPaste: (currentEditor: Editor, files: File[]) => {
         files.forEach((file) => {
           if (file.type.startsWith("image/")) {
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file);
-            fileReader.onload = () => {
-              currentEditor
-                .chain()
-                .setImage({
-                  src: fileReader.result as string,
-                  alt: file.name,
-                })
-                .focus()
-                .run();
-            };
+            // Open dialog with preselected image instead of direct upload
+            setInitialImageFile(file);
+            setImageDialogOpen(true);
           }
         });
       },
@@ -293,24 +273,22 @@ export default () => {
   }
 
   function handleImageClick() {
+    setInitialImageFile(null); // Clear any previous file
     setImageDialogOpen(true);
   }
 
-  function handleImageUpload(file: File) {
+  function handleImageUpload(url: string) {
     if (!editor) return;
 
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(file);
-    fileReader.onload = () => {
-      editor
-        .chain()
-        .focus()
-        .setImage({
-          src: fileReader.result as string,
-          alt: file.name,
-        })
-        .run();
-    };
+    // Insert Blossom URL directly
+    editor
+      .chain()
+      .focus()
+      .setImage({
+        src: url,
+        alt: "",
+      })
+      .run();
   }
 
   function handleLinkClick() {
@@ -349,8 +327,14 @@ export default () => {
       </div>
       <ImageUploadDialog
         open={imageDialogOpen}
-        onOpenChange={setImageDialogOpen}
+        onOpenChange={(open) => {
+          setImageDialogOpen(open);
+          if (!open) {
+            setInitialImageFile(null); // Clear initial file when dialog closes
+          }
+        }}
         onUpload={handleImageUpload}
+        initialFile={initialImageFile}
       />
       <LinkDialog
         editor={editor}
