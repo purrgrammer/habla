@@ -15,6 +15,7 @@ interface PublishArticleParams {
   hashtags?: string[];
   relays: string[];
   existingEvent?: NostrEvent;
+  alt?: string;
 }
 
 /**
@@ -202,6 +203,7 @@ export function PublishArticle({
   hashtags = [],
   relays,
   existingEvent,
+  alt,
 }: PublishArticleParams): Action {
   return async function* ({ factory }: any) {
     const tags: string[][] = [];
@@ -226,6 +228,12 @@ export function PublishArticle({
     if (summary) {
       tags.push(["summary", summary]);
     }
+    if (alt) {
+      tags.push(["alt", alt]);
+    }
+
+    // Client tag
+    tags.push(["client", "Habla"]);
 
     // Parse nostr mentions and add tags
     const mentions = parseNostrMentions(content);

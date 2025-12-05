@@ -35,6 +35,7 @@ interface PublishDialogProps {
     image?: string;
     summary?: string;
     relays: string[];
+    alt?: string;
   }) => Promise<void>;
   existingImage?: string;
   existingSummary?: string;
@@ -154,7 +155,11 @@ export default function PublishDialog({
         }
       }
 
-      const content = contentLines.join("\n").trim();
+      // Clean up content: remove trailing newlines with # character
+      const content = contentLines
+        .join("\n")
+        .trim()
+        .replace(/\n#\s*$/g, "");
 
       await onPublish({
         title,
@@ -162,6 +167,7 @@ export default function PublishDialog({
         image: image || undefined,
         summary: summary || undefined,
         relays: selectedRelays,
+        alt: `${title} - read it in ${window.location.origin}${articleUrl}`,
       });
 
       toast.success("Article published successfully!");

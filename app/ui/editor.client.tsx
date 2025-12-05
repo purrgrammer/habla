@@ -331,12 +331,14 @@ export default () => {
     image,
     summary,
     relays,
+    alt,
   }: {
     title: string;
     content: string;
     image?: string;
     summary?: string;
     relays: string[];
+    alt?: string;
   }) {
     if (!pubkey) {
       toast.error("Please connect your account to publish");
@@ -368,6 +370,7 @@ export default () => {
           hashtags,
           relays,
           existingEvent: article,
+          alt,
         }),
       );
 
