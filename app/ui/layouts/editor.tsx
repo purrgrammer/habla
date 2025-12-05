@@ -3,8 +3,8 @@ import Main from "../main";
 
 export default function Layout() {
   return (
-    <Main>
+    <main className="flex flex-col w-full h-screen">
       <Outlet />
-    </Main>
+    </main>
   );
 }
