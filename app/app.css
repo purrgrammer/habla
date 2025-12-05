@@ -273,6 +273,10 @@ body {
   @apply w-full rounded my-6;
 }
 
+.prose img {
+  @apply w-full rounded my-6;
+}
+
 .prose table {
   @apply font-sans w-full border-collapse border border-border my-6;
 }
