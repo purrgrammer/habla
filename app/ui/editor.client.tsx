@@ -32,6 +32,7 @@ import { default as BaseNAddr } from "./nostr/naddr.client";
 import EditorHeader from "./editor-header";
 import EditorToolbar from "./editor-toolbar.client";
 import ImageUploadDialog from "./image-upload-dialog.client";
+import ImageDetailsDialog from "./image-details-dialog.client";
 import LinkDialog from "./link-dialog.client";
 import { getArticleImage, getArticleTitle } from "applesauce-core/helpers";
 import type {
@@ -118,6 +119,14 @@ export default () => {
   }, [article?.id]);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [initialImageFile, setInitialImageFile] = useState<File | null>(null);
+
+  const [imageDetailsOpen, setImageDetailsOpen] = useState(false);
+  const [selectedImageData, setSelectedImageData] = useState<{
+    src: string;
+    alt: string;
+    pos: number;
+  } | null>(null);
+
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [linkEditData, setLinkEditData] = useState<{
     href: string;
@@ -190,6 +199,29 @@ export default () => {
     editorProps: {
       handleClick: (view, pos, event) => {
         const target = event.target as HTMLElement;
+
+        // Handle image clicks
+        if (target.tagName === "IMG") {
+          event.preventDefault();
+
+          const $pos = view.state.doc.resolve(pos);
+          const node = $pos.parent.nodeAt($pos.parentOffset);
+
+          if (node && node.type.name === "image") {
+            const src = node.attrs.src || "";
+            const alt = node.attrs.alt || "";
+
+            setSelectedImageData({
+              src,
+              alt,
+              pos: $pos.pos - $pos.parentOffset - 1,
+            });
+            setImageDetailsOpen(true);
+            return true;
+          }
+        }
+
+        // Handle link clicks
         if (target.tagName === "A" || target.closest("a")) {
           event.preventDefault();
 
@@ -291,6 +323,23 @@ export default () => {
       .run();
   }
 
+  function handleImageAltSave(newAlt: string) {
+    if (!editor || !selectedImageData) return;
+
+    // Update the image node's alt attribute
+    editor
+      .chain()
+      .focus()
+      .command(({ tr }) => {
+        tr.setNodeMarkup(selectedImageData.pos, undefined, {
+          ...tr.doc.nodeAt(selectedImageData.pos)?.attrs,
+          alt: newAlt,
+        });
+        return true;
+      })
+      .run();
+  }
+
   function handleLinkClick() {
     setLinkEditData(null); // Clear any existing link data
     setLinkDialogOpen(true);
@@ -335,6 +384,18 @@ export default () => {
         }}
         onUpload={handleImageUpload}
         initialFile={initialImageFile}
+      />
+      <ImageDetailsDialog
+        open={imageDetailsOpen}
+        onOpenChange={(open) => {
+          setImageDetailsOpen(open);
+          if (!open) {
+            setSelectedImageData(null); // Clear selected image when dialog closes
+          }
+        }}
+        imageUrl={selectedImageData?.src || ""}
+        imageAlt={selectedImageData?.alt || ""}
+        onSave={handleImageAltSave}
       />
       <LinkDialog
         editor={editor}
