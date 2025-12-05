@@ -46,24 +46,33 @@ export default function ImageUploadDialog({
   // Debug logging
   useEffect(() => {
     console.log("[dialog] servers:", servers);
+    console.log("[dialog] selectedServers:", selectedServers);
     console.log("[dialog] serversLoading:", serversLoading);
     console.log("[dialog] file:", file);
     console.log("[dialog] isUploading:", isUploading);
-  }, [servers, serversLoading, file, isUploading]);
+  }, [servers, selectedServers, serversLoading, file, isUploading]);
 
-  // Initialize with first server selected by default
+  // Initialize with first server selected by default and normalize selectedServers
   useEffect(() => {
     if (servers.length > 0 && selectedServers.length === 0) {
       setSelectedServers([servers[0]]); // Default to first server only
     }
-  }, [servers]);
 
-  // Ensure at least one server is always selected
-  useEffect(() => {
-    if (selectedServers.length === 0 && servers.length > 0) {
-      setSelectedServers([servers[0]]);
+    // Normalize selectedServers to match normalized servers list
+    if (selectedServers.length > 0) {
+      const normalizedSelected = selectedServers
+        .map((s) => s.replace(/\/$/, ""))
+        .filter((s) => servers.includes(s));
+
+      if (
+        JSON.stringify(normalizedSelected) !== JSON.stringify(selectedServers)
+      ) {
+        setSelectedServers(
+          normalizedSelected.length > 0 ? normalizedSelected : [servers[0]],
+        );
+      }
     }
-  }, [selectedServers, servers]);
+  }, [servers, selectedServers]);
 
   // Handle initial file if provided
   useEffect(() => {
@@ -131,6 +140,8 @@ export default function ImageUploadDialog({
     setUploadProgress(null);
 
     try {
+      console.log("[dialog] Uploading to selected servers:", selectedServers);
+
       // Create a simple signer function from account.signer
       const signerFn = (event: any) => account.signer.signEvent(event);
 
