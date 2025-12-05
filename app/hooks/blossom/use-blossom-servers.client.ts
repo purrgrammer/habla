@@ -1,6 +1,8 @@
-import { useMemo } from "react";
-import { useActiveAccount } from "applesauce-react/hooks";
-import { useTimeline } from "~/hooks/nostr.client";
+import { useEffect } from "react";
+import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
+import { map } from "rxjs";
+import { useRelays } from "~/hooks/nostr.client";
+import { blossomServerListLoader } from "~/services/loaders.client";
 
 const DEFAULT_BLOSSOM_SERVER = "https://blossom.band";
 const BLOSSOM_SERVER_LIST_KIND = 10063;
@@ -9,51 +11,59 @@ const BLOSSOM_SERVER_LIST_KIND = 10063;
  * Hook to fetch the user's Blossom server list from kind:10063 events
  * Returns array of server URLs, with default server if none configured
  */
-export function useBlossomServers() {
-  const account = useActiveAccount();
-  const pubkey = account?.pubkey;
+export function useBlossomServers(pubkey?: string) {
+  const eventStore = useEventStore();
+  const userRelays = useRelays(pubkey || "");
 
-  // Fetch kind:10063 events for the logged-in user
-  const { timeline } = useTimeline(
-    pubkey ? `${pubkey}-blossom-servers` : "no-servers",
-    {
-      kinds: [BLOSSOM_SERVER_LIST_KIND],
-      authors: pubkey ? [pubkey] : [],
-    },
-    [], // Empty relays means use default relays
-  );
-
-  const servers = useMemo(() => {
-    console.log("[blossom] useBlossomServers - timeline:", timeline);
-    console.log("[blossom] useBlossomServers - pubkey:", pubkey);
-
-    if (!timeline || timeline.length === 0) {
-      // Return default server if no configuration found
-      console.log("[blossom] No timeline, returning default server");
-      return [DEFAULT_BLOSSOM_SERVER];
+  // Get the replaceable event from the event store and extract servers
+  const servers = useObservableMemo(() => {
+    if (!pubkey) {
+      return undefined;
     }
 
-    // Get the most recent event (timeline is already sorted by created_at desc)
-    const latestEvent = timeline[0];
-    console.log("[blossom] Latest event:", latestEvent);
+    return eventStore.replaceable(BLOSSOM_SERVER_LIST_KIND, pubkey).pipe(
+      map((event) => {
+        console.log("[blossom] useBlossomServers - event:", event);
+        console.log("[blossom] useBlossomServers - pubkey:", pubkey);
 
-    // Extract server tags: ["server", "https://..."]
-    const serverTags = latestEvent.tags
-      .filter((tag) => tag[0] === "server" && tag[1])
-      .map((tag) => tag[1]);
+        if (!event) {
+          console.log("[blossom] No event, returning default server");
+          return [DEFAULT_BLOSSOM_SERVER];
+        }
 
-    console.log("[blossom] Server tags:", serverTags);
+        // Extract server tags: ["server", "https://..."]
+        const serverTags = event.tags
+          .filter((tag) => tag[0] === "server" && tag[1])
+          .map((tag) => tag[1]);
 
-    // Return servers or default if none found
-    const result =
-      serverTags.length > 0 ? serverTags : [DEFAULT_BLOSSOM_SERVER];
-    console.log("[blossom] Returning servers:", result);
-    return result;
-  }, [timeline, pubkey]);
+        console.log("[blossom] Server tags:", serverTags);
+
+        // Return servers or default if none found
+        const result =
+          serverTags.length > 0 ? serverTags : [DEFAULT_BLOSSOM_SERVER];
+        console.log("[blossom] Returning servers:", result);
+        return result;
+      }),
+    );
+  }, [pubkey]);
+
+  // Load the event from relays
+  useEffect(() => {
+    if (!pubkey) return;
+
+    const subscription = blossomServerListLoader({
+      kind: BLOSSOM_SERVER_LIST_KIND,
+      pubkey,
+      relays: userRelays,
+    }).subscribe();
+
+    return () => subscription.unsubscribe();
+  }, [pubkey, userRelays]);
 
   return {
-    servers,
-    hasCustomServers: timeline && timeline.length > 0,
-    isLoading: !timeline,
+    servers: servers || [DEFAULT_BLOSSOM_SERVER],
+    hasCustomServers:
+      servers && servers.length > 0 && servers[0] !== DEFAULT_BLOSSOM_SERVER,
+    isLoading: !servers && !!pubkey,
   };
 }

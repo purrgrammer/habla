@@ -38,8 +38,10 @@ export default function ImageUploadDialog({
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { servers, isLoading: serversLoading } = useBlossomServers();
   const account = useActiveAccount();
+  const { servers, isLoading: serversLoading } = useBlossomServers(
+    account?.pubkey,
+  );
 
   // Debug logging
   useEffect(() => {

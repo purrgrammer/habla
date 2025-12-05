@@ -33,6 +33,11 @@ export const profileLoader = createAddressLoader(pool, {
   lookupRelays: INDEX_RELAYS,
 });
 
+export const blossomServerListLoader = createAddressLoader(pool, {
+  eventStore,
+  bufferTime: 200,
+});
+
 export function fetchProfile(
   pointer: ProfilePointer,
 ): Promise<ProfileContent | undefined> {
