@@ -406,7 +406,10 @@ export default () => {
           }
         }}
       >
-        <EditorContent className="prose min-h-64" editor={editor} />
+        <EditorContent
+          className="prose min-h-64 w-xs xsm:w-sm sm:w-xl lg:w-2xl"
+          editor={editor}
+        />
       </div>
       <ImageUploadDialog
         open={imageDialogOpen}
