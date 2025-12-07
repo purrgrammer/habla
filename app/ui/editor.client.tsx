@@ -4,7 +4,6 @@ import Highlight from "@tiptap/extension-highlight";
 import { renderToMarkdown } from "@tiptap/static-renderer";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
-
 import Typography from "@tiptap/extension-typography";
 import Placeholder from "@tiptap/extension-placeholder";
 import { type NostrEvent, kinds } from "nostr-tools";
@@ -18,6 +17,8 @@ import {
   useEditor,
   useEditorState,
   type NodeViewRendererProps,
+  ReactNodeViewRenderer,
+  NodeViewWrapper,
 } from "@tiptap/react";
 import { Plugin } from "@tiptap/pm/state";
 import { type Level } from "@tiptap/extension-heading";
@@ -66,6 +67,11 @@ import {
   type Draft,
 } from "~/services/drafts.client";
 
+// Import Nostr extensions
+import NostrMention from "./editor/extensions/mention";
+import { NEventNode, NAddrNode } from "./editor/extensions/nostr-nodes";
+import { processNostrHTML } from "./editor/utils/process-nostr-html";
+
 type TextValue = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | undefined;
 
 const isHeadingActive = (editor: Editor, level: Level) =>
@@ -75,19 +81,41 @@ const CustomDocument = Document.extend({
   content: "heading block*",
 });
 
-function NProfile(props: NodeViewRendererProps) {
-  const nprofile = props.node.attrs as ProfilePointer;
-  return <UserLink {...nprofile} />;
+// NodeView components for rendering Nostr entities
+function MentionComponent(props: NodeViewRendererProps) {
+  const { pubkey, name, relays } = props.node.attrs;
+  return (
+    <NodeViewWrapper
+      as="span"
+      className="mention not-prose pointer-events-none select-none"
+    >
+      <UserLink
+        pubkey={pubkey}
+        relays={relays}
+        wrapper="inline-block"
+        name="font-serif text-primary"
+        img="size-5 -mb-1"
+      />
+    </NodeViewWrapper>
+  );
 }
 
-function NEvent(props: NodeViewRendererProps) {
+function NEventComponent(props: NodeViewRendererProps) {
   const nevent = props.node.attrs as EventPointer;
-  return <BaseNEvent {...nevent} />;
+  return (
+    <NodeViewWrapper className="not-prose pointer-events-none select-none">
+      <BaseNEvent {...nevent} />
+    </NodeViewWrapper>
+  );
 }
 
-function NAddr(props: NodeViewRendererProps) {
+function NAddrComponent(props: NodeViewRendererProps) {
   const naddr = props.node.attrs as AddressPointer;
-  return <BaseNAddr {...naddr} />;
+  return (
+    <NodeViewWrapper className="not-prose pointer-events-none select-none">
+      <BaseNAddr {...naddr} />
+    </NodeViewWrapper>
+  );
 }
 
 async function markdownToHTML(markdown: string): Promise<string> {
@@ -167,6 +195,30 @@ export default () => {
     }),
     Highlight,
     Typography,
+    // Nostr mention extension
+    NostrMention.configure({
+      HTMLAttributes: {
+        class: "mention",
+      },
+      renderLabel({ node }) {
+        return `@${node.attrs.name}`;
+      },
+    }).extend({
+      addNodeView() {
+        return ReactNodeViewRenderer(MentionComponent);
+      },
+    }),
+    // Nostr embed nodes
+    NEventNode.extend({
+      addNodeView() {
+        return ReactNodeViewRenderer(NEventComponent);
+      },
+    }),
+    NAddrNode.extend({
+      addNodeView() {
+        return ReactNodeViewRenderer(NAddrComponent);
+      },
+    }),
     FileHandler.configure({
       allowedMimeTypes: ["image/png", "image/jpeg", "image/gif", "image/webp"],
       onDrop: (currentEditor: Editor, files: File[], pos: number) => {
@@ -201,7 +253,7 @@ export default () => {
       const firstNode = json.content?.[0];
       const draftTitle =
         firstNode?.type === "heading" && firstNode?.attrs?.level === 1
-          ? firstNode.content?.[0]?.text || "Untitled"
+          ? (firstNode.content?.[0] as any)?.text || "Untitled"
           : "Untitled";
 
       const draft: Draft = {
@@ -215,6 +267,98 @@ export default () => {
       saveDraftToStorage(draft);
     },
     editorProps: {
+      handlePaste: (view, event, slice) => {
+        // Handle pasted nostr: links
+        const text = event.clipboardData?.getData("text/plain");
+        console.log("[editor] Paste detected:", text);
+        if (text && text.trim().startsWith("nostr:")) {
+          console.log("[editor] Nostr link detected, parsing...");
+          try {
+            const nostrLink = text.trim();
+            const parsed = nip19.decode(nostrLink.replace(/^nostr:/, ""));
+            console.log("[editor] Parsed nostr link:", parsed);
+
+            const { state, dispatch } = view;
+            const { $from } = state.selection;
+
+            switch (parsed.type) {
+              case "npub":
+                // Insert as mention
+                dispatch(
+                  state.tr.replaceSelectionWith(
+                    state.schema.nodes.mention.create({
+                      pubkey: parsed.data,
+                      name: "user",
+                      relays: [],
+                    }),
+                  ),
+                );
+                return true;
+
+              case "nprofile":
+                // Insert as mention with relay hints
+                dispatch(
+                  state.tr.replaceSelectionWith(
+                    state.schema.nodes.mention.create({
+                      pubkey: parsed.data.pubkey,
+                      name: "user",
+                      relays: parsed.data.relays || [],
+                    }),
+                  ),
+                );
+                return true;
+
+              case "nevent":
+                // Insert as nevent block
+                dispatch(
+                  state.tr.insert(
+                    $from.pos,
+                    state.schema.nodes.nevent.create({
+                      id: parsed.data.id,
+                      kind: parsed.data.kind,
+                      author: parsed.data.author,
+                      relays: parsed.data.relays || [],
+                    }),
+                  ),
+                );
+                return true;
+
+              case "note":
+                // Insert as nevent block (note is just a nevent without metadata)
+                dispatch(
+                  state.tr.insert(
+                    $from.pos,
+                    state.schema.nodes.nevent.create({
+                      id: parsed.data,
+                      kind: 1,
+                      relays: [],
+                    }),
+                  ),
+                );
+                return true;
+
+              case "naddr":
+                // Insert as naddr block
+                dispatch(
+                  state.tr.insert(
+                    $from.pos,
+                    state.schema.nodes.naddr.create({
+                      identifier: parsed.data.identifier,
+                      kind: parsed.data.kind,
+                      pubkey: parsed.data.pubkey,
+                      relays: parsed.data.relays || [],
+                    }),
+                  ),
+                );
+                return true;
+            }
+          } catch (error) {
+            console.error("[editor] Failed to parse nostr link:", error);
+            // Fall through to default paste handling
+          }
+        }
+        return false;
+      },
       handleClick: (view, pos, event) => {
         const target = event.target as HTMLElement;
 
@@ -295,7 +439,75 @@ export default () => {
   function asMarkdown(): string {
     if (!editor) return "";
     const json = editor.getJSON();
-    return renderToMarkdown({ content: json, extensions }).trim();
+
+    // Helper to convert custom nostr nodes to text nodes
+    const convertNostrNodes = (node: any): any => {
+      if (node.type === "mention") {
+        const { pubkey, relays } = node.attrs;
+        const identifier =
+          relays && relays.length > 0
+            ? nip19.nprofileEncode({ pubkey, relays })
+            : nip19.npubEncode(pubkey);
+        return {
+          type: "text",
+          text: `nostr:${identifier}`,
+        };
+      }
+
+      if (node.type === "nevent") {
+        const { id, kind, author, relays } = node.attrs;
+        const identifier = nip19.neventEncode({
+          id,
+          kind: kind || undefined,
+          author: author || undefined,
+          relays: relays || [],
+        });
+        return {
+          type: "text",
+          text: `nostr:${identifier}`,
+        };
+      }
+
+      if (node.type === "naddr") {
+        const { identifier, kind, pubkey, relays } = node.attrs;
+        const naddrId = nip19.naddrEncode({
+          identifier,
+          kind,
+          pubkey,
+          relays: relays || [],
+        });
+        return {
+          type: "text",
+          text: `nostr:${naddrId}`,
+        };
+      }
+
+      // Recursively process child nodes
+      if (node.content) {
+        return {
+          ...node,
+          content: node.content.map(convertNostrNodes),
+        };
+      }
+
+      return node;
+    };
+
+    // Convert nostr nodes to text, then render to markdown
+    const convertedJson = {
+      ...json,
+      content: json.content?.map(convertNostrNodes) || [],
+    };
+
+    try {
+      return renderToMarkdown({
+        content: convertedJson,
+        extensions,
+      }).trim();
+    } catch (error) {
+      console.error("[editor] Markdown serialization error:", error);
+      return "";
+    }
   }
 
   // Track whether document has a main heading (H1) reactively
@@ -461,7 +673,13 @@ export default () => {
       setTitle(title);
     }
 
-    const htmlContent = await markdownToHTML(`# ${title}\n${event.content}`);
+    // Convert markdown to HTML
+    let htmlContent = await markdownToHTML(`# ${title}\n${event.content}`);
+
+    // Process nostr: links in the HTML to convert them to proper nodes
+    htmlContent = processNostrHTML(htmlContent);
+
+    console.log("[editor] Loading content with processed nostr links");
     editor.commands.setContent(htmlContent);
   }
 
