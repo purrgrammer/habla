@@ -10,6 +10,8 @@ export const BOOK_CHAPTER = 30_041;
 
 export const INDEX_RELAYS = ["wss://purplepag.es", "wss://relay.vertexlab.io"];
 export const AGGREGATOR_RELAYS = [
+  "wss://relay.damus.io",
+  "wss://nos.lol",
   "wss://relay.primal.net",
 ];
 
