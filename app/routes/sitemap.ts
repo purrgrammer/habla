@@ -85,7 +85,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         const articleLastMod = getValidTimestamp(publishedAt, lastModified);
 
         urls.push({
-          url: `${origin}/${user.nip05}/${identifier}`,
+          url: `${origin}/${user.nip05}/${encodeURIComponent(identifier)}`,
           lastmod: articleLastMod,
           changefreq: "monthly",
           priority: "0.9",
