@@ -16,8 +16,8 @@ export function meta({ loaderData }: Route.MetaArgs) {
 
 async function loadData(store: DataStore, { params }: Route.MetaArgs) {
   const { username, identifier } = params;
-  const users = await store.getUsers();
-  const pointer = users.find((u) => u.username === username);
+  const users = await store.getMembers();
+  const pointer = users.find((u) => u.nip05 === username);
   if (pointer) {
     const pubkey = pointer.pubkey;
     try {
