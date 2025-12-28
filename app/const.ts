@@ -8,9 +8,8 @@ export const HABLA_CHAT_URL =
 export const BOOK = 30_040;
 export const BOOK_CHAPTER = 30_041;
 
-export const INDEX_RELAYS = ["wss://purplepag.es", "wss://relay.nostr.band"];
+export const INDEX_RELAYS = ["wss://purplepag.es", "wss://relay.vertexlab.io"];
 export const AGGREGATOR_RELAYS = [
-  "wss://relay.nostr.band",
   "wss://relay.primal.net",
 ];
 
