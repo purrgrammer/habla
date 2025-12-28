@@ -31,25 +31,27 @@ export function PureArticleCard({
   const summary = getArticleSummary(article) || article.content;
   if (!title) return null;
   return (
-    <div className="flex flex-col gap-2 h-full">
-      <ArticleLink article={article} address={address}>
+    <ArticleLink
+      article={article}
+      address={address}
+      className="flex flex-col gap-2 h-full"
+    >
+      <div className="flex flex-col gap-1 flex-1">
+        <img
+          src={image || picture}
+          className="w-full h-36 rounded-sm object-cover"
+        />
         <div className="flex flex-col gap-1">
-          <img
-            src={image || picture}
-            className="w-full h-36 rounded-sm object-cover"
-          />
-          <div className="flex flex-col gap-1">
-            <h2 className="font-sans font-semibold text-2xl text-balance">
-              {title}
-            </h2>
-            <p className="font-sans text-md text-muted-foreground line-clamp-3">
-              {summary}
-            </p>
-          </div>
+          <h2 className="font-sans font-semibold text-2xl text-balance">
+            {title}
+          </h2>
+          <p className="font-sans text-md text-muted-foreground line-clamp-3">
+            {summary}
+          </p>
         </div>
-      </ArticleLink>
-      <Tags className="py-0 mt-auto" tags={tags} />
-    </div>
+      </div>
+      <Tags className="py-0 mt-auto pointer-events-none" tags={tags} />
+    </ArticleLink>
   );
 }
 

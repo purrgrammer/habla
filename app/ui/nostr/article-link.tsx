@@ -12,14 +12,20 @@ export default function ArticleLink({
   article,
   address,
   children,
+  className,
 }: {
   article: NostrEvent;
   address: AddressPointer;
   children?: ReactNode;
+  className?: string;
 }) {
   const link = useAddressLink(address);
   const title = getArticleTitle(article);
   // Using stable link format to fix click handling issues
   // Removed ClientOnly wrapper which was causing hydration/event handling problems
-  return <Link to={link}>{children || title}</Link>;
+  return (
+    <Link to={link} className={className}>
+      {children || title}
+    </Link>
+  );
 }
