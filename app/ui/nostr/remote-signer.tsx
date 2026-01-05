@@ -31,8 +31,8 @@ export default function RemoteSignerLogin({
   const RELAYS = useMemo(() => ["wss://relay.nsec.app", ...AGGREGATOR_RELAYS], []);
 
   // Adapter for applesauce-signers
-  const signerPool = useMemo(() => ({
-    subscription: (relays: string[], filters: any[]) => {
+  const signerPool = useMemo(() => {
+    const sub = (relays: string[], filters: any[]) => {
         console.log("[RemoteSigner] Subscribing to", relays, filters);
         return pool.req(relays, filters).pipe(
             tap(ev => {
@@ -43,15 +43,24 @@ export default function RemoteSignerLogin({
                 }
             })
         );
-    },
-    publish: (relays: string[], event: any) => {
+    };
+    const pub = (relays: string[], event: any) => {
         console.log("[RemoteSigner] Publishing to", relays, event);
         return pool.publish(relays, event).then(res => {
             console.log("[RemoteSigner] Publish result:", res);
             return res;
         });
-    },
-  }), []);
+    };
+
+    // Safety: set global methods
+    NostrConnectSigner.subscriptionMethod = sub;
+    NostrConnectSigner.publishMethod = pub;
+
+    return {
+        subscription: sub,
+        publish: pub,
+    };
+  }, []);
 
   // Handle Bunker URL Connection
   async function handleConnectBunker() {
@@ -143,29 +152,36 @@ function QRCodeFlow({ relays, onConnected }: { relays: string[], onConnected?: (
         abortedRef.current = false;
 
         const secret = bytesToHex(generateSecretKey());
+        const sub = (relays: string[], filters: any[]) => {
+            console.log("[RemoteSigner:QR] Subscribing to", relays, filters);
+            return pool.req(relays, filters).pipe(
+                tap(ev => {
+                    if (typeof ev === "string") {
+                        console.log("[RemoteSigner:QR] Received control message:", ev);
+                    } else {
+                        console.log("[RemoteSigner:QR] Received Nostr event:", ev.kind, ev.id);
+                    }
+                })
+            );
+        };
+        const pub = (relays: string[], event: any) => {
+            console.log("[RemoteSigner:QR] Publishing to", relays, event);
+            return pool.publish(relays, event).then(res => {
+                console.log("[RemoteSigner:QR] Publish result:", res);
+                return res;
+            });
+        };
+
+        // Safety: set global methods
+        NostrConnectSigner.subscriptionMethod = sub;
+        NostrConnectSigner.publishMethod = pub;
+
         const signer = new NostrConnectSigner({
             relays,
             secret,
             pool: {
-                subscription: (relays: string[], filters: any[]) => {
-                    console.log("[RemoteSigner:QR] Subscribing to", relays, filters);
-                    return pool.req(relays, filters).pipe(
-                        tap(ev => {
-                            if (typeof ev === "string") {
-                                console.log("[RemoteSigner:QR] Received control message:", ev);
-                            } else {
-                                console.log("[RemoteSigner:QR] Received Nostr event:", ev.kind, ev.id);
-                            }
-                        })
-                    );
-                },
-                publish: (relays: string[], event: any) => {
-                    console.log("[RemoteSigner:QR] Publishing to", relays, event);
-                    return pool.publish(relays, event).then(res => {
-                        console.log("[RemoteSigner:QR] Publish result:", res);
-                        return res;
-                    });
-                },
+                subscription: sub,
+                publish: pub,
             },
         });
 
