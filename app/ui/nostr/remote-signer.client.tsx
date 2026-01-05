@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/ui/tabs";
 import { AGGREGATOR_RELAYS } from "~/const";
 import { toast } from "sonner";
 import { Loader2, Copy, Check } from "lucide-react";
+import pool from "~/services/relay-pool";
 
 export default function RemoteSignerLogin({
   onConnected,
@@ -27,6 +28,12 @@ export default function RemoteSignerLogin({
   // Default relays for signaling
   const RELAYS = ["wss://relay.nsec.app", ...AGGREGATOR_RELAYS];
 
+  // Adapter for applesauce-signers
+  const signerPool = {
+    subscription: (relays: string[], filters: any[]) => pool.req(relays, filters),
+    publish: (relays: string[], event: any) => pool.publish(relays, event),
+  };
+
   // Handle Bunker URL Connection
   async function handleConnectBunker() {
     if (!bunkerUrl) return;
@@ -39,6 +46,7 @@ export default function RemoteSignerLogin({
         relays: parsed.relays.length > 0 ? parsed.relays : RELAYS,
         remote: parsed.remote,
         secret: parsed.secret,
+        pool: signerPool,
       });
 
       await signer.connect();
@@ -115,6 +123,10 @@ function QRCodeFlow({ relays, onConnected }: { relays: string[], onConnected?: (
         const signer = new NostrConnectSigner({
             relays,
             secret,
+            pool: {
+                subscription: (relays: string[], filters: any[]) => pool.req(relays, filters),
+                publish: (relays: string[], event: any) => pool.publish(relays, event),
+            },
         });
 
         const generatedUri = Helpers.createNostrConnectURI({

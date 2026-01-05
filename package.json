@@ -10,6 +10,12 @@
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },
+  "pnpm": {
+    "overrides": {
+      "react": "19.2.1",
+      "react-dom": "19.2.1"
+    }
+  },
   "dependencies": {
     "@number-flow/react": "^0.5.10",
     "@radix-ui/react-avatar": "^1.1.10",
