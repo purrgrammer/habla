@@ -22,13 +22,23 @@ import type { DataStore, Nip05Data, Nip05Pointer, User } from "./types";
 
 const redisUrl = process.env.REDIS_URL;
 const url = redisUrl || "localhost";
-const redisOptions = {};
+const redisOptions = {
+  maxRetriesPerRequest: 1,
+};
 const host = url.replace(/:6379$/, "");
-console.log(`[redis] ${host}`);
-const redis = redisUrl
-  ? new Redis(redisUrl, redisOptions)
-  : new Redis(6379, host, redisOptions);
-console.log(`[redis] connected to ${host}`);
+
+let redisInstance: Redis | undefined;
+
+function getRedis(): Redis {
+  if (!redisInstance) {
+    console.log(`[redis] ${host}`);
+    redisInstance = redisUrl
+      ? new Redis(redisUrl, redisOptions)
+      : new Redis(6379, host, redisOptions);
+    console.log(`[redis] connected to ${host}`);
+  }
+  return redisInstance;
+}
 
 // Redis
 
@@ -42,10 +52,14 @@ async function cacheNostrRelays(
   const key = `relays:${pubkey}`;
   const json = JSON.stringify(relays);
   console.log(`[cache] caching ${key} ${json}`);
-  const writes = await redis.hset(key, pubkey, json);
-  if (writes === 1) {
-    console.log(`[cache] cache ${key} success`);
-    return true;
+  try {
+    const writes = await getRedis().hset(key, pubkey, json);
+    if (writes === 1) {
+      console.log(`[cache] cache ${key} success`);
+      return true;
+    }
+  } catch (e) {
+    console.warn(`[cache] failed to cache relays for ${pubkey}:`, e);
   }
   if (username) {
     await cacheNip05Relays(username, pubkey, relays);
@@ -56,8 +70,13 @@ async function cacheNostrRelays(
 
 async function getCachedRelays(pubkey: string): Promise<string[]> {
   const key = `relays:${pubkey}`;
-  const relaysJson = await redis.hget(key, pubkey);
-  return relaysJson ? (safeParse(relaysJson) ?? []) : [];
+  try {
+    const relaysJson = await getRedis().hget(key, pubkey);
+    return relaysJson ? (safeParse(relaysJson) ?? []) : [];
+  } catch (e) {
+    console.warn(`[cache] failed to get cached relays for ${pubkey}:`, e);
+    return [];
+  }
 }
 
 export async function fetchRelays(pubkey: string, username?: string) {
@@ -114,19 +133,29 @@ async function cacheNostrProfile(
   pubkey: string,
   profile: ProfileContent,
 ): Promise<string> {
-  return redis.set(
-    profileKey(pubkey),
-    JSON.stringify(profile),
-    //"EX",
-    //3600 // 1 hour ttl
-  );
+  try {
+    return getRedis().set(
+      profileKey(pubkey),
+      JSON.stringify(profile),
+      //"EX",
+      //3600 // 1 hour ttl
+    );
+  } catch (e) {
+    console.warn(`[cache] failed to cache profile for ${pubkey}:`, e);
+    return "OK";
+  }
 }
 
 async function getCachedProfile(
   pubkey: string,
 ): Promise<ProfileContent | null> {
-  const profilejson = await redis.get(profileKey(pubkey));
-  return profilejson ? (safeParse(profilejson) ?? null) : null;
+  try {
+    const profilejson = await getRedis().get(profileKey(pubkey));
+    return profilejson ? (safeParse(profilejson) ?? null) : null;
+  } catch (e) {
+    console.warn(`[cache] failed to get cached profile for ${pubkey}:`, e);
+    return null;
+  }
 }
 
 export async function syncProfile(
@@ -208,7 +237,11 @@ export async function isValidUsername(username: string): Promise<boolean> {
 }
 
 export async function getUsername(username: string): Promise<string | null> {
-  return redis.hget(NIP05_NAMES, username);
+  try {
+    return getRedis().hget(NIP05_NAMES, username);
+  } catch (e) {
+    return null;
+  }
 }
 
 export async function saveUser({
@@ -220,11 +253,16 @@ export async function saveUser({
   username: string;
   relays: Relay[];
 }) {
-  return redis
-    .multi()
-    .hset(NIP05_NAMES, username, pubkey)
-    .hset(NIP05_RELAYS, username, JSON.stringify(relays))
-    .exec();
+  try {
+    return getRedis()
+      .multi()
+      .hset(NIP05_NAMES, username, pubkey)
+      .hset(NIP05_RELAYS, username, JSON.stringify(relays))
+      .exec();
+  } catch (e) {
+    console.warn(`[cache] failed to save user ${username}:`, e);
+    return null;
+  }
 }
 
 async function cacheNip05Relays(
@@ -234,35 +272,44 @@ async function cacheNip05Relays(
 ): Promise<boolean> {
   const json = JSON.stringify(relays);
   console.log(`[cache] caching ${NIP05_RELAYS} ${username} ${json}`);
-  const writes = await redis.hset(NIP05_RELAYS, pubkey, json);
-  if (writes === 1) {
-    console.log(`[cache] cache ${NIP05_RELAYS} success`);
-    return true;
+  try {
+    const writes = await getRedis().hset(NIP05_RELAYS, pubkey, json);
+    if (writes === 1) {
+      console.log(`[cache] cache ${NIP05_RELAYS} success`);
+      return true;
+    }
+  } catch (e) {
+    console.warn(`[cache] failed to cache nip05 relays for ${username}:`, e);
   }
   console.warn(`[cache] cache ${NIP05_RELAYS} error`);
   return false;
 }
 
 export async function getNip05(): Promise<Nip05Data> {
-  const response = await redis
-    .multi()
-    .hgetall(NIP05_NAMES)
-    .hgetall(NIP05_RELAYS)
-    .exec();
+  try {
+    const response = await getRedis()
+      .multi()
+      .hgetall(NIP05_NAMES)
+      .hgetall(NIP05_RELAYS)
+      .exec();
 
-  const names = (response?.[0]?.[1] as Record<string, string>) || {};
-  const relaysRaw = (response?.[1]?.[1] as Record<string, string>) || {};
+    const names = (response?.[0]?.[1] as Record<string, string>) || {};
+    const relaysRaw = (response?.[1]?.[1] as Record<string, string>) || {};
 
-  const relays: Record<string, string[]> = {};
-  for (const [pubkey, relaysJson] of Object.entries(relaysRaw)) {
-    try {
-      relays[pubkey] = safeParse(relaysJson) ?? [];
-    } catch {
-      relays[pubkey] = [];
+    const relays: Record<string, string[]> = {};
+    for (const [pubkey, relaysJson] of Object.entries(relaysRaw)) {
+      try {
+        relays[pubkey] = safeParse(relaysJson) ?? [];
+      } catch {
+        relays[pubkey] = [];
+      }
     }
-  }
 
-  return { names, relays };
+    return { names, relays };
+  } catch (e) {
+    console.warn(`[cache] failed to get nip05 data:`, e);
+    return { names: {}, relays: {} };
+  }
 }
 
 export async function getMembers(): Promise<Nip05Pointer[]> {
@@ -276,36 +323,46 @@ export async function getMembers(): Promise<Nip05Pointer[]> {
 // TODO: get members with full profile info: { username, pubkey, profile }
 
 export async function getUsers(): Promise<User[]> {
-  const result = await redis.hgetall(NIP05_NAMES);
-  const results = await Promise.allSettled(
-    Object.entries(result).map(async (kv) => {
-      const [username, pubkey] = kv;
-      const profile = await fetchProfile({ pubkey });
-      if (profile) return { username, pubkey, profile };
-      throw new Error(
-        `profile for ${username} with pubkey ${pubkey} not found`,
-      );
-    }),
-  );
-  return results.filter((r) => r.status === "fulfilled").map((r) => r.value);
+  try {
+    const result = await getRedis().hgetall(NIP05_NAMES);
+    const results = await Promise.allSettled(
+      Object.entries(result).map(async (kv) => {
+        const [username, pubkey] = kv;
+        const profile = await fetchProfile({ pubkey });
+        if (profile) return { username, pubkey, profile };
+        throw new Error(
+          `profile for ${username} with pubkey ${pubkey} not found`,
+        );
+      }),
+    );
+    return results.filter((r) => r.status === "fulfilled").map((r) => r.value);
+  } catch (e) {
+    console.warn(`[cache] failed to get users:`, e);
+    return [];
+  }
 }
 
 export async function getArticles(
   pointer: Nip05Pointer,
 ): Promise<NostrEvent[]> {
-  const { pubkey } = pointer;
-  const identifiers = await redis.smembers(articlesKey(pubkey));
-  if (identifiers.length === 0) return [];
+  try {
+    const { pubkey } = pointer;
+    const identifiers = await getRedis().smembers(articlesKey(pubkey));
+    if (identifiers.length === 0) return [];
 
-  const results = await redis.mget(
-    identifiers.map((identifier) =>
-      addressKey({ pubkey, kind: kinds.LongFormArticle, identifier }),
-    ),
-  );
+    const results = await getRedis().mget(
+      identifiers.map((identifier) =>
+        addressKey({ pubkey, kind: kinds.LongFormArticle, identifier }),
+      ),
+    );
 
-  return results
-    .map((result) => (result ? safeParse(result) : null))
-    .filter(Boolean);
+    return results
+      .map((result) => (result ? safeParse(result) : null))
+      .filter(Boolean);
+  } catch (e) {
+    console.warn(`[cache] failed to get articles for ${pointer.nip05}:`, e);
+    return [];
+  }
 }
 
 function articlesKey(pubkey: Pubkey): string {
@@ -327,8 +384,12 @@ export async function fetchArticles({
 async function getCachedAddress(
   address: AddressPointer,
 ): Promise<NostrEvent | undefined> {
-  const articleJson = await redis.get(addressKey(address));
-  return articleJson ? safeParse(articleJson) : undefined;
+  try {
+    const articleJson = await getRedis().get(addressKey(address));
+    return articleJson ? safeParse(articleJson) : undefined;
+  } catch (e) {
+    return undefined;
+  }
 }
 
 // -- Nostr
@@ -345,21 +406,33 @@ async function cacheAddress(
   address: AddressPointer,
   event: NostrEvent,
 ): Promise<string> {
-  return redis.set(addressKey(address), JSON.stringify(event));
+  try {
+    return getRedis().set(addressKey(address), JSON.stringify(event));
+  } catch (e) {
+    return "OK";
+  }
 }
 
 async function cacheEvent(
   address: EventPointer,
   event: NostrEvent,
 ): Promise<string> {
-  return redis.set(eventKey(address), JSON.stringify(event));
+  try {
+    return getRedis().set(eventKey(address), JSON.stringify(event));
+  } catch (e) {
+    return "OK";
+  }
 }
 
 async function getCachedEvent(
   address: EventPointer,
 ): Promise<NostrEvent | undefined> {
-  const json = await redis.get(eventKey(address));
-  return json ? safeParse(json) : undefined;
+  try {
+    const json = await getRedis().get(eventKey(address));
+    return json ? safeParse(json) : undefined;
+  } catch (e) {
+    return undefined;
+  }
 }
 
 async function cacheArticle(
@@ -367,10 +440,14 @@ async function cacheArticle(
   article: NostrEvent,
 ): Promise<void> {
   // TODO: only sadd to articles if
-  const multi = redis.multi();
-  multi.set(addressKey(address), JSON.stringify(article));
-  multi.sadd(articlesKey(article.pubkey), address.identifier);
-  await multi.exec();
+  try {
+    const multi = getRedis().multi();
+    multi.set(addressKey(address), JSON.stringify(article));
+    multi.sadd(articlesKey(article.pubkey), address.identifier);
+    await multi.exec();
+  } catch (e) {
+    console.warn(`[cache] failed to cache article ${address.identifier}:`, e);
+  }
 }
 
 export async function syncArticles({
@@ -466,61 +543,6 @@ export async function syncArticles({
     throw error;
   }
 }
-
-//export class DataService {
-//  // Core NIP-05 operations
-//  // Article management (NIP-23)
-//
-//  async getArticlesByAuthor(hexPubkey: string): Promise<string[]> {
-//    return redis.smembers(`articles:author:${hexPubkey}`);
-//  }
-//
-//  async getMultipleArticles(addresses: string[]): Promise<(Article | null)[]> {
-//    if (addresses.length === 0) return [];
-//
-//    const keys = addresses.map(addr => `article:${addr}`);
-//    const results = await redis.mget(...keys);
-//
-//    return results.map(result =>
-//      result ? JSON.parse(result) : null
-//    );
-//  }
-//
-//  // User data pipeline (username -> full data)
-//  async getUserData(username: string): Promise<{
-//    pubkey: string | null;
-//    profile: UserProfile | null;
-//    relays: string[];
-//    articles: string[];
-//  }> {
-//    const pubkey = await this.getUsername(username);
-//    if (!pubkey) {
-//      return { pubkey: null, profile: null, relays: [], articles: [] };
-//    }
-//
-//    const multi = redis.multi();
-//    multi.get(`profile:${pubkey}`);
-//    multi.hget("nip05:relays", pubkey);
-//    multi.smembers(`articles:author:${pubkey}`);
-//    const results = await multi.exec();
-//
-//    const profileJson = results?.[0]?.[1] as string | null;
-//    const relaysJson = results?.[1]?.[1] as string | null;
-//    const articles = results?.[2]?.[1] as string[] || [];
-//
-//    const profile = profileJson ? JSON.parse(profileJson) : null;
-//    const relays = relaysJson ? JSON.parse(relaysJson) : [];
-//
-//    return { pubkey, profile, relays, articles };
-//  }
-//
-//  // Batch populate multiple events
-//  async populateFromEvents(events: NostrEvent[]): Promise<void> {
-//    for (const event of events) {
-//      await this.populateFromEvent(event);
-//    }
-//  }
-//
 
 async function fetchNostrRelays(
   pubkey: string,

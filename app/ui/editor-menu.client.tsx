@@ -166,7 +166,7 @@ export default function EditorMenu(props: EditorMenuProps) {
     // TODO: refactor to ExtensionAccount.fromExtension when released (v3)
     const signer = new ExtensionSigner();
     const pubkey = await signer.getPublicKey();
-    const account = new ExtensionAccount(pubkey, signer);
+    const account = new ExtensionAccount(pubkey, signer as any);
     // Load user profile, relay list and articles
     const loadUser = merge(
       profileLoader({ kind: kinds.Metadata, pubkey }),
