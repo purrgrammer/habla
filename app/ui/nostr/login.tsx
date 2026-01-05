@@ -40,20 +40,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/ui/dialog";
-import { useProfile } from "~/hooks/nostr.client";
-import { profileLoader } from "~/services/loaders.client";
+import { useProfile } from "~/hooks/nostr";
+import { profileLoader } from "~/services/loaders";
 import User from "~/ui/nostr/user";
 import { Button } from "~/ui/button";
-import { useTheme } from "~/ui/theme-provider.client";
-import { useCurrency } from "~/services/currency.client";
-import { useWallet, useWalletInfo } from "~/services/wallet.client";
-import { ConnectWallet } from "./nwc.client";
-import ZapDialog from "./zap.client";
+import { useTheme } from "~/ui/theme-provider";
+import { useCurrency } from "~/services/currency";
+import { useWallet, useWalletInfo } from "~/services/wallet";
+import { ConnectWallet } from "./nwc";
+import ZapDialog from "./zap";
 import { HABLA_PUBKEY } from "~/const";
-import { useState } from "react";
-import { WalletName } from "../wallet.client";
+import { useState, useCallback } from "react";
+import { WalletName } from "../wallet";
 import { Badge } from "../badge";
-import RemoteSignerLogin from "./remote-signer.client";
+import RemoteSignerLogin from "./remote-signer";
 
 function LoggedInUser({ pubkey }: { pubkey: string }) {
   const account = useActiveAccount();
@@ -238,6 +238,8 @@ export default function Login() {
   const accountManager = useAccountManager();
   const [open, setOpen] = useState(false);
 
+  const handleConnected = useCallback(() => setOpen(false), []);
+
   async function getStarted() {
     try {
       const account = await ExtensionAccount.fromExtension();
@@ -290,7 +292,7 @@ export default function Login() {
                   </span>
                 </div>
               </div>
-              <RemoteSignerLogin onConnected={() => setOpen(false)} />
+              <RemoteSignerLogin onConnected={handleConnected} />
             </div>
           </DialogContent>
         </Dialog>

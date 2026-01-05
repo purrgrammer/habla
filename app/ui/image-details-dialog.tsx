@@ -9,8 +9,8 @@ import {
 import { Button } from "~/ui/button";
 import { Label } from "~/ui/label";
 import { Input } from "~/ui/input";
-import { blossomMetadataStore } from "~/services/blossom/metadata-store.client";
-import type { BlossomFileMetadata } from "~/services/blossom/metadata-store.client";
+import { blossomMetadataStore } from "~/services/blossom/metadata-store";
+import type { BlossomFileMetadata } from "~/services/blossom/metadata-store";
 
 interface ImageDetailsDialogProps {
   open: boolean;

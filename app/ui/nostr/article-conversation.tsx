@@ -1,6 +1,6 @@
 import { type NostrEvent, kinds } from "nostr-tools";
 import { map } from "rxjs";
-import { type FeedComponent, PureFeed } from "~/ui/nostr/feed.client";
+import { type FeedComponent, PureFeed } from "~/ui/nostr/feed";
 import Highlight from "./highlight";
 import NostrCard from "./card";
 import {
@@ -9,7 +9,7 @@ import {
   useTimeline,
   useZaps,
   type Zap,
-} from "~/hooks/nostr.client";
+} from "~/hooks/nostr";
 import Note from "./note";
 import {
   getAddressPointerForEvent,
@@ -18,16 +18,16 @@ import {
   getZapRequest,
   getZapSender,
 } from "applesauce-core/helpers";
-import Zaps, { ZapButton } from "../zaps.client";
+import Zaps, { ZapButton } from "../zaps";
 import Debug from "../debug";
-import { EventReply, Reply } from "./reply.client";
+import { EventReply, Reply } from "./reply";
 import { useMemo, useState } from "react";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import { isReplaceableKind } from "nostr-tools/kinds";
 import { Bookmark, MessageCircle, Share } from "lucide-react";
 import { Button } from "../button";
 import { COMMENT } from "~/const";
-import CommentDialog from "./comment-dialog.client";
+import CommentDialog from "./comment-dialog";
 import ArticleCard from "./article-card";
 import NumberFlow from "@number-flow/react";
 

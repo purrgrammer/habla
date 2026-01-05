@@ -9,9 +9,9 @@ import {
 import { Button } from "~/ui/button";
 import { Label } from "~/ui/label";
 import { Upload, X, Check, Loader2, AlertCircle } from "lucide-react";
-import { useBlossomServers } from "~/hooks/blossom/use-blossom-servers.client";
-import { uploadToBlossomServers } from "~/services/blossom/upload.client";
-import type { UploadProgress } from "~/services/blossom/upload.client";
+import { useBlossomServers } from "~/hooks/blossom/use-blossom-servers";
+import { uploadToBlossomServers } from "~/services/blossom/upload";
+import type { UploadProgress } from "~/services/blossom/upload";
 import { useActiveAccount } from "applesauce-react/hooks";
 import { toast } from "sonner";
 

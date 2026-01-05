@@ -37,6 +37,7 @@ const WalletContext = createContext<WalletContextType | null>(null);
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [wallet, setWallet] = useState<WalletConnect | undefined>(() => {
+    if (typeof window === "undefined") return undefined;
     const connection = localStorage.getItem(WALLET);
     if (connection) {
       const json = safeParse(connection);
@@ -45,13 +46,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   });
 
   function changeWallet(w?: WalletConnect) {
-    if (w) {
-      const json = w.toJSON();
-      localStorage.setItem(WALLET, JSON.stringify(json));
-      setWallet(w);
-    } else {
-      localStorage.removeItem(WALLET);
-      setWallet(undefined);
+    if (typeof window !== "undefined") {
+      if (w) {
+        const json = w.toJSON();
+        localStorage.setItem(WALLET, JSON.stringify(json));
+        setWallet(w);
+      } else {
+        localStorage.removeItem(WALLET);
+        setWallet(undefined);
+      }
     }
   }
 

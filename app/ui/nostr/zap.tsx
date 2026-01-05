@@ -20,13 +20,13 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import Grid from "../grid";
-import { CurrencyAmount } from "../currency.client";
+import { CurrencyAmount } from "../currency";
 import { Input } from "../input";
 import { Textarea } from "../textarea";
-import { ConnectWallet } from "./nwc.client";
-import { queries, useWallet } from "~/services/wallet.client";
-import { WalletName } from "../wallet.client";
-import { useProfile } from "~/hooks/nostr.client";
+import { ConnectWallet } from "./nwc";
+import { queries, useWallet } from "~/services/wallet";
+import { WalletName } from "../wallet";
+import { useProfile } from "~/hooks/nostr";
 import { getInvoice, parseLNURLOrAddress } from "applesauce-core/helpers";
 import type { Pubkey } from "~/types";
 import { Avatar, Username } from "./user";
@@ -35,7 +35,7 @@ import { useActionHub } from "applesauce-react/hooks";
 import { firstValueFrom } from "rxjs";
 import type { DialogProps } from "@radix-ui/react-dialog";
 import Debug from "../debug";
-import { info } from "~/services/notifications.client";
+import { info } from "~/services/notifications";
 import { useActiveAccount } from "applesauce-react/hooks";
 import { ZapRequest } from "~/nostr/actions";
 

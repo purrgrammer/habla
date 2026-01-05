@@ -1,6 +1,6 @@
 import ClientOnly from "~/ui/client-only";
 import type { Route } from "./+types/relay";
-import RelayFeed from "~/ui/nostr/relay-feed.client";
+import RelayFeed from "~/ui/nostr/relay-feed";
 
 export default function Relay({ params }: Route.ComponentProps) {
   const { relay } = params;

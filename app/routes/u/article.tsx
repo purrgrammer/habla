@@ -1,12 +1,12 @@
 import type { Route } from "./+types/article";
 import { kinds } from "nostr-tools";
 import { queryProfile } from "nostr-tools/nip05";
-import { default as clientStore } from "~/services/data.client";
+import { default as clientStore } from "~/services/data";
 import { default as serverStore } from "~/services/data.server";
 import Article from "~/ui/nostr/article";
 import defaults, { articleMeta } from "~/seo";
 import ClientOnly from "~/ui/client-only";
-import ArticleConversation from "~/ui/nostr/article-conversation.client";
+import ArticleConversation from "~/ui/nostr/article-conversation";
 import type { DataStore } from "~/services/types";
 
 export function meta({ loaderData }: Route.MetaArgs) {

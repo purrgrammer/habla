@@ -9,7 +9,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { type NostrEvent, kinds } from "nostr-tools";
 import { marked } from "marked";
 import { useActiveAccount } from "applesauce-react/hooks";
-import { useRelays, useTimeline } from "~/hooks/nostr.client";
+import { useRelays, useTimeline } from "~/hooks/nostr";
 import {
   type Editor,
   EditorContent,
@@ -27,15 +27,15 @@ import StarterKit from "@tiptap/starter-kit";
 import { Input } from "~/ui/input";
 import Document from "@tiptap/extension-document";
 import { getMarkRange, Extension } from "@tiptap/core";
-import UserLink from "./nostr/user-link.client";
-import { default as BaseNEvent } from "./nostr/nevent.client";
-import { default as BaseNAddr } from "./nostr/naddr.client";
+import UserLink from "./nostr/user-link";
+import { default as BaseNEvent } from "./nostr/nevent";
+import { default as BaseNAddr } from "./nostr/naddr";
 import EditorHeader from "./editor-header";
-import EditorToolbar from "./editor-toolbar.client";
-import ImageUploadDialog from "./image-upload-dialog.client";
-import ImageDetailsDialog from "./image-details-dialog.client";
-import LinkDialog from "./link-dialog.client";
-import PublishDialog from "./publish-dialog.client";
+import EditorToolbar from "./editor-toolbar";
+import ImageUploadDialog from "./image-upload-dialog";
+import ImageDetailsDialog from "./image-details-dialog";
+import LinkDialog from "./link-dialog";
+import PublishDialog from "./publish-dialog";
 import {
   getArticleImage,
   getArticleTitle,
@@ -53,11 +53,11 @@ import { PublishArticle, generateIdentifier } from "~/nostr/publish-article";
 import { useActionHub } from "applesauce-react/hooks";
 import { firstValueFrom } from "rxjs";
 import { toast } from "sonner";
-import { publishToRelays } from "~/services/publish-article.client";
+import { publishToRelays } from "~/services/publish-article";
 import { useNavigate } from "react-router";
 import { nip19 } from "nostr-tools";
-import { useProfile } from "~/hooks/nostr.client";
-import store from "~/services/data.client";
+import { useProfile } from "~/hooks/nostr";
+import store from "~/services/data";
 import {
   getDraft,
   saveDraft as saveDraftToStorage,
@@ -65,7 +65,7 @@ import {
   generateDraftId,
   hasMeaningfulContent,
   type Draft,
-} from "~/services/drafts.client";
+} from "~/services/drafts";
 
 // Import Nostr extensions
 import NostrMention from "./editor/extensions/mention";

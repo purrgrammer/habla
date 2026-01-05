@@ -5,8 +5,8 @@ import {
   useWalletBalance,
   useWalletTransactions,
   useWalletInfo,
-} from "~/services/wallet.client";
-import { ConnectWallet } from "./nostr/nwc.client";
+} from "~/services/wallet";
+import { ConnectWallet } from "./nostr/nwc";
 import { Button } from "./button";
 import {
   Bitcoin,
@@ -17,10 +17,10 @@ import {
   Unplug,
   Cog,
 } from "lucide-react";
-import { CurrencyAmount } from "./currency.client";
+import { CurrencyAmount } from "./currency";
 import { ScrollArea } from "./scroll-area";
 import { parseBolt11, safeParse } from "applesauce-core/helpers";
-import UserLink from "./nostr/user-link.client";
+import UserLink from "./nostr/user-link";
 import { cn } from "~/lib/utils";
 import { useMemo, useState } from "react";
 import type { Transaction as Tx } from "applesauce-wallet-connect/helpers";

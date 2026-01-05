@@ -1,6 +1,6 @@
 import ClientOnly from "~/ui/client-only";
-import { ConnectWallet } from "~/ui/nostr/nwc.client";
-import Wallet from "~/ui/wallet.client";
+import { ConnectWallet } from "~/ui/nostr/nwc";
+import Wallet from "~/ui/wallet";
 
 import { buildBaseSeoTags } from "~/seo";
 

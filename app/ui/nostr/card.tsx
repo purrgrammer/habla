@@ -16,7 +16,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "~/ui/dropdown-menu";
-import { RelayName, RelayIcon } from "./relay-link.client";
+import { RelayName, RelayIcon } from "./relay-link";
 import { useNavigate } from "react-router";
 
 function Relays({ relays }: { relays: Set<string> }) {

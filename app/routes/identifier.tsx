@@ -1,6 +1,6 @@
 import type { Route } from "./+types/identifier";
 import { kinds } from "nostr-tools";
-import { default as clientStore } from "~/services/data.client";
+import { default as clientStore } from "~/services/data";
 import { default as serverStore } from "~/services/data.server";
 import defaults, { articleMeta } from "~/seo";
 import Article from "~/ui/nostr/article";

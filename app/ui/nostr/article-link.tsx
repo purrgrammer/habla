@@ -1,12 +1,17 @@
 import { Link } from "react-router";
 import { type NostrEvent, nip19 } from "nostr-tools";
 import { type AddressPointer } from "nostr-tools/nip19";
-import { getArticleTitle } from "applesauce-core/helpers";
-import ClientOnly from "../client-only";
-import ClientArticleLink from "./article-link.client";
+import { getArticleTitle, getTagValue } from "applesauce-core/helpers";
+import { useUsers } from "~/nostr/queries";
 import type { ReactNode } from "react";
 
-function useAddressLink(address: AddressPointer) {
+function useArticleLink(article: NostrEvent, address: AddressPointer) {
+  const { data: users } = useUsers();
+  const user = users?.find((u) => u.pubkey === article.pubkey);
+  const identifier = getTagValue(article, "d");
+  if (user && identifier) {
+    return `/${user.username}/${encodeURIComponent(identifier)}`;
+  }
   return `/a/${nip19.naddrEncode(address)}`;
 }
 
@@ -14,20 +19,18 @@ export default function ArticleLink({
   article,
   address,
   children,
+  className,
 }: {
   article: NostrEvent;
   address: AddressPointer;
   children?: ReactNode;
+  className?: string;
 }) {
-  const link = useAddressLink(address);
   const title = getArticleTitle(article);
+  const link = useArticleLink(article, address);
   return (
-    <ClientOnly fallback={<Link to={link}>{children || title}</Link>}>
-      {() => (
-        <ClientArticleLink article={article} address={address}>
-          {children}
-        </ClientArticleLink>
-      )}
-    </ClientOnly>
+    <Link className={className} to={link}>
+      {children || title}
+    </Link>
   );
 }

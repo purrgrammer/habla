@@ -1,6 +1,6 @@
 import type { Route } from "./+types/nip05";
 import { queryProfile } from "nostr-tools/nip05";
-import { default as clientStore } from "~/services/data.client";
+import { default as clientStore } from "~/services/data";
 import { fetchProfile as serverFetchProfile } from "~/services/data.server";
 import Profile from "~/ui/nostr/profile";
 import Debug from "~/ui/debug";

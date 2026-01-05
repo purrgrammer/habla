@@ -2,7 +2,7 @@ import NumberFlow from "@number-flow/react";
 import { useMemo } from "react";
 import { Euro, DollarSign } from "lucide-react";
 import { cn } from "~/lib/utils";
-import { useCurrency, useExchangeRate } from "~/services/currency.client";
+import { useCurrency, useExchangeRate } from "~/services/currency";
 import { type AmountSize, amounts } from "./amount";
 import SatsAmount from "~/ui/sats";
 

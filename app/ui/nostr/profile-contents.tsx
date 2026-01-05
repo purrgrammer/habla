@@ -14,15 +14,15 @@ import {
   type ProfileContent,
 } from "applesauce-core/helpers";
 import type { Pubkey } from "~/types";
-import { useRelays } from "~/hooks/nostr.client";
+import { useRelays } from "~/hooks/nostr";
 import ArticleCard from "./article-card";
 import Highlight from "./highlight";
 import Timestamp from "../timestamp";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/ui/tabs";
 import { BOOK } from "~/const";
-import RelayLink from "./relay-link.client";
-import Feed, { type FeedComponent } from "~/ui/nostr/feed.client";
-//import ZapLeaderboard from "../zap-leaderboard.client";
+import RelayLink from "./relay-link";
+import Feed, { type FeedComponent } from "~/ui/nostr/feed";
+//import ZapLeaderboard from "../zap-leaderboard";
 
 const components: Record<number, FeedComponent> = {
   [kinds.Highlights]: ({ event, profile }) => {

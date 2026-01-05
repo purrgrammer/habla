@@ -4,11 +4,11 @@ import { CircleQuestionMark, Newspaper } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { kinds, nip19, type NostrEvent } from "nostr-tools";
 import { map } from "rxjs";
-import { CurrencyAmount } from "../currency.client";
-import UserLink from "./user-link.client";
-import RichText from "./rich-text.client";
+import { CurrencyAmount } from "../currency";
+import UserLink from "./user-link";
+import RichText from "./rich-text";
 import { isReplaceableKind } from "nostr-tools/kinds";
-import { useProfile, useRelays, useTimeline } from "~/hooks/nostr.client";
+import { useProfile, useRelays, useTimeline } from "~/hooks/nostr";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import {
   getSeenRelays,
@@ -34,7 +34,7 @@ import {
 import Blockquote from "../blockquote";
 import { Avatar } from "./user";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/ui/hover-card";
-import { ZapPills } from "../zaps.client";
+import { ZapPills } from "../zaps";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,12 +43,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/ui/dropdown-menu";
-import ZapDialog from "./zap.client";
+import ZapDialog from "./zap";
 import { AGGREGATOR_RELAYS, COMMENT } from "~/const";
 import { useNavigate } from "react-router";
-import { info } from "~/services/notifications.client";
+import { info } from "~/services/notifications";
 import { Dialog, DialogContent, DialogTitle } from "../dialog";
-import CommentDialog from "~/ui/nostr/comment-dialog.client";
+import CommentDialog from "~/ui/nostr/comment-dialog";
 
 export function EventReply({
   event,

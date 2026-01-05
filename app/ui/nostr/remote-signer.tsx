@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import QRCode from "react-qr-code";
 import { NostrConnectSigner, Helpers } from "applesauce-signers";
 import { NostrConnectAccount } from "applesauce-accounts/accounts";
 import { useAccountManager } from "applesauce-react/hooks";
+import { kinds } from "nostr-tools";
 import { generateSecretKey } from "nostr-tools/pure";
 import { bytesToHex } from "@noble/hashes/utils";
 import { Button } from "~/ui/button";
@@ -15,6 +16,7 @@ import { AGGREGATOR_RELAYS } from "~/const";
 import { toast } from "sonner";
 import { Loader2, Copy, Check } from "lucide-react";
 import pool from "~/services/relay-pool";
+import { tap } from "rxjs";
 
 export default function RemoteSignerLogin({
   onConnected,
@@ -26,13 +28,30 @@ export default function RemoteSignerLogin({
   const [isConnecting, setIsConnecting] = useState(false);
   
   // Default relays for signaling
-  const RELAYS = ["wss://relay.nsec.app", ...AGGREGATOR_RELAYS];
+  const RELAYS = useMemo(() => ["wss://relay.nsec.app", ...AGGREGATOR_RELAYS], []);
 
   // Adapter for applesauce-signers
-  const signerPool = {
-    subscription: (relays: string[], filters: any[]) => pool.req(relays, filters),
-    publish: (relays: string[], event: any) => pool.publish(relays, event),
-  };
+  const signerPool = useMemo(() => ({
+    subscription: (relays: string[], filters: any[]) => {
+        console.log("[RemoteSigner] Subscribing to", relays, filters);
+        return pool.req(relays, filters).pipe(
+            tap(ev => {
+                if (typeof ev === "string") {
+                    console.log("[RemoteSigner] Received control message:", ev);
+                } else {
+                    console.log("[RemoteSigner] Received Nostr event:", ev.kind, ev.id);
+                }
+            })
+        );
+    },
+    publish: (relays: string[], event: any) => {
+        console.log("[RemoteSigner] Publishing to", relays, event);
+        return pool.publish(relays, event).then(res => {
+            console.log("[RemoteSigner] Publish result:", res);
+            return res;
+        });
+    },
+  }), []);
 
   // Handle Bunker URL Connection
   async function handleConnectBunker() {
@@ -111,27 +130,108 @@ export default function RemoteSignerLogin({
 
 function QRCodeFlow({ relays, onConnected }: { relays: string[], onConnected?: () => void }) {
     const accountManager = useAccountManager();
-    const initialized = useRef(false);
     const [uri, setUri] = useState("");
     const [copied, setCopied] = useState(false);
+    
+    // Use refs to track state within async closures
+    const finishedRef = useRef(false);
+    const abortedRef = useRef(false);
 
     useEffect(() => {
-        if (initialized.current) return;
-        initialized.current = true;
+        // Reset refs for this effect run
+        finishedRef.current = false;
+        abortedRef.current = false;
 
         const secret = bytesToHex(generateSecretKey());
         const signer = new NostrConnectSigner({
             relays,
             secret,
             pool: {
-                subscription: (relays: string[], filters: any[]) => pool.req(relays, filters),
-                publish: (relays: string[], event: any) => pool.publish(relays, event),
+                subscription: (relays: string[], filters: any[]) => {
+                    console.log("[RemoteSigner:QR] Subscribing to", relays, filters);
+                    return pool.req(relays, filters).pipe(
+                        tap(ev => {
+                            if (typeof ev === "string") {
+                                console.log("[RemoteSigner:QR] Received control message:", ev);
+                            } else {
+                                console.log("[RemoteSigner:QR] Received Nostr event:", ev.kind, ev.id);
+                            }
+                        })
+                    );
+                },
+                publish: (relays: string[], event: any) => {
+                    console.log("[RemoteSigner:QR] Publishing to", relays, event);
+                    return pool.publish(relays, event).then(res => {
+                        console.log("[RemoteSigner:QR] Publish result:", res);
+                        return res;
+                    });
+                },
             },
         });
 
+        const finish = async () => {
+             if (finishedRef.current || abortedRef.current) {
+                 console.log("[RemoteSigner:QR] finish() bailing. finished:", finishedRef.current, "aborted:", abortedRef.current);
+                 return;
+             }
+             finishedRef.current = true;
+
+             try {
+                console.log("[RemoteSigner:QR] Finalizing connection...");
+                
+                // Fetch public key from remote signer
+                console.log("[RemoteSigner:QR] Calling signer.getPublicKey()...");
+                const pubkey = await signer.getPublicKey();
+                console.log("[RemoteSigner:QR] Remote User Pubkey:", pubkey);
+                
+                if (abortedRef.current) {
+                    console.log("[RemoteSigner:QR] Public key fetched but instance already aborted.");
+                    return;
+                }
+
+                // Create account and set as active
+                console.log("[RemoteSigner:QR] Creating NostrConnectAccount...");
+                const account = new NostrConnectAccount(pubkey, signer as any);
+                accountManager.addAccount(account);
+                accountManager.setActive(account);
+                
+                console.log("[RemoteSigner:QR] Login successful. Calling onConnected()...");
+                toast.success("Connected via QR Code!");
+                onConnected?.();
+            } catch (err) {
+                console.error("[RemoteSigner:QR] Finalization failed", err);
+                if (!abortedRef.current) {
+                    finishedRef.current = false;
+                    toast.error("Connection failed during setup: " + (err instanceof Error ? err.message : String(err)));
+                }
+            }
+        };
+
+        // Patch handleEvent for direct trigger
+        const originalHandleEvent = signer.handleEvent.bind(signer);
+        (signer as any).handleEvent = async (event: any) => {
+            console.log("[RemoteSigner:QR] signer.handleEvent called for kind", event.kind);
+            try {
+                await originalHandleEvent(event);
+                console.log("[RemoteSigner:QR] signer.handleEvent finished. isConnected:", signer.isConnected);
+                if (signer.isConnected && !finishedRef.current && !abortedRef.current) {
+                    console.log("[RemoteSigner:QR] isConnected is true! Triggering finish()...");
+                    finish();
+                }
+            } catch (e) {
+                console.error("[RemoteSigner:QR] signer.handleEvent error:", e);
+            }
+        };
+
+        console.log("[RemoteSigner:QR] Client Pubkey:", signer.clientPubkey);
+
+        // Start listening
+        console.log("[RemoteSigner:QR] Opening signer connection...");
+        signer.open();
+
         const generatedUri = Helpers.createNostrConnectURI({
             client: signer.clientPubkey,
-            secret,
+            secret: signer.secret,
             relays,
             metadata: {
                 name: "Habla",
@@ -139,33 +239,12 @@ function QRCodeFlow({ relays, onConnected }: { relays: string[], onConnected?: (
             },
         });
         
+        console.log("[RemoteSigner:QR] Generated URI:", generatedUri);
         setUri(generatedUri);
 
-        let aborted = false;
-
-        async function wait() {
-             try {
-                await signer.waitForSigner();
-                if (aborted) return;
-
-                const pubkey = await signer.getPublicKey();
-                // Cast signer to any to avoid dual-package type mismatch
-                const account = new NostrConnectAccount(pubkey, signer as any);
-
-                accountManager.addAccount(account);
-                accountManager.setActive(account);
-                toast.success("Connected via QR Code!");
-                onConnected?.();
-            } catch (err) {
-                if (!aborted) {
-                    console.error("QR Connection failed", err);
-                }
-            }
-        }
-        wait();
-
         return () => {
-            aborted = true;
+            console.log("[RemoteSigner:QR] useEffect cleanup. Aborting instance...");
+            abortedRef.current = true;
             signer.close().catch(() => {});
         };
     }, [relays, onConnected, accountManager]);

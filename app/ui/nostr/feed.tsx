@@ -3,7 +3,7 @@ import { type ReactNode } from "react";
 import { CircleSlash2 } from "lucide-react";
 import { type NostrEvent, type Filter } from "nostr-tools";
 import { type ProfileContent } from "applesauce-core/helpers";
-import { useTimeline } from "~/hooks/nostr.client";
+import { useTimeline } from "~/hooks/nostr";
 import { Card as SkeletonCard } from "../skeleton";
 import Grid from "../grid";
 import Debug from "../debug";

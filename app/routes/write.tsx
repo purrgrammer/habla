@@ -1,4 +1,4 @@
-import Editor from "~/ui/editor.client";
+import Editor from "~/ui/editor";
 import ClientOnly from "~/ui/client-only";
 
 import { buildBaseSeoTags } from "~/seo";

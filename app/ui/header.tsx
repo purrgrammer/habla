@@ -1,4 +1,4 @@
-import LoginClient from "~/ui/nostr/login.client";
+import LoginClient from "~/ui/nostr/login";
 import { Link } from "react-router";
 import ClientOnly from "~/ui/client-only";
 import Logo from "~/ui/logo";

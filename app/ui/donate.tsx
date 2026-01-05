@@ -15,13 +15,13 @@ import {
   CardTitle,
 } from "~/ui/card";
 import ClientOnly from "~/ui/client-only";
-import ZapDialog from "./nostr/zap.client";
+import ZapDialog from "./nostr/zap";
 import Logo from "~/ui/logo";
 import { HABLA_PUBKEY } from "~/const";
 import { useState } from "react";
 import { Input } from "./input";
 import { useActiveAccount } from "applesauce-react/hooks";
-import { useProfile } from "~/hooks/nostr.client";
+import { useProfile } from "~/hooks/nostr";
 import Debug from "./debug";
 import type { Pubkey } from "~/types";
 

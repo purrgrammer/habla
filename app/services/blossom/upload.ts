@@ -1,7 +1,7 @@
 import { Actions, createUploadAuth } from "blossom-client-sdk";
 import type { EventTemplate, NostrEvent } from "nostr-tools";
-import type { BlossomFileMetadata } from "./metadata-store.client";
-import { blossomMetadataStore } from "./metadata-store.client";
+import type { BlossomFileMetadata } from "./metadata-store";
+import { blossomMetadataStore } from "./metadata-store";
 
 const { uploadBlob } = Actions;
 

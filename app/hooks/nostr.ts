@@ -26,7 +26,7 @@ import {
   eventLoader,
   addressLoader,
   profileLoader,
-} from "~/services/loaders.client";
+} from "~/services/loaders";
 import { getArticlePublished } from "applesauce-core/helpers";
 import { isReplaceableKind } from "nostr-tools/kinds";
 import { AGGREGATOR_RELAYS } from "~/const";

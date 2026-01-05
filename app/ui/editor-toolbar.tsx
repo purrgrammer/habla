@@ -32,7 +32,7 @@ import {
   getDrafts,
   clearAllDrafts,
   formatRelativeTime,
-} from "~/services/drafts.client";
+} from "~/services/drafts";
 import { ToggleGroup, ToggleGroupItem } from "~/ui/toggle-group";
 import {
   DropdownMenu,
