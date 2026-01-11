@@ -22,10 +22,14 @@ npm run start      # Serve production build
 - TanStack Query v5
 
 **Key Patterns:**
-- `.client.tsx` = browser-only code (hooks, DOM APIs, interactive components)
 - `.server.ts` = server-only code (Redis, external APIs, data fetching)
-- `.tsx/.ts` = isomorphic code (runs on both client and server)
+- `.tsx/.ts` = runs on both client and server (use `typeof window` checks for browser-only code)
 - `~/` = import alias for `./app/`
+
+**Authentication:**
+- NIP-07 browser extension signing via `ExtensionAccount`
+- NIP-46 remote signing (bunker) via `NostrConnectAccount`
+- Account management in `app/services/accounts.ts`
 
 ## Project Structure
 
@@ -33,9 +37,10 @@ npm run start      # Serve production build
 app/
 ├── routes/          # File-based routing (loader + component)
 ├── services/        # Business logic & data fetching
+│   ├── accounts.ts           # Account manager (NIP-07/NIP-46)
 │   ├── nostr.ts              # Nostr protocol wrappers
-│   ├── data.{server,client}  # Data stores (Redis/IndexedDB)
-│   ├── loaders.{server,client}  # Data loaders
+│   ├── data.server.ts        # Server data store (Redis)
+│   ├── data.ts               # Client data store (IndexedDB)
 │   ├── relay-pool.ts         # WebSocket relay management
 │   └── event-store.ts        # Event caching
 ├── ui/              # React components
@@ -115,7 +120,7 @@ await publisher.publish(event, relays);
 ## Development Notes
 
 - Always run `npm run typecheck` after route changes
-- Server-side data is cached in Redis (optional, defaults to localhost)
+- Server-side data is cached in Redis (optional, gracefully degrades if unavailable)
 - Client-side events cached in IndexedDB via `event-store.ts`
-- Drafts saved to localStorage (`services/drafts.client.ts`)
+- Drafts saved to localStorage (`services/drafts.ts`)
 - Featured content hardcoded in `app/featured.ts`
