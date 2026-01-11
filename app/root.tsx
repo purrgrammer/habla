@@ -9,7 +9,9 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import { Toaster } from "sonner";
+import { Toaster } from "~/ui/sonner";
+import { AppProviders } from "./ui/providers";
+import ClientOnly from "./ui/client-only";
 
 function googleFont(font: string) {
   return {
@@ -59,7 +61,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex flex-col items-center min-h-[100dvh]">
         {children}
-        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -68,7 +69,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <AppProviders>
+      <Outlet />
+      <ClientOnly>{() => <Toaster />}</ClientOnly>
+    </AppProviders>
+  );
 }
 
 // TODO: make error messages translatable

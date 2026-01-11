@@ -3,7 +3,7 @@ import { nip19 } from "nostr-tools";
 import { type Pubkey } from "~/types";
 import defaults, { profileMeta } from "~/seo";
 import Profile from "~/ui/nostr/profile";
-import { default as clientStore } from "~/services/data.client";
+import { default as clientStore } from "~/services/data";
 import { default as serverStore } from "~/services/data.server";
 import { type DataStore } from "~/services/types";
 

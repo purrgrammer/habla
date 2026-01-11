@@ -1,14 +1,17 @@
 import { useMemo } from "react";
-import { nip19 } from "nostr-tools";
-import { type ProfileContent } from "applesauce-core/helpers";
-import { Link } from "react-router";
 import { cn } from "~/lib/utils";
-import ClientOnly from "~/ui/client-only";
-import ClientUserLink from "~/ui/nostr/user-link.client";
+import { Link } from "react-router";
+import { nip19 } from "nostr-tools";
 import { Avatar, Username } from "~/ui/nostr/user";
+import { useProfile, useRelays } from "~/hooks/nostr";
 import { INDEX_RELAYS } from "~/const";
+import { useUsers } from "~/nostr/queries";
+import Nip05 from "./nip05";
+import type { ProfileContent } from "applesauce-core/helpers";
 
 function useUserLink(pubkey: string, relays?: string[]) {
+  const { data: users } = useUsers();
+  const user = users?.find((u) => u.pubkey === pubkey);
   const nprofile = useMemo(() => {
     if (relays) {
       return nip19.nprofileEncode({ pubkey, relays });
@@ -16,29 +19,35 @@ function useUserLink(pubkey: string, relays?: string[]) {
       return nip19.nprofileEncode({ pubkey, relays: INDEX_RELAYS });
     }
   }, [pubkey, relays]);
+  if (user) {
+    return `/${user.username}`;
+  }
   return `/p/${nprofile}`;
 }
 
-function ProfileLink({
+function PureUserLink({
   pubkey,
-  relays,
-  profile,
-  className,
   img = "size-6",
   name,
   wrapper,
+  withNip05,
+  nip05,
+  profile,
+  className,
 }: {
   pubkey: string;
   relays?: string[];
-  profile?: ProfileContent;
   img?: string;
   name?: string;
   wrapper?: string;
+  withNip05?: boolean;
+  nip05?: string;
+  profile?: ProfileContent;
   className?: string;
 }) {
+  const relays = useRelays(pubkey);
   const link = useUserLink(pubkey, relays);
-
-  return profile ? (
+  return (
     <div className={wrapper}>
       <div className={cn("flex flex-row items-center gap-1", className)}>
         <Link to={link} className="flex-shrink-0">
@@ -61,60 +70,45 @@ function ProfileLink({
               )}
             />
           </Link>
+          {withNip05 && profile?.nip05 ? (
+            <Nip05 pubkey={pubkey} nip05={profile?.nip05} className={nip05} />
+          ) : null}
         </div>
       </div>
     </div>
-  ) : null;
+  );
 }
 
-export default function UserLink({
-  pubkey,
-  relays,
-  profile,
-  className,
-  img,
-  name,
-  wrapper,
-  withNip05,
-  nip05,
-}: {
+function FetchUserLink(props: {
   pubkey: string;
   relays?: string[];
-  profile?: ProfileContent;
   img?: string;
   name?: string;
   wrapper?: string;
   withNip05?: boolean;
   nip05?: string;
+}) {
+  const profile = useProfile(props.pubkey);
+  return <PureUserLink {...props} profile={profile} />;
+}
+
+export default function UserLink({
+  profile,
+  ...props
+}: {
+  pubkey: string;
+  relays?: string[];
+  img?: string;
+  name?: string;
+  wrapper?: string;
+  withNip05?: boolean;
+  nip05?: string;
+  profile?: ProfileContent;
   className?: string;
 }) {
-  return (
-    <ClientOnly
-      fallback={
-        <ProfileLink
-          pubkey={pubkey}
-          relays={relays}
-          profile={profile}
-          className={className}
-          img={img}
-          name={name}
-          wrapper={wrapper}
-        />
-      }
-    >
-      {() => (
-        <ClientUserLink
-          withNip05={withNip05}
-          nip05={nip05}
-          pubkey={pubkey}
-          relays={relays}
-          profile={profile}
-          img={img}
-          name={name}
-          wrapper={wrapper}
-          className={className}
-        />
-      )}
-    </ClientOnly>
+  return profile ? (
+    <PureUserLink {...props} profile={profile} />
+  ) : (
+    <FetchUserLink {...props} />
   );
 }

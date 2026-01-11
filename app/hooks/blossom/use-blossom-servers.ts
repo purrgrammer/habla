@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import { map } from "rxjs";
-import { useRelays } from "~/hooks/nostr.client";
-import { blossomServerListLoader } from "~/services/loaders.client";
+import { useRelays } from "~/hooks/nostr";
+import { blossomServerListLoader } from "~/services/loaders";
 import { BLOSSOM_SERVER_LIST_KIND } from "~/const";
 
 const DEFAULT_BLOSSOM_SERVER = "https://blossom.band";

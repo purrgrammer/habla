@@ -18,11 +18,11 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useActiveAccount } from "applesauce-react/hooks";
-import { useRelays, useProfile } from "~/hooks/nostr.client";
+import { useRelays, useProfile } from "~/hooks/nostr";
 import { extractTitle, generateIdentifier } from "~/nostr/publish-article";
 import { toast } from "sonner";
-import ImageUploadDialog from "~/ui/image-upload-dialog.client";
-import store from "~/services/data.client";
+import ImageUploadDialog from "~/ui/image-upload-dialog";
+import store from "~/services/data";
 import { nip19 } from "nostr-tools";
 
 interface PublishDialogProps {

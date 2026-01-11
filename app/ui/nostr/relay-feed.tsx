@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { normalizeURL } from "nostr-tools/utils";
 import { kinds } from "nostr-tools";
-import Feed, { type FeedComponent } from "~/ui/nostr/feed.client";
+import Feed, { type FeedComponent } from "~/ui/nostr/feed";
 import { Newspaper, Highlighter, Server } from "lucide-react";
 import Highlight from "./highlight";
 import { PureArticleCard } from "./article-card";

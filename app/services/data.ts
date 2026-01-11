@@ -7,10 +7,10 @@ import type {
   AddressPointer,
 } from "nostr-tools/nip19";
 import type { ProfileContent } from "applesauce-core/helpers";
-import { profileLoader, eventLoader, addressLoader } from "./loaders.client";
+import { profileLoader, eventLoader, addressLoader } from "./loaders";
 import { getProfileContent } from "applesauce-core/helpers";
 import { type DataStore } from "./types";
-import { getUsers, getMembers } from "~/lib/api.client";
+import { getUsers, getMembers } from "~/lib/api";
 import type { Pubkey, Relay } from "~/types";
 import { getRelayURLs } from "~/lib/url";
 

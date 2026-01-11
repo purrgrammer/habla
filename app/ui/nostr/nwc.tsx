@@ -2,9 +2,9 @@ import { DialogTrigger, type DialogProps } from "@radix-ui/react-dialog";
 import { WalletConnect } from "applesauce-wallet-connect";
 import { Wallet, RotateCcw, PlugZap, Unplug } from "lucide-react";
 import { useState } from "react";
-import { info } from "~/services/notifications.client";
+import { info } from "~/services/notifications";
 import { Link } from "react-router";
-import { useWallet } from "~/services/wallet.client";
+import { useWallet } from "~/services/wallet";
 import { Button } from "~/ui/button";
 import {
   Dialog,

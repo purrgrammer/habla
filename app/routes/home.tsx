@@ -43,7 +43,7 @@ import Grid from "~/ui/grid";
 import NostrCard from "~/ui/nostr/card";
 import { type DataStore, type User } from "~/services/types";
 import { default as serverStore } from "~/services/data.server";
-import { default as clientStore } from "~/services/data.client";
+import { default as clientStore } from "~/services/data";
 import { Button } from "~/ui/button";
 import { Badge } from "~/ui/badge";
 import {
@@ -53,20 +53,20 @@ import {
   CardHeader,
   CardTitle,
 } from "~/ui/card";
-import { FiatAmount } from "~/ui/currency.client";
+import { FiatAmount } from "~/ui/currency";
 import SatsAmount from "~/ui/sats";
 import ClientOnly from "~/ui/client-only";
 import Logo from "~/ui/logo";
 import { cn } from "~/lib/utils";
 import { TagCloud } from "~/ui/tag-cloud";
-import { parseZap, useProfileZaps, type Zap } from "~/hooks/nostr.client";
+import { parseZap, useProfileZaps, type Zap } from "~/hooks/nostr";
 import { HABLA_PUBKEY, HABLA_REPO_URL } from "~/const";
-import { ZapPill } from "~/ui/zaps.client";
+import { ZapPill } from "~/ui/zaps";
 import Donate from "~/ui/donate";
 import Note from "~/ui/nostr/note";
 import Blockquote from "~/ui/blockquote";
 import UserLink from "~/ui/nostr/user-link";
-import { EventReply } from "~/ui/nostr/reply.client";
+import { EventReply } from "~/ui/nostr/reply";
 
 export function meta({}: Route.MetaArgs) {
   return defaults;

@@ -3,7 +3,7 @@ import { type Pubkey } from "~/types";
 import defaults, { profileMeta } from "~/seo";
 import Profile from "~/ui/nostr/profile";
 import { type DataStore } from "~/services/types";
-import { default as clientStore } from "~/services/data.client";
+import { default as clientStore } from "~/services/data";
 import { default as serverStore } from "~/services/data.server";
 
 export function meta({ loaderData }: Route.MetaArgs) {

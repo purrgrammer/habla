@@ -8,13 +8,13 @@ import {
   useActiveAccount,
   useEventStore,
 } from "applesauce-react/hooks";
-import { useRelays } from "~/hooks/nostr.client";
+import { useRelays } from "~/hooks/nostr";
 import { getInboxes } from "applesauce-core/helpers";
 import { Button } from "~/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "~/ui/dialog";
 import { Textarea } from "~/ui/textarea";
 import { Comment } from "~/nostr/actions";
-import { publishToRelays } from "~/services/publish-article.client";
+import { publishToRelays } from "~/services/publish-article";
 import { toast } from "sonner";
 
 export default function CommentDialog({

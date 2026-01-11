@@ -19,15 +19,19 @@ export default {
   presets: [vercelPreset()],
   async prerender() {
     let result = ["/", "/sitemap.xml", "/.well-known/nostr.json"];
-    const users = await getMembers();
-    for (const user of users) {
-      result.push(`${user.nip05}`);
-      const articles = await getArticles(user);
-      for (const article of articles) {
-        const identifier = getTagValue(article, "d");
-        if (!isValidIdentifier(identifier)) continue;
-        result.push(`/${user.nip05}/${encodeURIComponent(identifier)}`);
+    try {
+      const users = await getMembers();
+      for (const user of users) {
+        result.push(`${user.nip05}`);
+        const articles = await getArticles(user);
+        for (const article of articles) {
+          const identifier = getTagValue(article, "d");
+          if (!isValidIdentifier(identifier)) continue;
+          result.push(`/${user.nip05}/${encodeURIComponent(identifier)}`);
+        }
       }
+    } catch (error) {
+      console.warn("Failed to fetch dynamic routes for prerendering (likely Redis unavailable):", error);
     }
     return result;
   },

@@ -4,7 +4,7 @@ import { kinds } from "nostr-tools";
 import { nip19 } from "nostr-tools";
 import { setSingletonTag } from "applesauce-factory/operations/tag";
 import { modifyPublicTags } from "applesauce-factory/operations";
-import { blossomMetadataStore } from "~/services/blossom/metadata-store.client";
+import { blossomMetadataStore } from "~/services/blossom/metadata-store";
 
 interface PublishArticleParams {
   identifier: string;

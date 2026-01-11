@@ -1,7 +1,7 @@
 import NumberFlow from "@number-flow/react";
 import { Bitcoin, Zap } from "lucide-react";
 import { cn } from "~/lib/utils";
-import { type Currency } from "~/services/currency.client";
+import { type Currency } from "~/services/currency";
 import { type AmountSize, amounts } from "./amount";
 
 function formatSats(amount: number) {

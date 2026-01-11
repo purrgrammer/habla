@@ -4,7 +4,7 @@ import { type ProfilePointer } from "nostr-tools/nip19";
 import { type ProfileContent } from "applesauce-core/helpers";
 import { Username, Avatar } from "~/ui/nostr/user";
 import { type Pubkey } from "~/types";
-import ProfileContents from "~/ui/nostr/profile-contents.client";
+import ProfileContents from "~/ui/nostr/profile-contents";
 import ClientOnly from "~/ui/client-only";
 import RichText from "./rich-text";
 import { prettify } from "~/lib/url";

@@ -16,7 +16,7 @@ import {
 import NAddr from "./naddr";
 import NEvent from "./nevent";
 import NEventLink from "./nevent-link";
-import UserLink from "./user-link.client";
+import UserLink from "./user-link";
 import RichText from "./rich-text";
 
 export function PureHighlight({

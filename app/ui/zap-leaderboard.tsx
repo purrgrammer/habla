@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { HABLA_PUBKEY } from "~/const";
-import { usePubkeyZaps, type Zap } from "~/hooks/nostr.client";
-import UserLink from "./nostr/user-link.client";
-import { CurrencyAmount } from "./currency.client";
+import { usePubkeyZaps, type Zap } from "~/hooks/nostr";
+import UserLink from "./nostr/user-link";
+import { CurrencyAmount } from "./currency";
 import { Crown } from "lucide-react";
 import type { Pubkey } from "~/types";
 

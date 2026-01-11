@@ -4,13 +4,13 @@ import Highlight from "~/ui/nostr/highlight";
 import Note from "~/ui/nostr/note";
 import NostrCard from "~/ui/nostr/card";
 import defaults, { eventMeta } from "~/seo";
-import { default as clientStore } from "~/services/data.client";
+import { default as clientStore } from "~/services/data";
 import { default as serverStore } from "~/services/data.server";
 import { type DataStore } from "~/services/types";
 import type { ProfileContent } from "applesauce-core/helpers";
 import type { ReactNode } from "react";
-import { EventReply } from "~/ui/nostr/reply.client";
-import { Conversation } from "~/ui/nostr/article-conversation.client";
+import { EventReply } from "~/ui/nostr/reply";
+import { Conversation } from "~/ui/nostr/article-conversation";
 import ClientOnly from "~/ui/client-only";
 
 export function meta({ loaderData }: Route.MetaArgs) {

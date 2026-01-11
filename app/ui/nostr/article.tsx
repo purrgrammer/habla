@@ -12,7 +12,7 @@ import Markdown from "~/ui/markdown";
 import UserLink from "~/ui/nostr/user-link";
 import Timestamp from "~/ui/timestamp";
 import Blockquote from "../blockquote";
-import ArticleConversation from "./article-conversation.client";
+import ArticleConversation from "./article-conversation";
 import ClientOnly from "../client-only";
 import type { Relay } from "~/types";
 import { TagCloud } from "../tag-cloud";

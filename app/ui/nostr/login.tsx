@@ -32,19 +32,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/ui/dropdown-menu";
-import { useProfile } from "~/hooks/nostr.client";
-import { profileLoader } from "~/services/loaders.client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/ui/dialog";
+import { useProfile } from "~/hooks/nostr";
+import { profileLoader } from "~/services/loaders";
 import User from "~/ui/nostr/user";
 import { Button } from "~/ui/button";
-import { useTheme } from "~/ui/theme-provider.client";
-import { useCurrency } from "~/services/currency.client";
-import { useWallet, useWalletInfo } from "~/services/wallet.client";
-import { ConnectWallet } from "./nwc.client";
-import ZapDialog from "./zap.client";
+import { useTheme } from "~/ui/theme-provider";
+import { useCurrency } from "~/services/currency";
+import { useWallet, useWalletInfo } from "~/services/wallet";
+import { ConnectWallet } from "./nwc";
+import ZapDialog from "./zap";
 import { HABLA_PUBKEY } from "~/const";
-import { useState } from "react";
-import { WalletName } from "../wallet.client";
+import { useState, useCallback } from "react";
+import { WalletName } from "../wallet";
 import { Badge } from "../badge";
+import RemoteSignerLogin from "./remote-signer";
 
 function LoggedInUser({ pubkey }: { pubkey: string }) {
   const account = useActiveAccount();
@@ -227,31 +236,66 @@ function DonateButton() {
 export default function Login() {
   const account = useActiveAccount();
   const accountManager = useAccountManager();
+  const [open, setOpen] = useState(false);
+
+  const handleConnected = useCallback(() => setOpen(false), []);
 
   async function getStarted() {
-    const account = await ExtensionAccount.fromExtension();
-    const pubkey = await account.getPublicKey();
-    // Load user profile and relay list
-    const loadUser = merge(
-      profileLoader({ kind: kinds.Metadata, pubkey }),
-      profileLoader({ kind: kinds.RelayList, pubkey }),
-      profileLoader({ kind: 10063, pubkey }),
-    );
-    const sub = loadUser.subscribe();
-    // Add account & set as active
-    accountManager.addAccount(account);
-    accountManager.setActive(account);
-    // Clean up subscription
-    sub.unsubscribe();
+    try {
+      const account = await ExtensionAccount.fromExtension();
+      const pubkey = await account.getPublicKey();
+      // Load user profile and relay list
+      const loadUser = merge(
+        profileLoader({ kind: kinds.Metadata, pubkey }),
+        profileLoader({ kind: kinds.RelayList, pubkey }),
+        profileLoader({ kind: 10063, pubkey }),
+      );
+      const sub = loadUser.subscribe();
+      // Add account & set as active
+      accountManager.addAccount(account);
+      accountManager.setActive(account);
+      // Clean up subscription
+      sub.unsubscribe();
+      setOpen(false);
+    } catch (e) {
+      console.error(e);
+    }
   }
   return (
     <div className="flex flex-row items-center gap-1">
       {account ? (
         <LoggedInUser pubkey={account.pubkey} />
       ) : (
-        <Button type="button" onClick={getStarted}>
-          Get started
-        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button type="button">Get started</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Login to Habla</DialogTitle>
+              <DialogDescription>
+                Choose a method to sign in.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <Button onClick={getStarted} variant="outline" className="w-full justify-start gap-2">
+                <img src="/favicon.ico" className="w-4 h-4" alt="" />
+                Browser Extension (NIP-07)
+              </Button>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or connect remotely
+                  </span>
+                </div>
+              </div>
+              <RemoteSignerLogin onConnected={handleConnected} />
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

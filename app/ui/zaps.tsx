@@ -1,13 +1,13 @@
 import { type NostrEvent } from "nostr-tools";
-import { useZaps, type Zap } from "~/hooks/nostr.client";
+import { useZaps, type Zap } from "~/hooks/nostr";
 import UserLink from "./nostr/user-link";
 import { Badge } from "~/ui/badge";
-import { CurrencyAmount } from "~/ui/currency.client";
+import { CurrencyAmount } from "~/ui/currency";
 import { getZapRequest, getZapSender } from "applesauce-core/helpers";
 import { Button } from "~/ui/button";
-import ZapDialog from "~/ui/nostr/zap.client";
+import ZapDialog from "~/ui/nostr/zap";
 import { useState } from "react";
-import { Reply } from "./nostr/reply.client";
+import { Reply } from "./nostr/reply";
 import { cn } from "~/lib/utils";
 import { BIG_ZAP_AMOUNT } from "~/const";
 

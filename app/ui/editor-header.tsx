@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import ClientOnly from "~/ui/client-only";
 import { Avatar as AvatarSkeleton } from "~/ui/skeleton";
 import Logo from "./logo";
-import EditorMenu, { type EditorMenuProps } from "./editor-menu.client";
+import EditorMenu, { type EditorMenuProps } from "./editor-menu";
 
 export default function EditorHeader(props: EditorMenuProps) {
   return (

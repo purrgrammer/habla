@@ -3,7 +3,7 @@ import { ActionHub } from "applesauce-actions";
 
 //import pool from "./relay-pool";
 import eventStore from "./event-store";
-import eventFactory from "./event-factory.client";
+import eventFactory from "./event-factory";
 
 //const publish = async (event: NostrEvent) => {
 //  console.log("Publishing event:", event.kind);
