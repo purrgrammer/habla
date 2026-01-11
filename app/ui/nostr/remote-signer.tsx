@@ -7,7 +7,7 @@ import { NostrConnectAccount } from "applesauce-accounts/accounts";
 import { useAccountManager } from "applesauce-react/hooks";
 import { kinds } from "nostr-tools";
 import { generateSecretKey } from "nostr-tools/pure";
-import { bytesToHex } from "@noble/hashes/utils";
+import { bytesToHex } from "@noble/hashes/utils.js";
 import { Button } from "~/ui/button";
 import { Input } from "~/ui/input";
 import { Label } from "~/ui/label";
