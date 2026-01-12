@@ -4,7 +4,6 @@ import { type NostrEvent, nip19, kinds } from "nostr-tools";
 import { merge } from "rxjs";
 import {
   Feather,
-  Eye,
   Menu,
   Check,
   Newspaper,

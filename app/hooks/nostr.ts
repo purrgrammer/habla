@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { NostrEvent } from "nostr-tools";
-import { map, scan } from "rxjs";
+import { map } from "rxjs";
 import { type Filter, kinds } from "nostr-tools";
 import { type EventPointer, type AddressPointer } from "nostr-tools/nip19";
 import { useObservableMemo } from "applesauce-react/hooks";
@@ -13,7 +13,7 @@ import {
   getZapPayment,
   getZapSender,
 } from "applesauce-core/helpers";
-import { EventZapsModel, ReceivedZapsModel } from "applesauce-core/models/zaps";
+import { EventZapsModel } from "applesauce-core/models/zaps";
 import { getRelayURLs } from "~/lib/url";
 import {
   createTimelineLoader,

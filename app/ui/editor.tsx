@@ -5,7 +5,6 @@ import { renderToMarkdown } from "@tiptap/static-renderer";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Typography from "@tiptap/extension-typography";
-import Placeholder from "@tiptap/extension-placeholder";
 import { type NostrEvent, kinds } from "nostr-tools";
 import { marked } from "marked";
 import { useActiveAccount } from "applesauce-react/hooks";
@@ -20,13 +19,11 @@ import {
   ReactNodeViewRenderer,
   NodeViewWrapper,
 } from "@tiptap/react";
-import { Plugin } from "@tiptap/pm/state";
 import { type Level } from "@tiptap/extension-heading";
-import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import { Input } from "~/ui/input";
 import Document from "@tiptap/extension-document";
-import { getMarkRange, Extension } from "@tiptap/core";
+import { getMarkRange } from "@tiptap/core";
 import UserLink from "./nostr/user-link";
 import { default as BaseNEvent } from "./nostr/nevent";
 import { default as BaseNAddr } from "./nostr/naddr";
