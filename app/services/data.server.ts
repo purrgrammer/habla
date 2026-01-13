@@ -255,7 +255,7 @@ export async function saveUser({
 
       .hset(NIP05_NAMES, username, pubkey)
 
-      .hset(NIP05_RELAYS, username, JSON.stringify(relays))
+      .hset(NIP05_RELAYS, pubkey, JSON.stringify(relays))
 
       .exec();
 
