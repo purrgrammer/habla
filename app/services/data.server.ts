@@ -143,6 +143,48 @@ export async function syncRelays(pubkey: string, username?: string) {
   }
 }
 
+export async function syncProfile(
+  pubkey: string,
+  relays?: string[],
+): Promise<ProfileContent | undefined> {
+  const startTime = Date.now();
+  console.log(`[sync:profile] Starting sync for pubkey: ${pubkey}`);
+  console.log(
+    `[sync:profile] Using ${relays?.length || 0} specific relays: ${relays ? JSON.stringify(relays) : "none, using INDEX_RELAYS"}`,
+  );
+
+  try {
+    console.log(`[sync:profile] Fetching profile from nostr for ${pubkey}`);
+    const profile = await fetchNostrProfile(pubkey, relays);
+
+    if (profile) {
+      console.log(
+        `[sync:profile] Retrieved profile for ${pubkey}: ${JSON.stringify(profile)}`,
+      );
+
+      console.log(`[sync:profile] Caching profile for ${pubkey}`);
+      await cacheNostrProfile(pubkey, profile);
+      console.log(`[sync:profile] Cache operation successful for ${pubkey}`);
+
+      const duration = Date.now() - startTime;
+      console.log(`[sync:profile] Completed sync for ${pubkey} in ${duration}ms`);
+      return profile;
+    } else {
+      console.log(`[sync:profile] No profile found for ${pubkey}`);
+      const duration = Date.now() - startTime;
+      console.log(`[sync:profile] Completed sync for ${pubkey} in ${duration}ms (no data)`);
+      return undefined;
+    }
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    console.error(
+      `[sync:profile] Error syncing profile for ${pubkey} after ${duration}ms:`,
+      error,
+    );
+    throw error;
+  }
+}
+
 // -- Profiles
 
 function profileKey(pubkey: string): string {
@@ -205,9 +247,35 @@ async function getCachedProfile(
 
 }
 
+// -- NIP-05
 
+const NIP05_NAMES = `nip05:names`;
+const NIP05_RELAYS = `nip05:relays`;
 
-// ... rest of the file stays similar but using isAvailable() check
+const INVALID_USERNAMES = new Set([
+  "faq",
+  "write",
+  "support",
+  "bookmarks",
+  "admin",
+  "nostr",
+  "wallet",
+  "trending",
+  "latest",
+  "settings",
+  "profile",
+  "login",
+  "logout",
+  "signup",
+  "signin",
+  "register",
+  "api",
+  "help",
+  "about",
+  "contact",
+  "terms",
+  "privacy",
+]);
 
 export async function getUsername(username: string): Promise<string | null> {
 
