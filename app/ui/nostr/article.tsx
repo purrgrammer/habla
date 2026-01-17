@@ -1,6 +1,7 @@
 import { type NostrEvent } from "nostr-tools";
 import { cn } from "~/lib/utils";
 import { type AddressPointer } from "nostr-tools/nip19";
+import { nip19 } from "nostr-tools";
 import {
   type ProfileContent,
   getArticleTitle,
@@ -16,6 +17,10 @@ import ArticleConversation from "./article-conversation";
 import ClientOnly from "../client-only";
 import type { Relay } from "~/types";
 import { TagCloud } from "../tag-cloud";
+import { useActiveAccount } from "applesauce-react/hooks";
+import { Button } from "~/ui/button";
+import { Edit } from "lucide-react";
+import { Link } from "react-router";
 
 function Author({
   author,
@@ -24,7 +29,10 @@ function Author({
   author?: ProfileContent;
   article: NostrEvent;
 }) {
+  const account = useActiveAccount();
   const publishedAt = getArticlePublished(article);
+  const isOwner = account?.pubkey === article.pubkey;
+
   return (
     <div className="flex flex-row items-center gap-2 sm:gap-4 justify-between select-none w-full">
       <UserLink
@@ -35,9 +43,25 @@ function Author({
         profile={author}
         withNip05
       />
-      <span className="text-right font-light text-muted-foreground text-sm sm:text-base">
-        <Timestamp timestamp={publishedAt} />
-      </span>
+      <div className="flex items-center gap-4">
+        <span className="text-right font-light text-muted-foreground text-sm sm:text-base">
+          <Timestamp timestamp={publishedAt} />
+        </span>
+        {isOwner && (
+          <Button variant="outline" size="sm" asChild>
+            <Link
+              to={`/write?edit=${nip19.naddrEncode({
+                identifier: article.tags.find((t) => t[0] === "d")?.[1] || "",
+                pubkey: article.pubkey,
+                kind: article.kind,
+              })}`}
+            >
+              <Edit className="size-4 mr-2" />
+              Edit
+            </Link>
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

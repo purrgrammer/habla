@@ -8,7 +8,7 @@ import Typography from "@tiptap/extension-typography";
 import { type NostrEvent, kinds } from "nostr-tools";
 import { marked } from "marked";
 import { useActiveAccount } from "applesauce-react/hooks";
-import { useRelays, useTimeline } from "~/hooks/nostr";
+import { useRelays, useTimeline, useAddress } from "~/hooks/nostr";
 import {
   type Editor,
   EditorContent,
@@ -51,7 +51,7 @@ import { useActionHub } from "applesauce-react/hooks";
 import { firstValueFrom } from "rxjs";
 import { toast } from "sonner";
 import { publishToRelays } from "~/services/publish-article";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { nip19 } from "nostr-tools";
 import { useProfile } from "~/hooks/nostr";
 import store from "~/services/data";
@@ -175,7 +175,31 @@ export default () => {
   );
   const hub = useActionHub();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const profile = useProfile(pubkey || "");
+
+  // Handle edit mode
+  const editParam = searchParams.get("edit");
+  const editPointer = useMemo(() => {
+    if (!editParam) return undefined;
+    try {
+      const decoded = nip19.decode(editParam);
+      if (decoded.type === "naddr") return decoded.data;
+    } catch (e) {
+      console.error("Failed to decode edit param", e);
+    }
+    return undefined;
+  }, [editParam]);
+
+  const loadedEvent = useAddress(
+    editPointer || { identifier: "", kind: -1, pubkey: "" },
+  );
+
+  useEffect(() => {
+    if (loadedEvent && editPointer && loadedEvent.id !== article?.id) {
+      onLoad(loadedEvent);
+    }
+  }, [loadedEvent, editPointer?.identifier, editPointer?.pubkey, article?.id]);
 
   const extensions = [
     CustomDocument,
