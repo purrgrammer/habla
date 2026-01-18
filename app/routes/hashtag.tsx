@@ -7,6 +7,7 @@ import { type ProfileContent, getArticleTitle, getTagValue } from "applesauce-co
 import ArticleCard from "~/ui/nostr/article-card";
 import Grid from "~/ui/grid";
 import { Button } from "~/ui/button";
+import { useZapCounts } from "~/hooks/nostr";
 import {
   Select,
   SelectContent,
@@ -46,7 +47,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   return { articles, authors, tag };
 }
 
-type SortOption = "newest" | "oldest" | "title_asc" | "title_desc" | "author_asc" | "author_desc";
+type SortOption = "newest" | "oldest" | "title_asc" | "title_desc" | "author_asc" | "author_desc" | "popularity";
 
 export default function Hashtag({ loaderData }: Route.ComponentProps) {
   const { tag } = loaderData;
@@ -54,6 +55,8 @@ export default function Hashtag({ loaderData }: Route.ComponentProps) {
   const [authors, setAuthors] = useState(loaderData.authors);
   const [sort, setSort] = useState<SortOption>("newest");
   const fetcher = useFetcher<typeof loader>();
+  
+  const zapCounts = useZapCounts(articles);
 
   useEffect(() => {
     setArticles(loaderData.articles);
@@ -103,11 +106,13 @@ export default function Hashtag({ loaderData }: Route.ComponentProps) {
           const authorB = authors[b.pubkey]?.name || "";
           return authorB.localeCompare(authorA);
         }
+        case "popularity":
+          return ((zapCounts?.[b.id] || 0) - (zapCounts?.[a.id] || 0));
         default:
           return 0;
       }
     });
-  }, [articles, authors, sort]);
+  }, [articles, authors, sort, zapCounts]);
 
   return (
     <div className="flex flex-col gap-8 w-full py-8">
@@ -127,6 +132,7 @@ export default function Hashtag({ loaderData }: Route.ComponentProps) {
           <SelectContent>
             <SelectItem value="newest">Newest</SelectItem>
             <SelectItem value="oldest">Oldest</SelectItem>
+            <SelectItem value="popularity">Popularity</SelectItem>
             <SelectItem value="title_asc">Title (A-Z)</SelectItem>
             <SelectItem value="title_desc">Title (Z-A)</SelectItem>
             <SelectItem value="author_asc">Author (A-Z)</SelectItem>
