@@ -1,10 +1,12 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useFetcher } from "react-router";
 import type { Route } from "./+types/hashtag";
 import { buildBaseSeoTags } from "~/seo";
 import { fetchArticlesByTag, fetchProfile } from "~/services/data.server";
 import { type ProfileContent, getArticleTitle, getTagValue } from "applesauce-core/helpers";
 import ArticleCard from "~/ui/nostr/article-card";
 import Grid from "~/ui/grid";
+import { Button } from "~/ui/button";
 import {
   Select,
   SelectContent,
@@ -22,11 +24,15 @@ export function meta({ params }: Route.MetaArgs) {
   });
 }
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   const { tag } = params;
   if (!tag) throw new Response("Not Found", { status: 404 });
 
-  const articles = await fetchArticlesByTag(tag);
+  const url = new URL(request.url);
+  const untilParam = url.searchParams.get("until");
+  const until = untilParam ? parseInt(untilParam) : undefined;
+
+  const articles = await fetchArticlesByTag(tag, 50, until);
   const pubkeys = [...new Set(articles.map((a) => a.pubkey))];
   const profiles = await Promise.all(
     pubkeys.map((pubkey) => fetchProfile({ pubkey }))
@@ -43,8 +49,38 @@ export async function loader({ params }: Route.LoaderArgs) {
 type SortOption = "newest" | "oldest" | "title_asc" | "title_desc" | "author_asc" | "author_desc";
 
 export default function Hashtag({ loaderData }: Route.ComponentProps) {
-  const { articles, authors, tag } = loaderData;
+  const { tag } = loaderData;
+  const [articles, setArticles] = useState(loaderData.articles);
+  const [authors, setAuthors] = useState(loaderData.authors);
   const [sort, setSort] = useState<SortOption>("newest");
+  const fetcher = useFetcher<typeof loader>();
+
+  useEffect(() => {
+    setArticles(loaderData.articles);
+    setAuthors(loaderData.authors);
+  }, [loaderData.tag, loaderData.articles, loaderData.authors]);
+
+  useEffect(() => {
+    if (fetcher.data) {
+      if (fetcher.data.articles.length > 0) {
+        setArticles((prev) => {
+          const newArticles = fetcher.data!.articles.filter(
+            (a) => !prev.some((existing) => existing.id === a.id)
+          );
+          return [...prev, ...newArticles];
+        });
+        setAuthors((prev) => ({ ...prev, ...fetcher.data!.authors }));
+      }
+    }
+  }, [fetcher.data]);
+
+  const loadMore = () => {
+    if (articles.length === 0) return;
+    const oldestArticle = articles.reduce((min, p) => p.created_at < min.created_at ? p : min, articles[0]);
+    if (oldestArticle) {
+      fetcher.load(`/t/${tag}?until=${oldestArticle.created_at - 1}`);
+    }
+  };
 
   const sortedArticles = useMemo(() => {
     return [...articles].sort((a, b) => {
@@ -104,20 +140,32 @@ export default function Hashtag({ loaderData }: Route.ComponentProps) {
           No articles found with this tag.
         </div>
       ) : (
-        <Grid>
-          {sortedArticles.map((article) => (
-            <ArticleCard
-              key={article.id}
-              article={article}
-              author={authors[article.pubkey]}
-              address={{
-                kind: article.kind,
-                pubkey: article.pubkey,
-                identifier: getTagValue(article, "d") || "",
-              }}
-            />
-          ))}
-        </Grid>
+        <>
+          <Grid>
+            {sortedArticles.map((article) => (
+              <ArticleCard
+                key={article.id}
+                article={article}
+                author={authors[article.pubkey]}
+                address={{
+                  kind: article.kind,
+                  pubkey: article.pubkey,
+                  identifier: getTagValue(article, "d") || "",
+                }}
+              />
+            ))}
+          </Grid>
+          
+          <div className="flex justify-center mt-8">
+            <Button 
+              variant="outline" 
+              onClick={loadMore} 
+              disabled={fetcher.state === "loading"}
+            >
+              {fetcher.state === "loading" ? "Loading..." : "Load more"}
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );
