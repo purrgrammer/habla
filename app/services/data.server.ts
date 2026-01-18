@@ -892,6 +892,37 @@ function fetchNostrArticles(pubkey: string, relays: string[]) {
   );
 }
 
+function fetchNostrArticlesByTag(tag: string, relays: string[]) {
+  return lastValueFrom(
+    pool
+      .req(relays, {
+        kinds: [kinds.LongFormArticle],
+        "#t": [tag],
+      })
+      .pipe(timeout(10_000), completeOnEose(), toArray()),
+  );
+}
+
+export async function fetchArticlesByTag(tag: string): Promise<NostrEvent[]> {
+  const cacheKey = `articles:tag:${tag}`;
+  if (isAvailable()) {
+    try {
+      const cached = await getRedis().get(cacheKey);
+      if (cached) return safeParse(cached) ?? [];
+    } catch (e) {}
+  }
+
+  const articles = await fetchNostrArticlesByTag(tag, AGGREGATOR_RELAYS);
+
+  if (isAvailable()) {
+    try {
+      await getRedis().set(cacheKey, JSON.stringify(articles), "EX", 300); // 5 min cache
+    } catch (e) {}
+  }
+
+  return articles;
+}
+
 // Loader API
 
 export async function fetchProfile(
