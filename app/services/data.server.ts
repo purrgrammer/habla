@@ -837,6 +837,7 @@ async function fetchNostrRelays(
         completeOnEose(),
         map((ev) => getRelayURLs(ev).filter((r) => !r.startsWith("ws://"))),
       ),
+    { defaultValue: [] },
   );
 }
 
@@ -852,10 +853,11 @@ async function fetchNostrProfile(
         limit: 1,
       })
       .pipe(timeout(10_000), completeOnEose(), map(getProfileContent)),
+    { defaultValue: undefined },
   );
 }
 
-function fetchNostrAddress(pointer: AddressPointer): Promise<NostrEvent> {
+function fetchNostrAddress(pointer: AddressPointer): Promise<NostrEvent | undefined> {
   const { kind, pubkey, relays, identifier } = pointer;
   return firstValueFrom(
     pool
@@ -865,10 +867,11 @@ function fetchNostrAddress(pointer: AddressPointer): Promise<NostrEvent> {
         "#d": [identifier],
       })
       .pipe(timeout(10_000), completeOnEose()),
+    { defaultValue: undefined },
   );
 }
 
-function fetchNostrEvent(pointer: EventPointer): Promise<NostrEvent> {
+function fetchNostrEvent(pointer: EventPointer): Promise<NostrEvent | undefined> {
   const { kind, author, id, relays } = pointer;
   return lastValueFrom(
     pool
@@ -878,6 +881,7 @@ function fetchNostrEvent(pointer: EventPointer): Promise<NostrEvent> {
         ...(author ? { authors: [author] } : {}),
       })
       .pipe(timeout(10_000), completeOnEose()),
+    { defaultValue: undefined },
   );
 }
 
@@ -890,6 +894,53 @@ function fetchNostrArticles(pubkey: string, relays: string[]) {
       })
       .pipe(timeout(10_000), completeOnEose(), toArray()),
   );
+}
+
+function fetchNostrArticlesByTag(
+  tag: string,
+  relays: string[],
+  limit: number = 50,
+  until?: number,
+) {
+  return lastValueFrom(
+    pool
+      .req(relays, {
+        kinds: [kinds.LongFormArticle],
+        "#t": [tag],
+        limit,
+        until,
+      })
+      .pipe(timeout(10_000), completeOnEose(), toArray()),
+  );
+}
+
+export async function fetchArticlesByTag(
+  tag: string,
+  limit: number = 50,
+  until?: number,
+): Promise<NostrEvent[]> {
+  const cacheKey = `articles:tag:${tag}:limit:${limit}:until:${until || "latest"}`;
+  if (isAvailable()) {
+    try {
+      const cached = await getRedis().get(cacheKey);
+      if (cached) return safeParse(cached) ?? [];
+    } catch (e) {}
+  }
+
+  const articles = await fetchNostrArticlesByTag(
+    tag,
+    AGGREGATOR_RELAYS,
+    limit,
+    until,
+  );
+
+  if (isAvailable()) {
+    try {
+      await getRedis().set(cacheKey, JSON.stringify(articles), "EX", 300); // 5 min cache
+    } catch (e) {}
+  }
+
+  return articles;
 }
 
 // Loader API

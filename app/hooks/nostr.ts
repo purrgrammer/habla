@@ -301,3 +301,101 @@ export function useProfileZaps(pubkey: Pubkey) {
     relays,
   );
 }
+
+export function useZapCounts(events: NostrEvent[]) {
+  const eventStore = useEventStore();
+  const [counts, setCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (events.length === 0) return;
+
+    // Filter out events that we can't easily track zaps for (need addressable or id)
+    // For articles (30023), use 'a' tag. For notes, use 'e' tag.
+    const aTags = events
+      .filter((e) => isReplaceableKind(e.kind))
+      .map(
+        (e) => `${e.kind}:${e.pubkey}:${e.tags.find((t) => t[0] === "d")?.[1]}`,
+      );
+    
+    const eTags = events
+      .filter((e) => !isReplaceableKind(e.kind))
+      .map((e) => e.id);
+
+    if (aTags.length === 0 && eTags.length === 0) return;
+
+    const filters: Filter[] = [];
+    if (aTags.length > 0) filters.push({ kinds: [kinds.Zap], "#a": aTags });
+    if (eTags.length > 0) filters.push({ kinds: [kinds.Zap], "#e": eTags });
+
+    const subscription = pool
+      .subscription(AGGREGATOR_RELAYS, filters)
+      .subscribe((event) => {
+        if (event === "EOSE") return;
+        eventStore.add(event);
+      });
+
+    return () => subscription.unsubscribe();
+  }, [events]);
+
+  // Observe the store for zaps related to these events
+  // This is expensive if we do it for every event individually.
+  // Instead, we can observe the timeline of zaps and aggregate?
+  // Or just query the store.
+  // Ideally, useObservableMemo on the whole set?
+
+  // Simplified approach: Subscribe to all zaps matching the filters, 
+  // and maintain a local count or derive from store.
+  // Since eventStore holds the zaps, we can query it.
+  
+  // Let's rely on eventStore. 
+  // We need to re-calculate counts when new zaps arrive.
+  
+  return useObservableMemo(() => {
+     // Create observables for each event's zaps and combine? No, too many.
+     // Better: Watch the Zaps collection in store? 
+     // applesauce-react doesn't expose a "watch all zaps" easily.
+     
+     // Alternative: Just use the subscription above to update local state directly?
+     // But we want to use the store's deduplication.
+     
+     // Let's use createTimelineLoader logic but just listen to the store.
+     // We can filter the store's zaps.
+     
+     const aTags = new Set(events
+      .filter((e) => isReplaceableKind(e.kind))
+      .map((e) => `${e.kind}:${e.pubkey}:${e.tags.find((t) => t[0] === "d")?.[1]}`));
+
+     const eTags = new Set(events.map(e => e.id));
+
+     return eventStore.timeline({ kinds: [kinds.Zap], "#a": Array.from(aTags), "#e": Array.from(eTags) }).pipe(
+        map(zaps => {
+            const newCounts: Record<string, number> = {};
+            for (const zap of zaps) {
+                const amount = getZapPayment(zap)?.amount;
+                if (!amount) continue;
+                
+                // Check 'a' tag
+                const aTag = zap.tags.find(t => t[0] === "a")?.[1];
+                if (aTag && aTags.has(aTag)) {
+                    // Map back to event ID?
+                    // We need to map aTag -> event.id
+                    // This is tricky. The hook returns counts keyed by event ID?
+                    // Or keyed by aTag?
+                    // Let's key by event ID for simplicity in consumption.
+                    const event = events.find(e => `${e.kind}:${e.pubkey}:${e.tags.find((t) => t[0] === "d")?.[1]}` === aTag);
+                    if (event) {
+                        newCounts[event.id] = (newCounts[event.id] || 0) + amount / 1000;
+                    }
+                }
+                
+                // Check 'e' tag
+                const eTag = zap.tags.find(t => t[0] === "e")?.[1];
+                if (eTag && eTags.has(eTag)) {
+                     newCounts[eTag] = (newCounts[eTag] || 0) + amount / 1000;
+                }
+            }
+            return newCounts;
+        })
+     );
+  }, [events]);
+}
