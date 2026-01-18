@@ -68,9 +68,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+import GlobalLoading from "~/ui/global-loading";
+
 export default function App() {
   return (
     <AppProviders>
+      <GlobalLoading />
       <Outlet />
       <ClientOnly>{() => <Toaster />}</ClientOnly>
     </AppProviders>
