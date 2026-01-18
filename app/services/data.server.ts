@@ -896,19 +896,27 @@ function fetchNostrArticles(pubkey: string, relays: string[]) {
   );
 }
 
-function fetchNostrArticlesByTag(tag: string, relays: string[]) {
+function fetchNostrArticlesByTag(
+  tag: string,
+  relays: string[],
+  limit: number = 50,
+) {
   return lastValueFrom(
     pool
       .req(relays, {
         kinds: [kinds.LongFormArticle],
         "#t": [tag],
+        limit,
       })
       .pipe(timeout(10_000), completeOnEose(), toArray()),
   );
 }
 
-export async function fetchArticlesByTag(tag: string): Promise<NostrEvent[]> {
-  const cacheKey = `articles:tag:${tag}`;
+export async function fetchArticlesByTag(
+  tag: string,
+  limit: number = 50,
+): Promise<NostrEvent[]> {
+  const cacheKey = `articles:tag:${tag}:limit:${limit}`;
   if (isAvailable()) {
     try {
       const cached = await getRedis().get(cacheKey);
@@ -916,7 +924,7 @@ export async function fetchArticlesByTag(tag: string): Promise<NostrEvent[]> {
     } catch (e) {}
   }
 
-  const articles = await fetchNostrArticlesByTag(tag, AGGREGATOR_RELAYS);
+  const articles = await fetchNostrArticlesByTag(tag, AGGREGATOR_RELAYS, limit);
 
   if (isAvailable()) {
     try {
