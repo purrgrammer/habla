@@ -18,7 +18,8 @@ export default {
   ssr: true,
   presets: [vercelPreset()],
   async prerender() {
-    let result = ["/", "/sitemap.xml", "/.well-known/nostr.json"];
+    // Note: Don't prerender JSON/XML API routes (nip05, sitemap) - they get wrapped in HTML
+    let result = ["/"];
     try {
       const users = await getMembers();
       for (const user of users) {
