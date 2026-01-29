@@ -6,18 +6,18 @@ Comprehensive reference for working with the Applesauce suite in Habla.
 
 Habla uses the **Applesauce** suite of Nostr client libraries:
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `applesauce-core` | ^3.0.0 | Core Nostr event helpers and utilities |
-| `applesauce-loaders` | ^3.0.0 | Data loading utilities for profiles, events |
-| `applesauce-relay` | ^3.0.0 | Relay pool and WebSocket management |
-| `applesauce-signers` | ^3.0.0 | Key signing and account management |
-| `applesauce-react` | ^3.0.0 | React hooks and providers |
-| `applesauce-actions` | ^3.0.0 | Action management system |
-| `applesauce-factory` | ^3.0.0 | Event creation and modification |
-| `applesauce-wallet-connect` | ^3.0.0 | NWC (Nostr Wallet Connect) support |
-| `applesauce-accounts` | ^4.1.0 | Multi-account management |
-| `applesauce-content` | ^3.0.0 | Content parsing and rendering |
+| Package                     | Version | Purpose                                     |
+| --------------------------- | ------- | ------------------------------------------- |
+| `applesauce-core`           | ^3.0.0  | Core Nostr event helpers and utilities      |
+| `applesauce-loaders`        | ^3.0.0  | Data loading utilities for profiles, events |
+| `applesauce-relay`          | ^3.0.0  | Relay pool and WebSocket management         |
+| `applesauce-signers`        | ^3.0.0  | Key signing and account management          |
+| `applesauce-react`          | ^3.0.0  | React hooks and providers                   |
+| `applesauce-actions`        | ^3.0.0  | Action management system                    |
+| `applesauce-factory`        | ^3.0.0  | Event creation and modification             |
+| `applesauce-wallet-connect` | ^3.0.0  | NWC (Nostr Wallet Connect) support          |
+| `applesauce-accounts`       | ^4.1.0  | Multi-account management                    |
+| `applesauce-content`        | ^3.0.0  | Content parsing and rendering               |
 
 ## Provider Setup
 
@@ -64,7 +64,7 @@ await eventStore.addEvent(event);
 // Query cached events
 const events = await eventStore.query({
   kinds: [1],
-  limit: 20
+  limit: 20,
 });
 ```
 
@@ -78,8 +78,8 @@ import { useCurrentAccount } from "applesauce-accounts/hooks";
 const account = useCurrentAccount();
 
 if (account) {
-  console.log(account.pubkey);  // User's public key
-  console.log(account.signer);  // Signer instance
+  console.log(account.pubkey); // User's public key
+  console.log(account.signer); // Signer instance
 }
 ```
 
@@ -100,7 +100,7 @@ const article = factory.longFormArticle({
   title: "My Article",
   content: "Article content in markdown...",
   identifier: "my-article-slug",
-  tags: ["nostr", "technology"]
+  tags: ["nostr", "technology"],
 });
 
 // Create a comment (kind 1111)
@@ -139,7 +139,7 @@ import { useSubscription } from "applesauce-react/hooks";
 const { events, eose } = useSubscription({
   relays: ["wss://relay.nostr.band"],
   filters: [{ kinds: [1], limit: 20 }],
-  enabled: true  // Can toggle on/off
+  enabled: true, // Can toggle on/off
 });
 
 // events: array of received events
@@ -171,16 +171,12 @@ import { createTimelineLoader } from "applesauce-loaders";
 import { firstValueFrom } from "rxjs";
 import { toArray } from "rxjs/operators";
 
-const timelineLoader = createTimelineLoader(
-  relayPool,
-  relays,
-  [{ kinds: [1], limit: 20 }]
-);
+const timelineLoader = createTimelineLoader(relayPool, relays, [
+  { kinds: [1], limit: 20 },
+]);
 
 // Load timeline events
-const events = await firstValueFrom(
-  timelineLoader(since).pipe(toArray())
-);
+const events = await firstValueFrom(timelineLoader(since).pipe(toArray()));
 ```
 
 ### createAddressLoader
@@ -194,7 +190,7 @@ const addressLoader = createAddressLoader(relayPool, relays);
 const article = await addressLoader({
   kind: 30023,
   pubkey: "hex-pubkey",
-  identifier: "article-slug"
+  identifier: "article-slug",
 });
 ```
 
@@ -253,7 +249,7 @@ actionHub.on("publish", (event) => {
 // Dispatch action
 actionHub.dispatch({
   type: "publish",
-  event: event
+  event: event,
 });
 ```
 

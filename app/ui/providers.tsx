@@ -21,9 +21,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
           <FactoryProvider factory={factory}>
             <ActionsProvider actionHub={actionHub}>
               <ThemeProvider defaultTheme="light" storageKey="habla-theme">
-                <WalletProvider>
-                  {children}
-                </WalletProvider>
+                <WalletProvider>{children}</WalletProvider>
               </ThemeProvider>
             </ActionsProvider>
           </FactoryProvider>

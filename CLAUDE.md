@@ -24,6 +24,7 @@ This catches type errors and build issues early. Always run this before committi
 ## Core Architecture
 
 **Tech Stack:**
+
 - React Router v7 (SSR framework)
 - Nostr Protocol (decentralized social protocol)
 - Applesauce Suite v3/v4 (Nostr client libraries)
@@ -33,6 +34,7 @@ This catches type errors and build issues early. Always run this before committi
 - RxJS (reactive data streams)
 
 **Key Patterns:**
+
 - `.client.tsx` = browser-only code (hooks, DOM APIs, interactive components)
 - `.server.ts` = server-only code (Redis, external APIs, data fetching)
 - `.tsx/.ts` = isomorphic code (runs on both client and server)
@@ -45,6 +47,7 @@ This catches type errors and build issues early. Always run this before committi
 The app uses different data stores for server and client:
 
 **Server-Side (`app/services/data.server.ts`):**
+
 - Redis cache for profiles, relays, events, articles
 - Falls back gracefully when Redis is unavailable (`isRedisOffline` mode)
 - Cache keys: `profile:{pubkey}`, `relays:{pubkey}`, `address:{kind}:{pubkey}:{identifier}`
@@ -61,6 +64,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 ```
 
 **Client-Side (`app/services/loaders.ts`):**
+
 - EventStore (IndexedDB) as single source of truth for Nostr events
 - Applesauce loaders with batching and relay hints
 - Reactive updates via RxJS observables
@@ -94,15 +98,15 @@ const event = useObservableMemo(() => {
 
 ## Key Hooks (`app/hooks/nostr.ts`)
 
-| Hook | Purpose |
-|------|---------|
-| `useProfile(pubkey)` | Load and subscribe to a user's profile |
-| `useEvent(pointer)` | Load event by EventPointer |
-| `useAddress(pointer)` | Load replaceable event by AddressPointer |
-| `useRelays(pubkey)` | Get user's relay list |
-| `useInboxRelays(pubkey)` | Get user's inbox (read) relays |
-| `useTimeline(id, filters, relays)` | Load and subscribe to a timeline |
-| `useZaps(event)` | Load zaps for an event with real-time updates |
+| Hook                               | Purpose                                       |
+| ---------------------------------- | --------------------------------------------- |
+| `useProfile(pubkey)`               | Load and subscribe to a user's profile        |
+| `useEvent(pointer)`                | Load event by EventPointer                    |
+| `useAddress(pointer)`              | Load replaceable event by AddressPointer      |
+| `useRelays(pubkey)`                | Get user's relay list                         |
+| `useInboxRelays(pubkey)`           | Get user's inbox (read) relays                |
+| `useTimeline(id, filters, relays)` | Load and subscribe to a timeline              |
+| `useZaps(event)`                   | Load zaps for an event with real-time updates |
 
 **Pattern:** Hooks combine loader subscription + EventStore observation:
 
@@ -130,7 +134,11 @@ export function useEvent(pointer: EventPointer) {
 **Helpers cache computed values internally using symbols. You don't need `useMemo` when calling applesauce helpers.**
 
 ```typescript
-import { getProfileContent, getTagValue, getZapPayment } from "applesauce-core/helpers";
+import {
+  getProfileContent,
+  getTagValue,
+  getZapPayment,
+} from "applesauce-core/helpers";
 
 // These are already cached - no useMemo needed
 const profile = getProfileContent(event);
@@ -171,11 +179,11 @@ app/
 ## Constants (`app/const.ts`)
 
 ```typescript
-INDEX_RELAYS     // For profile/relay lookups: purplepag.es, vertexlab.io
-AGGREGATOR_RELAYS // For content: damus.io, nos.lol, primal.net
-COMMENT          // Kind 1111 for comments
-BOOK             // Kind 30040 for books
-BOOK_CHAPTER     // Kind 30041 for chapters
+INDEX_RELAYS; // For profile/relay lookups: purplepag.es, vertexlab.io
+AGGREGATOR_RELAYS; // For content: damus.io, nos.lol, primal.net
+COMMENT; // Kind 1111 for comments
+BOOK; // Kind 30040 for books
+BOOK_CHAPTER; // Kind 30041 for chapters
 ```
 
 ## Common Patterns
@@ -226,6 +234,7 @@ try {
 ## Documentation Index
 
 **Read these on-demand when working with:**
+
 - **Nostr protocol** → `claudedocs/nostr-guide.md`
 - **Applesauce libraries** → `claudedocs/applesauce-guide.md`
 - **Implementation tasks** → `claudedocs/common-tasks.md`

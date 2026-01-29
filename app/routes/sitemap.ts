@@ -13,7 +13,10 @@ function escapeXml(unsafe: string): string {
 }
 
 // Validate and convert Unix timestamp to ISO string
-function getValidTimestamp(timestamp: number | undefined, fallback: string): string {
+function getValidTimestamp(
+  timestamp: number | undefined,
+  fallback: string,
+): string {
   if (!timestamp) return fallback;
 
   // Unix timestamps are in seconds, should be positive and reasonable
@@ -35,10 +38,16 @@ function getValidTimestamp(timestamp: number | undefined, fallback: string): str
 }
 
 // Validate identifier and URL components
-function isValidIdentifier(identifier: string | undefined): identifier is string {
+function isValidIdentifier(
+  identifier: string | undefined,
+): identifier is string {
   if (!identifier || typeof identifier !== "string") return false;
   // Check for reasonable length and no control characters
-  return identifier.length > 0 && identifier.length < 500 && !/[\x00-\x1F\x7F]/.test(identifier);
+  return (
+    identifier.length > 0 &&
+    identifier.length < 500 &&
+    !/[\x00-\x1F\x7F]/.test(identifier)
+  );
 }
 
 // Generate sitemap XML with proper structure and SEO metadata

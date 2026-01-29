@@ -82,7 +82,9 @@ if (activeAccountId) {
   if (accountManager.getAccount(activeAccountId)) {
     accountManager.setActive(activeAccountId);
   } else {
-    console.warn(`[accounts] Active account ${activeAccountId} not found in manager.`);
+    console.warn(
+      `[accounts] Active account ${activeAccountId} not found in manager.`,
+    );
     if (typeof window !== "undefined") localStorage.removeItem(ACTIVE_ACCOUNT);
   }
 }
