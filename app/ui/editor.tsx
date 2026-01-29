@@ -68,6 +68,7 @@ import {
 import NostrMention from "./editor/extensions/mention";
 import { NEventNode, NAddrNode } from "./editor/extensions/nostr-nodes";
 import { processNostrHTML } from "./editor/utils/process-nostr-html";
+import { ensureBlockSpacing } from "~/lib/markdown-spacing";
 
 type TextValue = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | undefined;
 
@@ -542,47 +543,13 @@ export default () => {
     };
 
     try {
-      let markdown = renderToMarkdown({
+      const markdown = renderToMarkdown({
         content: convertedJson,
         extensions,
       }).trim();
 
-      // Fix block element spacing: ensure there's always a blank line after block elements
-      // This prevents following content from being "sucked into" the previous element
-      // when the markdown is parsed by other tools
-
-      // 1. Blockquotes: line starting with > followed by non-blockquote, non-blank content
-      markdown = markdown.replace(
-        /(^>.*\n)(?=(?!>|\n|$))/gm,
-        "$1\n",
-      );
-
-      // 2. Fenced code blocks: ``` followed by content that isn't a blank line
-      markdown = markdown.replace(
-        /(^```\n)(?!\n|$)/gm,
-        "$1\n",
-      );
-
-      // 3. Lists: ensure blank line after list items when followed by non-list content
-      // Match a list item line (starts with -, *, +, or number.) not followed by another list item or blank line
-      markdown = markdown.replace(
-        /(^(?:[-*+]|\d+\.)\s+.*\n)(?=(?![-*+]|\d+\.|\s|\n|$))/gm,
-        "$1\n",
-      );
-
-      // 4. Horizontal rules: ---, ***, ___ followed by content
-      markdown = markdown.replace(
-        /(^(?:---|\*\*\*|___)\n)(?!\n|$)/gm,
-        "$1\n",
-      );
-
-      // 5. Headings: ensure blank line after headings when followed by content
-      markdown = markdown.replace(
-        /(^#{1,6}\s+.*\n)(?!\n|$)/gm,
-        "$1\n",
-      );
-
-      return markdown;
+      // Ensure proper spacing between block elements
+      return ensureBlockSpacing(markdown);
     } catch (error) {
       console.error("[editor] Markdown serialization error:", error);
       return "";
