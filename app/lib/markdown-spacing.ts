@@ -20,8 +20,9 @@ export function ensureBlockSpacing(markdown: string): string {
   // 1. Blockquotes: line starting with > followed by non-blockquote, non-blank content
   result = result.replace(/(^>.*\n)(?=(?!>|\n|$))/gm, "$1\n");
 
-  // 2. Fenced code blocks: closing ``` followed by content that isn't a blank line
-  result = result.replace(/(^```\n)(?!\n|$)/gm, "$1\n");
+  // 2. Fenced code blocks: match entire code block (opening to closing ```) and ensure spacing after
+  // This avoids adding a blank line after the opening ```
+  result = result.replace(/(^```[^\n]*\n[\s\S]*?^```\n)(?!\n|$)/gm, "$1\n");
 
   // 3. Lists: ensure blank line after list items when followed by non-list content
   // Match a list item line (starts with -, *, +, or number.) not followed by another list item or blank line
@@ -37,8 +38,11 @@ export function ensureBlockSpacing(markdown: string): string {
   result = result.replace(/(^#{1,6}\s+.*\n)(?!\n|$)/gm, "$1\n");
 
   // 6. Images: ![alt](url) followed by content that isn't a blank line
-  // The alt text can contain any characters except ], and url can contain any except )
-  result = result.replace(/(^!\[[^\]]*\]\([^)]*\)\n)(?!\n|$)/gm, "$1\n");
+  // Alt text can contain nested brackets like [text], url can contain any char except )
+  result = result.replace(
+    /(^!\[(?:[^\[\]]|\[[^\]]*\])*\]\([^)]*\)\n)(?!\n|$)/gm,
+    "$1\n",
+  );
 
   return result;
 }
