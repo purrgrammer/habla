@@ -51,7 +51,7 @@ import { useActionHub } from "applesauce-react/hooks";
 import { firstValueFrom } from "rxjs";
 import { toast } from "sonner";
 import { publishToRelays } from "~/services/publish-article";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { nip19 } from "nostr-tools";
 import { useProfile } from "~/hooks/nostr";
 import store from "~/services/data";
@@ -68,6 +68,7 @@ import {
 import NostrMention from "./editor/extensions/mention";
 import { NEventNode, NAddrNode } from "./editor/extensions/nostr-nodes";
 import { processNostrHTML } from "./editor/utils/process-nostr-html";
+import { ensureBlockSpacing } from "~/lib/markdown-spacing";
 
 type TextValue = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | undefined;
 
@@ -176,6 +177,7 @@ export default () => {
   const hub = useActionHub();
   const navigate = useNavigate();
   const profile = useProfile(pubkey || "");
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const extensions = [
     CustomDocument,
@@ -433,6 +435,50 @@ export default () => {
     },
   });
 
+  // Handle edit param - load article from URL if specified
+  useEffect(() => {
+    const editParam = searchParams.get("edit");
+    if (!editParam || !editor) return;
+
+    async function loadArticleFromParam() {
+      try {
+        const decoded = nip19.decode(editParam!);
+        if (decoded.type !== "naddr") {
+          console.error("[editor] Invalid edit param - expected naddr");
+          return;
+        }
+
+        const address = decoded.data;
+        const event = await store.fetchAddress(address);
+
+        if (event) {
+          // Use onLoad to load the article into the editor
+          const title = getArticleTitle(event);
+          setArticle(event);
+          if (title) {
+            setTitle(title);
+          }
+
+          // Convert markdown to HTML
+          let htmlContent = await markdownToHTML(`# ${title}\n${event.content}`);
+          htmlContent = processNostrHTML(htmlContent);
+          editor!.commands.setContent(htmlContent);
+
+          // Clear the edit param from URL
+          setSearchParams({}, { replace: true });
+        } else {
+          console.error("[editor] Article not found");
+          toast.error("Article not found");
+        }
+      } catch (error) {
+        console.error("[editor] Failed to load article from edit param:", error);
+        toast.error("Failed to load article");
+      }
+    }
+
+    loadArticleFromParam();
+  }, [editor, searchParams]);
+
   function asMarkdown(): string {
     if (!editor) return "";
     const json = editor.getJSON();
@@ -497,10 +543,13 @@ export default () => {
     };
 
     try {
-      return renderToMarkdown({
+      const markdown = renderToMarkdown({
         content: convertedJson,
         extensions,
       }).trim();
+
+      // Ensure proper spacing between block elements
+      return ensureBlockSpacing(markdown);
     } catch (error) {
       console.error("[editor] Markdown serialization error:", error);
       return "";
@@ -627,7 +676,7 @@ export default () => {
       };
       saveDraftToStorage(draft);
 
-      // Navigate to the published article
+      // Build the article URL
       // Check if user is a Habla member first
       const members = await store.getMembers();
       const member = members.find((m) => m.pubkey === pubkey);
@@ -645,7 +694,8 @@ export default () => {
           : `/u/${nip19.npubEncode(pubkey!)}/${identifier}`;
       }
 
-      navigate(articleUrl);
+      // Return the URL - dialog will handle navigation after closing
+      return articleUrl;
     } catch (error) {
       console.error("[editor] Failed to publish article:", error);
       toast.error("Failed to publish article", {

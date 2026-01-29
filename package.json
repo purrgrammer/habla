@@ -8,7 +8,9 @@
     "add-npub": "npx tsx ./app/scripts/add-npub.ts",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "pnpm": {
     "overrides": {
@@ -106,6 +108,7 @@
     "tw-animate-css": "^1.3.6",
     "typescript": "^5.8.3",
     "vite": "^6.3.3",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.0"
   }
 }
