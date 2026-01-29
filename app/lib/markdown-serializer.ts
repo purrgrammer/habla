@@ -41,6 +41,12 @@ function renderNode(node: JSONContent, nodeMapping: NodeMapping): string {
 
   // Default: render children if present, otherwise return empty
   if (node.content) {
+    // Log warning for unhandled node types (except common structural ones)
+    if (node.type && !["doc"].includes(node.type)) {
+      console.warn(
+        `[markdown-serializer] Unknown node type: ${node.type}. Content will be rendered without formatting.`,
+      );
+    }
     const helpers = { renderChildren: createRenderChildren(nodeMapping) };
     return helpers.renderChildren(node.content);
   }
@@ -73,7 +79,54 @@ function renderNode(node: JSONContent, nodeMapping: NodeMapping): string {
     return text;
   }
 
+  // Log warning for completely unhandled nodes
+  if (node.type) {
+    console.warn(
+      `[markdown-serializer] Unhandled node type: ${node.type}. Node will be skipped.`,
+    );
+  }
+
   return "";
+}
+
+/**
+ * Helper to render a list item, handling nested lists with proper indentation
+ */
+function renderListItem(
+  item: JSONContent,
+  marker: string,
+  helpers: { renderChildren: (content?: JSONContent[]) => string },
+): string {
+  const parts: string[] = [];
+  let firstParagraph = true;
+
+  for (const child of item.content || []) {
+    if (child.type === "paragraph") {
+      const content = helpers.renderChildren(child.content);
+      if (firstParagraph) {
+        parts.push(`${marker} ${content.trim()}`);
+        firstParagraph = false;
+      } else {
+        // Additional paragraphs in same list item
+        parts.push(`  ${content.trim()}`);
+      }
+    } else if (child.type === "bulletList" || child.type === "orderedList") {
+      // Nested list - indent each line
+      const nestedContent = helpers.renderChildren([child]);
+      const indented = nestedContent
+        .trim()
+        .split("\n")
+        .map((line) => `  ${line}`)
+        .join("\n");
+      parts.push(indented);
+    } else {
+      // Other content types
+      const content = helpers.renderChildren([child]);
+      parts.push(`  ${content.trim()}`);
+    }
+  }
+
+  return parts.join("\n");
 }
 
 /**
@@ -115,9 +168,7 @@ export const nodeMapping: NodeMapping = {
   bulletList: (node, helpers) => {
     const items = (node.content || [])
       .map((item) => {
-        const content = helpers.renderChildren(item.content);
-        // Remove trailing newlines from list item content
-        return `- ${content.trim()}`;
+        return renderListItem(item, "-", helpers);
       })
       .join("\n");
     return `${items}\n\n`;
@@ -126,8 +177,7 @@ export const nodeMapping: NodeMapping = {
   orderedList: (node, helpers) => {
     const items = (node.content || [])
       .map((item, index) => {
-        const content = helpers.renderChildren(item.content);
-        return `${index + 1}. ${content.trim()}`;
+        return renderListItem(item, `${index + 1}.`, helpers);
       })
       .join("\n");
     return `${items}\n\n`;

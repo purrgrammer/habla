@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { renderToMarkdownWithSpacing } from "./markdown-serializer";
 import type { JSONContent } from "@tiptap/core";
 
@@ -286,6 +286,217 @@ After list.`;
 2. Second
 
 After list.`;
+
+      expect(renderToMarkdownWithSpacing(content)).toBe(expected);
+    });
+
+    it("renders nested bullet lists with proper indentation", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "bulletList",
+            content: [
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Parent item" }],
+                  },
+                  {
+                    type: "bulletList",
+                    content: [
+                      {
+                        type: "listItem",
+                        content: [
+                          {
+                            type: "paragraph",
+                            content: [{ type: "text", text: "Child item 1" }],
+                          },
+                        ],
+                      },
+                      {
+                        type: "listItem",
+                        content: [
+                          {
+                            type: "paragraph",
+                            content: [{ type: "text", text: "Child item 2" }],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Another parent" }],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const expected = `- Parent item
+  - Child item 1
+  - Child item 2
+- Another parent`;
+
+      expect(renderToMarkdownWithSpacing(content)).toBe(expected);
+    });
+
+    it("renders nested ordered lists with proper indentation", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "orderedList",
+            content: [
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "First parent" }],
+                  },
+                  {
+                    type: "orderedList",
+                    content: [
+                      {
+                        type: "listItem",
+                        content: [
+                          {
+                            type: "paragraph",
+                            content: [{ type: "text", text: "First child" }],
+                          },
+                        ],
+                      },
+                      {
+                        type: "listItem",
+                        content: [
+                          {
+                            type: "paragraph",
+                            content: [{ type: "text", text: "Second child" }],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const expected = `1. First parent
+  1. First child
+  2. Second child`;
+
+      expect(renderToMarkdownWithSpacing(content)).toBe(expected);
+    });
+
+    it("renders deeply nested lists", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "bulletList",
+            content: [
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Level 1" }],
+                  },
+                  {
+                    type: "bulletList",
+                    content: [
+                      {
+                        type: "listItem",
+                        content: [
+                          {
+                            type: "paragraph",
+                            content: [{ type: "text", text: "Level 2" }],
+                          },
+                          {
+                            type: "bulletList",
+                            content: [
+                              {
+                                type: "listItem",
+                                content: [
+                                  {
+                                    type: "paragraph",
+                                    content: [
+                                      { type: "text", text: "Level 3" },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const expected = `- Level 1
+  - Level 2
+    - Level 3`;
+
+      expect(renderToMarkdownWithSpacing(content)).toBe(expected);
+    });
+
+    it("renders mixed nested lists (bullet inside ordered)", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "orderedList",
+            content: [
+              {
+                type: "listItem",
+                content: [
+                  {
+                    type: "paragraph",
+                    content: [{ type: "text", text: "Ordered item" }],
+                  },
+                  {
+                    type: "bulletList",
+                    content: [
+                      {
+                        type: "listItem",
+                        content: [
+                          {
+                            type: "paragraph",
+                            content: [{ type: "text", text: "Bullet child" }],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const expected = `1. Ordered item
+  - Bullet child`;
 
       expect(renderToMarkdownWithSpacing(content)).toBe(expected);
     });
@@ -817,6 +1028,81 @@ Conclusion.`;
       expect(renderToMarkdownWithSpacing(content)).toBe(
         '![Alt text](https://example.com/img.jpg "Image title")',
       );
+    });
+
+    it("handles unknown node types gracefully with warning", () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "Before." }],
+          },
+          {
+            type: "unknownBlockType",
+            content: [
+              {
+                type: "paragraph",
+                content: [{ type: "text", text: "Unknown content" }],
+              },
+            ],
+          },
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "After." }],
+          },
+        ],
+      };
+
+      const result = renderToMarkdownWithSpacing(content);
+
+      // Unknown node's content should still be rendered
+      expect(result).toContain("Before.");
+      expect(result).toContain("Unknown content");
+      expect(result).toContain("After.");
+
+      // Warning should be logged
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining("unknownBlockType"),
+      );
+
+      warnSpy.mockRestore();
+    });
+
+    it("handles unknown node without content", () => {
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "Before." }],
+          },
+          {
+            type: "customEmptyNode",
+          },
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "After." }],
+          },
+        ],
+      };
+
+      const result = renderToMarkdownWithSpacing(content);
+
+      // Should still render other content
+      expect(result).toContain("Before.");
+      expect(result).toContain("After.");
+
+      // Warning should be logged
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining("customEmptyNode"),
+      );
+
+      warnSpy.mockRestore();
     });
   });
 });
