@@ -4,9 +4,7 @@ import Highlight from "~/ui/nostr/highlight";
 import Note from "~/ui/nostr/note";
 import NostrCard from "~/ui/nostr/card";
 import defaults, { eventMeta } from "~/seo";
-import { default as clientStore } from "~/services/data";
-import { default as serverStore } from "~/services/data.server";
-import { type DataStore } from "~/services/types";
+import { createDualLoader } from "~/lib/route-loader";
 import type { ProfileContent } from "applesauce-core/helpers";
 import type { ReactNode } from "react";
 import { EventReply } from "~/ui/nostr/reply";
@@ -18,33 +16,27 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return eventMeta(loaderData.event, loaderData.profile);
 }
 
-async function loadData(store: DataStore, { params }: Route.MetaArgs) {
-  const { nevent } = params;
-  const decoded = nip19.decode(nevent);
-  if (decoded?.type === "nevent" && decoded?.data.author) {
-    const [profile, event] = await Promise.all([
-      store.fetchProfile({ pubkey: decoded.data.author }),
-      store.fetchEvent(decoded.data),
-    ]);
-    if (event) {
-      return { event, profile };
+export const { loader, clientLoader } = createDualLoader(
+  async (store, { params }: Route.MetaArgs) => {
+    const { nevent } = params;
+    const decoded = nip19.decode(nevent);
+    if (decoded?.type === "nevent" && decoded?.data.author) {
+      const [profile, event] = await Promise.all([
+        store.fetchProfile({ pubkey: decoded.data.author }),
+        store.fetchEvent(decoded.data),
+      ]);
+      if (event) {
+        return { event, profile };
+      }
+    } else if (decoded?.type === "note") {
+      const event = await store.fetchEvent({ id: decoded.data });
+      if (event) {
+        const profile = await store.fetchProfile({ pubkey: event.pubkey });
+        return { profile, event };
+      }
     }
-  } else if (decoded?.type === "note") {
-    const event = await store.fetchEvent({ id: decoded.data });
-    if (event) {
-      const profile = await store.fetchProfile({ pubkey: event.pubkey });
-      return { profile, event };
-    }
-  }
-}
-
-export async function loader(args: Route.MetaArgs) {
-  return loadData(serverStore, args);
-}
-
-export async function clientLoader(args: Route.MetaArgs) {
-  return loadData(clientStore, args);
-}
+  },
+);
 
 interface ComponentProps {
   profile?: ProfileContent;

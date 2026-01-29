@@ -1,11 +1,8 @@
 import type { Route } from "./+types/identifier";
 import { kinds } from "nostr-tools";
-import { default as clientStore } from "~/services/data";
-import { default as serverStore } from "~/services/data.server";
+import { createDualLoader } from "~/lib/route-loader";
 import defaults, { articleMeta } from "~/seo";
 import Article from "~/ui/nostr/article";
-import { type DataStore } from "~/services/types";
-import Debug from "~/ui/debug";
 import { Card as CardSkeleton } from "~/ui/skeleton";
 import { notFound } from "~/lib/http";
 
@@ -14,47 +11,41 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return articleMeta(loaderData.event, loaderData.profile || {});
 }
 
-async function loadData(store: DataStore, { params }: Route.MetaArgs) {
-  const { username, identifier } = params;
-  const users = await store.getMembers();
-  const pointer = users.find((u) => u.nip05 === username);
-  if (pointer) {
-    const pubkey = pointer.pubkey;
-    try {
-      const address = {
-        kind: kinds.LongFormArticle,
-        pubkey,
-        identifier,
-      };
-      const [profile, event] = await Promise.all([
-        store.fetchProfile(pointer),
-        store.fetchAddress(address),
-      ]);
-      if (event) {
-        return {
+export const { loader, clientLoader } = createDualLoader(
+  async (store, { params }: Route.MetaArgs) => {
+    const { username, identifier } = params;
+    const users = await store.getMembers();
+    const pointer = users.find((u) => u.nip05 === username);
+    if (pointer) {
+      const pubkey = pointer.pubkey;
+      try {
+        const address = {
+          kind: kinds.LongFormArticle,
           pubkey,
-          event,
-          relays: [],
-          profile,
-          address,
+          identifier,
         };
+        const [profile, event] = await Promise.all([
+          store.fetchProfile(pointer),
+          store.fetchAddress(address),
+        ]);
+        if (event) {
+          return {
+            pubkey,
+            event,
+            relays: [],
+            profile,
+            address,
+          };
+        }
+        notFound();
+      } catch (error) {
+        notFound();
       }
-      notFound();
-    } catch (error) {
+    } else {
       notFound();
     }
-  } else {
-    notFound();
-  }
-}
-
-export async function loader(args: Route.MetaArgs) {
-  return loadData(serverStore, args);
-}
-
-export async function clientLoader(args: Route.MetaArgs) {
-  return loadData(clientStore, args);
-}
+  },
+);
 
 export default function Identifier({ loaderData }: Route.ComponentProps) {
   return loaderData ? <Article {...loaderData} /> : <CardSkeleton />;

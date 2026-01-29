@@ -23,11 +23,7 @@ import {
 import type { ProfileContent } from "applesauce-core/helpers/profile";
 import pool from "~/services/relay-pool";
 import { useEventStore } from "applesauce-react/hooks";
-import {
-  eventLoader,
-  addressLoader,
-  profileLoader,
-} from "~/services/loaders";
+import { eventLoader, addressLoader, profileLoader } from "~/services/loaders";
 import { getArticlePublished } from "applesauce-core/helpers";
 import { isReplaceableKind } from "nostr-tools/kinds";
 import { AGGREGATOR_RELAYS } from "~/const";
@@ -229,7 +225,7 @@ export function usePubkeyZaps(pubkey: string) {
           (acc, z) => {
             const sender = getZapSender(z);
             if (!sender) return acc;
-            acc[sender] = (acc[sender] | 0) + z.amount;
+            acc[sender] = (acc[sender] || 0) + z.amount;
             return acc;
           },
           {} as Record<string, number>,
