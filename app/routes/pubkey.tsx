@@ -1,8 +1,10 @@
 import type { Route } from "./+types/pubkey";
 import { nip19 } from "nostr-tools";
+import { default as clientStore } from "~/services/data";
+import { default as serverStore } from "~/services/data.server";
+import type { DataStore } from "~/services/types";
 import defaults, { profileMeta } from "~/seo";
 import Profile from "~/ui/nostr/profile";
-import { clientStore, serverStore, type DataStore } from "~/lib/route-loader";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData || !loaderData.profile) return defaults;

@@ -1,6 +1,8 @@
 import type { Route } from "./+types/nip05";
 import { queryProfile } from "nostr-tools/nip05";
-import { clientStore, serverStore, type DataStore } from "~/lib/route-loader";
+import { default as clientStore } from "~/services/data";
+import { default as serverStore } from "~/services/data.server";
+import type { DataStore } from "~/services/types";
 import Profile from "~/ui/nostr/profile";
 import Debug from "~/ui/debug";
 import defaults, { profileMeta } from "~/seo";

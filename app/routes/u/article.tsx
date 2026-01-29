@@ -1,7 +1,9 @@
 import type { Route } from "./+types/article";
 import { kinds } from "nostr-tools";
 import { queryProfile } from "nostr-tools/nip05";
-import { clientStore, serverStore, type DataStore } from "~/lib/route-loader";
+import { default as clientStore } from "~/services/data";
+import { default as serverStore } from "~/services/data.server";
+import type { DataStore } from "~/services/types";
 import Article from "~/ui/nostr/article";
 import defaults, { articleMeta } from "~/seo";
 import ClientOnly from "~/ui/client-only";
