@@ -44,5 +44,12 @@ export function ensureBlockSpacing(markdown: string): string {
     "$1\n",
   );
 
+  // 7. Images directly followed by content (no newline at all) - TipTap sometimes omits newlines
+  // e.g., "![](url)# Heading" should become "![](url)\n\n# Heading"
+  result = result.replace(
+    /(^!\[(?:[^\[\]]|\[[^\]]*\])*\]\([^)]*\))(?=[^\n\s])/gm,
+    "$1\n\n",
+  );
+
   return result;
 }

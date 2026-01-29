@@ -491,6 +491,36 @@ Explanation of diagram.`;
 
       expect(ensureBlockSpacing(input)).toBe(expected);
     });
+
+    it("handles image directly followed by heading (no newline)", () => {
+      const input = `![](https://example.com/image.png)# Heading`;
+
+      const expected = `![](https://example.com/image.png)
+
+# Heading`;
+
+      expect(ensureBlockSpacing(input)).toBe(expected);
+    });
+
+    it("handles image directly followed by paragraph (no newline)", () => {
+      const input = `![](https://example.com/image.png)Some text here`;
+
+      const expected = `![](https://example.com/image.png)
+
+Some text here`;
+
+      expect(ensureBlockSpacing(input)).toBe(expected);
+    });
+
+    it("handles image directly followed by list (no newline)", () => {
+      const input = `![](https://example.com/image.png)- List item`;
+
+      const expected = `![](https://example.com/image.png)
+
+- List item`;
+
+      expect(ensureBlockSpacing(input)).toBe(expected);
+    });
   });
 
   describe("edge cases", () => {
