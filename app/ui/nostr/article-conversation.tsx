@@ -111,11 +111,11 @@ function isReply(event: NostrEvent): boolean {
 
 export default function EventConversation({
   event,
-  relays,
 }: {
   event: NostrEvent;
-  relays: string[];
 }) {
+  // Use author's inbox relays for fetching conversation (NIP-65)
+  const inboxRelays = useInboxRelays(event.pubkey);
   useZaps(event);
   const [showCommentDialog, setShowCommentDialog] = useState(false);
   const id = isReplaceableKind(event.kind)
@@ -132,7 +132,7 @@ export default function EventConversation({
       ...(isReplaceableKind(event.kind) ? { "#a": [id] } : { "#e": [id] }),
     },
   ];
-  useTimeline(`${id}-comments`, filters, relays, {
+  useTimeline(`${id}-comments`, filters, inboxRelays, {
     limit: 200,
   });
   const eventStore = useEventStore();
@@ -210,6 +210,5 @@ export default function EventConversation({
 }
 
 export function Conversation({ event }: { event: NostrEvent }) {
-  const relays = useInboxRelays(event.pubkey);
-  return <EventConversation event={event} relays={relays} />;
+  return <EventConversation event={event} />;
 }

@@ -108,7 +108,7 @@ export default function Article(props: {
           }, {})}
         />
       </div>
-      <ClientOnly>{() => <ArticleConversation {...props} />}</ClientOnly>
+      <ClientOnly>{() => <ArticleConversation event={event} />}</ClientOnly>
     </div>
   );
 }
