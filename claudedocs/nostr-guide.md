@@ -12,13 +12,13 @@ All data in Nostr is represented as **events**—JSON objects with:
 
 ```json
 {
-  "id": "event-hash",           // SHA256 hash
-  "pubkey": "author-pubkey",    // 32-byte hex
-  "created_at": 1234567890,     // Unix timestamp
-  "kind": 1,                    // Event type
-  "tags": [["e", "..."]],       // Array of tags
-  "content": "Hello Nostr!",    // Event content
-  "sig": "signature"            // Schnorr signature
+  "id": "event-hash", // SHA256 hash
+  "pubkey": "author-pubkey", // 32-byte hex
+  "created_at": 1234567890, // Unix timestamp
+  "kind": 1, // Event type
+  "tags": [["e", "..."]], // Array of tags
+  "content": "Hello Nostr!", // Event content
+  "sig": "signature" // Schnorr signature
 }
 ```
 
@@ -27,14 +27,14 @@ All data in Nostr is represented as **events**—JSON objects with:
 ```typescript
 // From app/const.ts
 export const kinds = {
-  Metadata: 0,           // User profile
-  ShortNote: 1,          // Short text note
-  LongFormArticle: 30023,  // Blog post (NIP-23)
-  Book: 30040,           // Book
-  BookChapter: 30041,    // Book chapter
-  Comment: 1111,         // Comment/reply
-  ZapReceipt: 9735,      // Lightning payment receipt
-  BlossomServerList: 10063,  // File server list
+  Metadata: 0, // User profile
+  ShortNote: 1, // Short text note
+  LongFormArticle: 30023, // Blog post (NIP-23)
+  Book: 30040, // Book
+  BookChapter: 30041, // Book chapter
+  Comment: 1111, // Comment/reply
+  ZapReceipt: 9735, // Lightning payment receipt
+  BlossomServerList: 10063, // File server list
 };
 ```
 
@@ -44,14 +44,11 @@ WebSocket servers that store and distribute events:
 
 ```typescript
 // From app/const.ts
-export const INDEX_RELAYS = [
-  "wss://purplepag.es",
-  "wss://relay.nostr.band"
-];
+export const INDEX_RELAYS = ["wss://purplepag.es", "wss://relay.nostr.band"];
 
 export const AGGREGATOR_RELAYS = [
   "wss://relay.nostr.band",
-  "wss://relay.primal.net"
+  "wss://relay.primal.net",
 ];
 ```
 
@@ -66,11 +63,11 @@ export const AGGREGATOR_RELAYS = [
 
 Special identifiers for referencing entities:
 
-| Type | Format | Usage |
-|------|--------|-------|
-| **naddr** | Address pointer | kind + pubkey + identifier + relays |
-| **nevent** | Event pointer | event ID + relays |
-| **nprofile** | Profile pointer | pubkey + relays |
+| Type         | Format          | Usage                               |
+| ------------ | --------------- | ----------------------------------- |
+| **naddr**    | Address pointer | kind + pubkey + identifier + relays |
+| **nevent**   | Event pointer   | event ID + relays                   |
+| **nprofile** | Profile pointer | pubkey + relays                     |
 
 ## NIP-05 Identity
 
@@ -90,7 +87,7 @@ import { fetchProfile } from "~/services/nostr";
 
 const profile = await fetchProfile({
   pubkey: "hex-pubkey",
-  relays: INDEX_RELAYS
+  relays: INDEX_RELAYS,
 });
 // Returns: { name, about, picture, nip05, ... }
 ```
@@ -104,7 +101,7 @@ const article = await fetchAddress({
   kind: 30023,
   pubkey: "hex-pubkey",
   identifier: "article-slug",
-  relays: INDEX_RELAYS
+  relays: INDEX_RELAYS,
 });
 ```
 
@@ -115,7 +112,7 @@ import { fetchEvent } from "~/services/nostr";
 
 const event = await fetchEvent({
   id: "event-id",
-  relays: INDEX_RELAYS
+  relays: INDEX_RELAYS,
 });
 ```
 
@@ -126,7 +123,7 @@ import { useSubscription } from "~/hooks/nostr.client";
 
 const { events } = useSubscription({
   relays: ["wss://relay.nostr.band"],
-  filters: [{ kinds: [1], limit: 20 }]
+  filters: [{ kinds: [1], limit: 20 }],
 });
 ```
 
@@ -151,7 +148,7 @@ const article = factory.longFormArticle({
   title: "My Article",
   content: "Article content in markdown...",
   identifier: "my-article-slug",
-  tags: ["nostr", "decentralization"]
+  tags: ["nostr", "decentralization"],
 });
 
 await publisher.publish(article, relays);
@@ -187,7 +184,7 @@ import { relayPool } from "~/services/relay-pool";
 // Subscribe to events
 const subscription = relayPool.subscribe(
   ["wss://relay.nostr.band"],
-  [{ kinds: [1], limit: 20 }]
+  [{ kinds: [1], limit: 20 }],
 );
 
 subscription.on("event", (relay, event) => {
@@ -217,7 +214,7 @@ await eventStore.addEvent(event);
 // Query cached events
 const events = await eventStore.query({
   kinds: [1],
-  limit: 20
+  limit: 20,
 });
 ```
 

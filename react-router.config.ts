@@ -4,7 +4,9 @@ import { getMembers, getArticles } from "./app/services/data.server";
 import { getTagValue } from "applesauce-core/helpers";
 
 // Validate identifier for URL safety
-function isValidIdentifier(identifier: string | undefined): identifier is string {
+function isValidIdentifier(
+  identifier: string | undefined,
+): identifier is string {
   if (!identifier || typeof identifier !== "string") return false;
   // Check for reasonable length and no control characters
   return (
@@ -31,7 +33,10 @@ export default {
         }
       }
     } catch (error) {
-      console.warn("Failed to fetch dynamic routes for prerendering (likely Redis unavailable):", error);
+      console.warn(
+        "Failed to fetch dynamic routes for prerendering (likely Redis unavailable):",
+        error,
+      );
     }
     return result;
   },

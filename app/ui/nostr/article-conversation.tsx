@@ -109,11 +109,7 @@ function isReply(event: NostrEvent): boolean {
   );
 }
 
-export default function EventConversation({
-  event,
-}: {
-  event: NostrEvent;
-}) {
+export default function EventConversation({ event }: { event: NostrEvent }) {
   // Use author's inbox relays for fetching conversation (NIP-65)
   const inboxRelays = useInboxRelays(event.pubkey);
   useZaps(event);

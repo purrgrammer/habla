@@ -6,7 +6,7 @@ import NostrCard from "~/ui/nostr/card";
 import defaults, { eventMeta } from "~/seo";
 import { default as clientStore } from "~/services/data";
 import { default as serverStore } from "~/services/data.server";
-import { type DataStore } from "~/services/types";
+import type { DataStore } from "~/services/types";
 import type { ProfileContent } from "applesauce-core/helpers";
 import type { ReactNode } from "react";
 import { EventReply } from "~/ui/nostr/reply";

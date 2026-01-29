@@ -30,7 +30,7 @@ export default [
   layout("routes/layouts/main.tsx", [
     route("/my-new-route", "routes/my-new-route.tsx"),
     // ... other routes
-  ])
+  ]),
 ] satisfies RouteConfig;
 ```
 
@@ -311,7 +311,7 @@ export const kinds = {
 export async function fetchMyCustomKind(pointer: AddressPointer) {
   return dataStore.fetchAddress({
     ...pointer,
-    kind: kinds.MyCustomKind
+    kind: kinds.MyCustomKind,
   });
 }
 ```
@@ -343,7 +343,7 @@ function AutoSaveDraft({ title, content }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       saveDraft({ title, content });
-    }, 1000);  // Debounce 1 second
+    }, 1000); // Debounce 1 second
 
     return () => clearTimeout(timer);
   }, [title, content]);
@@ -383,7 +383,7 @@ import { deleteDraft } from "~/services/drafts.client";
 
 async function handlePublish() {
   await publishArticle();
-  deleteDraft();  // Clear draft after successful publish
+  deleteDraft(); // Clear draft after successful publish
 }
 ```
 
@@ -396,7 +396,7 @@ export const FEATURED_AUTHORS = [
   {
     npub: "npub1...",
     nip05: "alice@example.com",
-    relays: ["wss://relay.nostr.band"]
+    relays: ["wss://relay.nostr.band"],
   },
   // ... more authors
 ];
@@ -405,7 +405,7 @@ export const FEATURED_ARTICLES = [
   {
     author: "npub1...",
     identifier: "article-slug",
-    relays: ["wss://relay.nostr.band"]
+    relays: ["wss://relay.nostr.band"],
   },
   // ... more articles
 ];

@@ -2,10 +2,9 @@ import type { Route } from "./+types/identifier";
 import { kinds } from "nostr-tools";
 import { default as clientStore } from "~/services/data";
 import { default as serverStore } from "~/services/data.server";
+import type { DataStore } from "~/services/types";
 import defaults, { articleMeta } from "~/seo";
 import Article from "~/ui/nostr/article";
-import { type DataStore } from "~/services/types";
-import Debug from "~/ui/debug";
 import { Card as CardSkeleton } from "~/ui/skeleton";
 import { notFound } from "~/lib/http";
 

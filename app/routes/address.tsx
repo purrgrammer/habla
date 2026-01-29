@@ -2,9 +2,9 @@ import type { Route } from "./+types/address";
 import { kinds, nip19 } from "nostr-tools";
 import { default as clientStore } from "~/services/data";
 import { default as serverStore } from "~/services/data.server";
+import type { DataStore } from "~/services/types";
 import Article from "~/ui/nostr/article";
 import defaults, { articleMeta } from "~/seo";
-import type { DataStore } from "~/services/types";
 import Debug from "~/ui/debug";
 
 export function meta({ loaderData }: Route.MetaArgs) {

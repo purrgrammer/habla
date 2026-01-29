@@ -273,12 +273,14 @@ export default function Login() {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Login to Habla</DialogTitle>
-              <DialogDescription>
-                Choose a method to sign in.
-              </DialogDescription>
+              <DialogDescription>Choose a method to sign in.</DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
-              <Button onClick={getStarted} variant="outline" className="w-full justify-start gap-2">
+              <Button
+                onClick={getStarted}
+                variant="outline"
+                className="w-full justify-start gap-2"
+              >
                 <img src="/favicon.ico" className="w-4 h-4" alt="" />
                 Browser Extension (NIP-07)
               </Button>
