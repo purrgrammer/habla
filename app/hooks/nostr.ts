@@ -294,7 +294,7 @@ export function useZaps(event: NostrEvent) {
       loaderSubscription.unsubscribe();
       realtimeSubscription.unsubscribe();
     };
-  }, [event.id]);
+  }, [event.id, relays.length]);
 
   return useObservableMemo(() => {
     return eventStore.model(EventZapsModel, pointer).pipe(

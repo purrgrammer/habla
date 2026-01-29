@@ -11,6 +11,7 @@ import { isReplaceableKind } from "nostr-tools/kinds";
 import { useProfile, useInboxRelays, useTimeline } from "~/hooks/nostr";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import {
+  getReplaceableAddress,
   getSeenRelays,
   getTagValue,
   getZapPayment,
@@ -223,7 +224,7 @@ function Replies({ author, event }: { author: Pubkey; event?: NostrEvent }) {
   const tagFilter =
     event && isReplaceableKind(event.kind)
       ? {
-          "#a": [],
+          "#a": [getReplaceableAddress(event)],
         }
       : event
         ? {

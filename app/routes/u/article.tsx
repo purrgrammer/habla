@@ -44,7 +44,9 @@ export default function Identifier({ loaderData }: Route.ComponentProps) {
   return (
     <div>
       <Article {...loaderData} />
-      <ClientOnly>{() => <ArticleConversation {...loaderData} />}</ClientOnly>
+      <ClientOnly>
+        {() => <ArticleConversation event={loaderData.event} />}
+      </ClientOnly>
     </div>
   );
 }
