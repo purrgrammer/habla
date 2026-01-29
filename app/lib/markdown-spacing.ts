@@ -12,6 +12,7 @@
  * - Lists (-, *, +, 1.)
  * - Horizontal rules (---, ***, ___)
  * - Headings (#)
+ * - Images (![alt](url))
  */
 export function ensureBlockSpacing(markdown: string): string {
   let result = markdown;
@@ -34,6 +35,10 @@ export function ensureBlockSpacing(markdown: string): string {
 
   // 5. Headings: ensure blank line after headings when followed by content
   result = result.replace(/(^#{1,6}\s+.*\n)(?!\n|$)/gm, "$1\n");
+
+  // 6. Images: ![alt](url) followed by content that isn't a blank line
+  // The alt text can contain any characters except ], and url can contain any except )
+  result = result.replace(/(^!\[[^\]]*\]\([^)]*\)\n)(?!\n|$)/gm, "$1\n");
 
   return result;
 }

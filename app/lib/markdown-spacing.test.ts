@@ -389,6 +389,110 @@ Third paragraph.`;
     });
   });
 
+  describe("images", () => {
+    it("adds blank line after image followed by heading", () => {
+      const input = `![Cover image](https://example.com/image.jpg)
+## Next Section`;
+
+      const expected = `![Cover image](https://example.com/image.jpg)
+
+## Next Section`;
+
+      expect(ensureBlockSpacing(input)).toBe(expected);
+    });
+
+    it("adds blank line after image followed by paragraph", () => {
+      const input = `![Photo](https://example.com/photo.png)
+This is the caption text.`;
+
+      const expected = `![Photo](https://example.com/photo.png)
+
+This is the caption text.`;
+
+      expect(ensureBlockSpacing(input)).toBe(expected);
+    });
+
+    it("adds blank line after heading followed by image", () => {
+      const input = `# Article Title
+![Hero image](https://example.com/hero.jpg)
+Some text after.`;
+
+      const expected = `# Article Title
+
+![Hero image](https://example.com/hero.jpg)
+
+Some text after.`;
+
+      expect(ensureBlockSpacing(input)).toBe(expected);
+    });
+
+    it("handles consecutive images", () => {
+      const input = `![Image 1](https://example.com/1.jpg)
+![Image 2](https://example.com/2.jpg)
+![Image 3](https://example.com/3.jpg)
+Caption for gallery.`;
+
+      const expected = `![Image 1](https://example.com/1.jpg)
+
+![Image 2](https://example.com/2.jpg)
+
+![Image 3](https://example.com/3.jpg)
+
+Caption for gallery.`;
+
+      expect(ensureBlockSpacing(input)).toBe(expected);
+    });
+
+    it("preserves existing blank line after image", () => {
+      const input = `![Photo](https://example.com/photo.png)
+
+This paragraph is already separated.`;
+
+      expect(ensureBlockSpacing(input)).toBe(input);
+    });
+
+    it("handles image at end of document", () => {
+      const input = `Some text.
+
+![Final image](https://example.com/end.jpg)`;
+
+      expect(ensureBlockSpacing(input)).toBe(input);
+    });
+
+    it("handles image with complex alt text", () => {
+      const input = `![A complex [alt] text with (parens) and special chars!](https://example.com/img.jpg)
+Next paragraph.`;
+
+      const expected = `![A complex [alt] text with (parens) and special chars!](https://example.com/img.jpg)
+
+Next paragraph.`;
+
+      expect(ensureBlockSpacing(input)).toBe(expected);
+    });
+
+    it("handles image in complex document", () => {
+      const input = `# Article Title
+![Hero](https://example.com/hero.jpg)
+## Introduction
+Some intro text.
+![Diagram](https://example.com/diagram.png)
+Explanation of diagram.`;
+
+      const expected = `# Article Title
+
+![Hero](https://example.com/hero.jpg)
+
+## Introduction
+
+Some intro text.
+![Diagram](https://example.com/diagram.png)
+
+Explanation of diagram.`;
+
+      expect(ensureBlockSpacing(input)).toBe(expected);
+    });
+  });
+
   describe("edge cases", () => {
     it("handles empty string", () => {
       expect(ensureBlockSpacing("")).toBe("");
