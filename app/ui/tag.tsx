@@ -41,10 +41,7 @@ export function Tags({
   return tags.length > 0 ? (
     <div
       className={cn(
-        `flex flex-row flex-wrap items-center gap-1 py-2
-        overflow-auto overflox-x-scroll
-        no-scrollbar
-        `,
+        "flex flex-row flex-wrap items-center gap-1 py-2 overflow-x-auto no-scrollbar",
         className,
       )}
     >
