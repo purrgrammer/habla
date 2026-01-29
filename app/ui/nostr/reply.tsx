@@ -8,7 +8,7 @@ import { CurrencyAmount } from "../currency";
 import UserLink from "./user-link";
 import RichText from "./rich-text";
 import { isReplaceableKind } from "nostr-tools/kinds";
-import { useProfile, useRelays, useTimeline } from "~/hooks/nostr";
+import { useProfile, useInboxRelays, useTimeline } from "~/hooks/nostr";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import {
   getSeenRelays,
@@ -219,7 +219,7 @@ function Repliers({ replies }: { replies: NostrEvent[] }) {
 }
 
 function Replies({ author, event }: { author: Pubkey; event?: NostrEvent }) {
-  const relays = useRelays(event?.pubkey || author);
+  const relays = useInboxRelays(event?.pubkey || author);
   const tagFilter =
     event && isReplaceableKind(event.kind)
       ? {

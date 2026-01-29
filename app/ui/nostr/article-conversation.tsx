@@ -5,7 +5,7 @@ import Highlight from "./highlight";
 import NostrCard from "./card";
 import {
   parseZap,
-  useRelays,
+  useInboxRelays,
   useTimeline,
   useZaps,
   type Zap,
@@ -210,6 +210,6 @@ export default function EventConversation({
 }
 
 export function Conversation({ event }: { event: NostrEvent }) {
-  const relays = useRelays(event.pubkey);
+  const relays = useInboxRelays(event.pubkey);
   return <EventConversation event={event} relays={relays} />;
 }

@@ -12,6 +12,7 @@ import {
   getEventPointerForEvent,
   getZapPayment,
   getZapSender,
+  getInboxes,
 } from "applesauce-core/helpers";
 import { EventZapsModel } from "applesauce-core/models/zaps";
 import { getRelayURLs } from "~/lib/url";
@@ -110,6 +111,30 @@ export function useRelays(pubkey: string): string[] {
   return relays || [];
 }
 
+export function useInboxRelays(pubkey: string): string[] {
+  const eventStore = useEventStore();
+  const relays = useObservableMemo(() => {
+    return eventStore.replaceable(kinds.RelayList, pubkey).pipe(
+      map((event) => {
+        if (event) {
+          return getInboxes(event);
+        }
+        return [];
+      }),
+    );
+  }, [pubkey]);
+
+  useEffect(() => {
+    const subscription = profileLoader({
+      kind: kinds.RelayList,
+      pubkey,
+    }).subscribe();
+    return () => subscription.unsubscribe();
+  }, [pubkey]);
+
+  return relays || [];
+}
+
 export function useTimeline(
   id: string,
   filters: Filter | Filter[],
@@ -171,7 +196,7 @@ export function parseZap(event: NostrEvent): Zap | null {
 }
 
 export function usePubkeyZaps(pubkey: string) {
-  const relays = useRelays(pubkey);
+  const relays = useInboxRelays(pubkey);
   const eventStore = useEventStore();
   const filters = {
     kinds: [kinds.Zap],
@@ -226,7 +251,7 @@ export function usePubkeyZaps(pubkey: string) {
 }
 
 export function useZaps(event: NostrEvent) {
-  const relays = useRelays(event.pubkey);
+  const relays = useInboxRelays(event.pubkey);
   const pointer = isReplaceableKind(event.kind)
     ? getAddressPointerForEvent(event)
     : getEventPointerForEvent(event);
@@ -290,7 +315,7 @@ export function useZaps(event: NostrEvent) {
 }
 
 export function useProfileZaps(pubkey: Pubkey) {
-  const relays = useRelays(pubkey);
+  const relays = useInboxRelays(pubkey);
   const eventStore = useEventStore();
   return useTimeline(
     `${pubkey}-zaps`,
