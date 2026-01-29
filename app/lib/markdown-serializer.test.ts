@@ -568,4 +568,255 @@ Conclusion.`;
       expect(renderToMarkdownWithSpacing(content)).toBe(expected);
     });
   });
+
+  describe("nostr nodes", () => {
+    it("renders mention with npub", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              { type: "text", text: "Hello " },
+              {
+                type: "mention",
+                attrs: {
+                  pubkey:
+                    "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+                },
+              },
+              { type: "text", text: "!" },
+            ],
+          },
+        ],
+      };
+
+      const result = renderToMarkdownWithSpacing(content);
+      expect(result).toContain("Hello ");
+      expect(result).toContain("nostr:npub1");
+      expect(result).toContain("!");
+    });
+
+    it("renders mention with nprofile when relays provided", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "mention",
+                attrs: {
+                  pubkey:
+                    "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+                  relays: ["wss://relay.example.com"],
+                },
+              },
+            ],
+          },
+        ],
+      };
+
+      const result = renderToMarkdownWithSpacing(content);
+      expect(result).toContain("nostr:nprofile1");
+    });
+
+    it("renders nevent", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "nevent",
+                attrs: {
+                  id: "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+                  kind: 1,
+                },
+              },
+            ],
+          },
+        ],
+      };
+
+      const result = renderToMarkdownWithSpacing(content);
+      expect(result).toContain("nostr:nevent1");
+    });
+
+    it("renders naddr", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "naddr",
+                attrs: {
+                  identifier: "my-article",
+                  kind: 30023,
+                  pubkey:
+                    "7fa56f5d6962ab1e3cd424e758c3002b8665f7b0d8dcee9fe9e288d7751ac194",
+                },
+              },
+            ],
+          },
+        ],
+      };
+
+      const result = renderToMarkdownWithSpacing(content);
+      expect(result).toContain("nostr:naddr1");
+    });
+  });
+
+  describe("edge cases", () => {
+    it("handles empty document", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [],
+      };
+
+      expect(renderToMarkdownWithSpacing(content)).toBe("");
+    });
+
+    it("handles empty paragraph", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [],
+          },
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "After empty." }],
+          },
+        ],
+      };
+
+      const result = renderToMarkdownWithSpacing(content);
+      expect(result).toContain("After empty.");
+    });
+
+    it("handles nested marks (bold + italic)", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "bold and italic",
+                marks: [{ type: "bold" }, { type: "italic" }],
+              },
+            ],
+          },
+        ],
+      };
+
+      const result = renderToMarkdownWithSpacing(content);
+      expect(result).toContain("**");
+      expect(result).toContain("*");
+    });
+
+    it("handles strikethrough", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "deleted",
+                marks: [{ type: "strike" }],
+              },
+            ],
+          },
+        ],
+      };
+
+      expect(renderToMarkdownWithSpacing(content)).toBe("~~deleted~~");
+    });
+
+    it("handles underline", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "underlined",
+                marks: [{ type: "underline" }],
+              },
+            ],
+          },
+        ],
+      };
+
+      expect(renderToMarkdownWithSpacing(content)).toBe("<u>underlined</u>");
+    });
+
+    it("handles highlight", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "highlighted",
+                marks: [{ type: "highlight" }],
+              },
+            ],
+          },
+        ],
+      };
+
+      expect(renderToMarkdownWithSpacing(content)).toBe("==highlighted==");
+    });
+
+    it("handles hard breaks", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              { type: "text", text: "Line 1" },
+              { type: "hardBreak" },
+              { type: "text", text: "Line 2" },
+            ],
+          },
+        ],
+      };
+
+      expect(renderToMarkdownWithSpacing(content)).toBe("Line 1\nLine 2");
+    });
+
+    it("handles image with title", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "image",
+            attrs: {
+              src: "https://example.com/img.jpg",
+              alt: "Alt text",
+              title: "Image title",
+            },
+          },
+        ],
+      };
+
+      expect(renderToMarkdownWithSpacing(content)).toBe(
+        '![Alt text](https://example.com/img.jpg "Image title")',
+      );
+    });
+  });
 });
