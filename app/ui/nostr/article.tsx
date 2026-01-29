@@ -1,4 +1,4 @@
-import { type NostrEvent } from "nostr-tools";
+import { type NostrEvent, nip19 } from "nostr-tools";
 import { cn } from "~/lib/utils";
 import { type AddressPointer } from "nostr-tools/nip19";
 import {
@@ -16,13 +16,36 @@ import ArticleConversation from "./article-conversation";
 import ClientOnly from "../client-only";
 import type { Relay } from "~/types";
 import { TagCloud } from "../tag-cloud";
+import { Link } from "react-router";
+import { Pencil } from "lucide-react";
+import { useActiveAccount } from "applesauce-react/hooks";
+
+function EditButton({ address }: { address: AddressPointer }) {
+  const account = useActiveAccount();
+  const isAuthor = account?.pubkey === address.pubkey;
+
+  if (!isAuthor) return null;
+
+  const naddr = nip19.naddrEncode(address);
+  return (
+    <Link
+      to={`/write?edit=${naddr}`}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-accent"
+    >
+      <Pencil className="size-4" />
+      Edit
+    </Link>
+  );
+}
 
 function Author({
   author,
   article,
+  address,
 }: {
   author?: ProfileContent;
   article: NostrEvent;
+  address?: AddressPointer;
 }) {
   const publishedAt = getArticlePublished(article);
   return (
@@ -35,9 +58,14 @@ function Author({
         profile={author}
         withNip05
       />
-      <span className="text-right font-light text-muted-foreground text-sm sm:text-base">
-        <Timestamp timestamp={publishedAt} />
-      </span>
+      <div className="flex items-center gap-2">
+        {address && (
+          <ClientOnly>{() => <EditButton address={address} />}</ClientOnly>
+        )}
+        <span className="text-right font-light text-muted-foreground text-sm sm:text-base">
+          <Timestamp timestamp={publishedAt} />
+        </span>
+      </div>
     </div>
   );
 }
@@ -85,7 +113,7 @@ export default function Article(props: {
   address: AddressPointer;
   relays: Relay[];
 }) {
-  const { author, event } = props;
+  const { author, event, address } = props;
   const title = getArticleTitle(event);
   const image = getArticleImage(event);
   const summary = getArticleSummary(event);
@@ -94,7 +122,7 @@ export default function Article(props: {
   ];
   return (
     <div className="flex flex-col gap-4 sm:gap-6 w-full">
-      <Author article={event} author={author} />
+      <Author article={event} author={author} address={address} />
       <PureArticle
         title={title}
         summary={summary}

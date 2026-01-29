@@ -117,7 +117,8 @@ export default function EditorToolbar({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2 p-2 w-full xs:w-xs xsm:w-sm sm:w-xl lg:w-2xl mx-auto">
+    <div className="sticky top-0 z-50 bg-background border-b w-full">
+      <div className="flex flex-wrap items-center gap-2 p-2 w-full xs:w-xs xsm:w-sm sm:w-xl lg:w-2xl mx-auto">
       {/* Group 1: Undo/Redo */}
       <div className="flex items-center">
         <ToggleGroup
@@ -463,6 +464,7 @@ export default function EditorToolbar({
             </DropdownMenuContent>
           </DropdownMenu>
         </ToggleGroup>
+      </div>
       </div>
     </div>
   );
