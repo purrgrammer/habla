@@ -439,6 +439,8 @@ export default () => {
     const editParam = searchParams.get("edit");
     if (!editParam || !editor) return;
 
+    let cancelled = false;
+
     async function loadArticleFromParam() {
       try {
         const decoded = nip19.decode(editParam!);
@@ -449,9 +451,9 @@ export default () => {
 
         const address = decoded.data;
         const event = await store.fetchAddress(address);
+        if (cancelled) return;
 
         if (event) {
-          // Use onLoad to load the article into the editor
           const title = getArticleTitle(event);
           setArticle(event);
           if (title) {
@@ -462,16 +464,20 @@ export default () => {
           let htmlContent = await markdownToHTML(
             `# ${title}\n${event.content}`,
           );
+          if (cancelled) return;
           htmlContent = processNostrHTML(htmlContent);
           editor!.commands.setContent(htmlContent);
 
-          // Clear the edit param from URL
-          setSearchParams({}, { replace: true });
+          // Clear only the edit param from URL, preserving others
+          const next = new URLSearchParams(searchParams);
+          next.delete("edit");
+          setSearchParams(next, { replace: true });
         } else {
           console.error("[editor] Article not found");
           toast.error("Article not found");
         }
       } catch (error) {
+        if (cancelled) return;
         console.error(
           "[editor] Failed to load article from edit param:",
           error,
@@ -481,7 +487,12 @@ export default () => {
     }
 
     loadArticleFromParam();
-  }, [editor, searchParams]);
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor, searchParams.get("edit")]);
 
   function asMarkdown(): string {
     if (!editor) return "";

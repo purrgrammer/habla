@@ -173,7 +173,6 @@ export default function PublishDialog({
       });
 
       // Success - close dialog first, then navigate
-      setIsPublishing(false);
       onOpenChange(false);
 
       // Navigate to the published article
@@ -183,6 +182,7 @@ export default function PublishDialog({
     } catch (error) {
       // Error toasts are shown in onPublish, just log here
       console.error("[publish-dialog] Failed to publish:", error);
+    } finally {
       setIsPublishing(false);
     }
   }
