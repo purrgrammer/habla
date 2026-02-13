@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import ImageUploadDialog from "~/ui/image-upload-dialog";
 import store from "~/services/data";
 import { nip19 } from "nostr-tools";
+import { useNavigate } from "react-router";
 
 interface PublishDialogProps {
   open: boolean;
@@ -36,7 +37,7 @@ interface PublishDialogProps {
     summary?: string;
     relays: string[];
     alt?: string;
-  }) => Promise<void>;
+  }) => Promise<string | void>;
   existingImage?: string;
   existingSummary?: string;
   existingIdentifier?: string;
@@ -54,6 +55,7 @@ export default function PublishDialog({
   const account = useActiveAccount();
   const userRelays = useRelays(account?.pubkey || "");
   const profile = useProfile(account?.pubkey || "");
+  const navigate = useNavigate();
 
   const [image, setImage] = useState<string>(existingImage || "");
   const [summary, setSummary] = useState<string>(existingSummary || "");
@@ -161,7 +163,7 @@ export default function PublishDialog({
         .trim()
         .replace(/\n#\s*$/g, "");
 
-      await onPublish({
+      const redirectUrl = await onPublish({
         title,
         content,
         image: image || undefined,
@@ -170,11 +172,16 @@ export default function PublishDialog({
         alt: `${title} - read it in ${window.location.origin}${articleUrl}`,
       });
 
-      toast.success("Article published successfully!");
+      // Success - close dialog first, then navigate
       onOpenChange(false);
+
+      // Navigate to the published article
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      }
     } catch (error) {
+      // Error toasts are shown in onPublish, just log here
       console.error("[publish-dialog] Failed to publish:", error);
-      toast.error("Failed to publish article");
     } finally {
       setIsPublishing(false);
     }

@@ -117,129 +117,130 @@ export default function EditorToolbar({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2 p-2 w-full xs:w-xs xsm:w-sm sm:w-xl lg:w-2xl mx-auto">
-      {/* Group 1: Undo/Redo */}
-      <div className="flex items-center">
-        <ToggleGroup
-          type="multiple"
-          variant="outline"
-          value={[]}
-          className="gap-0"
-        >
-          <ToggleGroupItem
-            value="undo"
-            aria-label="Undo"
-            size="sm"
-            disabled={!state.canUndo}
-            onClick={() => editor.chain().focus().undo().run()}
-            className={cn("rounded-r-none")}
+    <div className="sticky top-0 z-10 bg-background border-b w-full">
+      <div className="flex flex-wrap items-center gap-2 p-2 w-full xs:w-xs xsm:w-sm sm:w-xl lg:w-2xl mx-auto">
+        {/* Group 1: Undo/Redo */}
+        <div className="flex items-center">
+          <ToggleGroup
+            type="multiple"
+            variant="outline"
+            value={[]}
+            className="gap-0"
           >
-            <Undo className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="redo"
-            aria-label="Redo"
-            size="sm"
-            disabled={!state.canRedo}
-            onClick={() => editor.chain().focus().redo().run()}
-            className={cn("rounded-l-none")}
-          >
-            <Redo className="h-4 w-4" />
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
+            <ToggleGroupItem
+              value="undo"
+              aria-label="Undo"
+              size="sm"
+              disabled={!state.canUndo}
+              onClick={() => editor.chain().focus().undo().run()}
+              className={cn("rounded-r-none")}
+            >
+              <Undo className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="redo"
+              aria-label="Redo"
+              size="sm"
+              disabled={!state.canRedo}
+              onClick={() => editor.chain().focus().redo().run()}
+              className={cn("rounded-l-none")}
+            >
+              <Redo className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
 
-      <Separator orientation="vertical" className="h-8" />
+        <Separator orientation="vertical" className="h-8" />
 
-      {/* Group 2: Style (Heading + Text Formatting) */}
-      <div className="flex items-center">
-        <ToggleGroup
-          type="multiple"
-          variant="outline"
-          value={[
-            ...(state.isBold ? ["bold"] : []),
-            ...(state.isItalic ? ["italic"] : []),
-            ...(state.isUnderline ? ["underline"] : []),
-            ...(state.isCode ? ["code"] : []),
-          ]}
-          className="gap-0"
-        >
-          {/* Style Selector */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ToggleGroupItem
-                value="style"
-                aria-label="Style"
-                size="sm"
-                className={cn("rounded-r-none")}
-              >
-                <Type className="h-4 w-4" />
-              </ToggleGroupItem>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={setParagraph}>
-                Paragraph
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setHeading(1)}>
-                Heading 1
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setHeading(2)}>
-                Heading 2
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setHeading(3)}>
-                Heading 3
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setHeading(4)}>
-                Heading 4
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setHeading(5)}>
-                Heading 5
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setHeading(6)}>
-                Heading 6
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Group 2: Style (Heading + Text Formatting) */}
+        <div className="flex items-center">
+          <ToggleGroup
+            type="multiple"
+            variant="outline"
+            value={[
+              ...(state.isBold ? ["bold"] : []),
+              ...(state.isItalic ? ["italic"] : []),
+              ...(state.isUnderline ? ["underline"] : []),
+              ...(state.isCode ? ["code"] : []),
+            ]}
+            className="gap-0"
+          >
+            {/* Style Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ToggleGroupItem
+                  value="style"
+                  aria-label="Style"
+                  size="sm"
+                  className={cn("rounded-r-none")}
+                >
+                  <Type className="h-4 w-4" />
+                </ToggleGroupItem>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={setParagraph}>
+                  Paragraph
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setHeading(1)}>
+                  Heading 1
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setHeading(2)}>
+                  Heading 2
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setHeading(3)}>
+                  Heading 3
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setHeading(4)}>
+                  Heading 4
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setHeading(5)}>
+                  Heading 5
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setHeading(6)}>
+                  Heading 6
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <ToggleGroupItem
-            value="bold"
-            aria-label="Bold"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={cn("rounded-none")}
-          >
-            <Bold className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="italic"
-            aria-label="Italic"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={cn("rounded-none")}
-          >
-            <Italic className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="underline"
-            aria-label="Underline"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={cn("rounded-none")}
-          >
-            <Underline className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="code"
-            aria-label="Inline code"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            className={cn("rounded-l-none")}
-          >
-            <Code className="h-4 w-4" />
-          </ToggleGroupItem>
+            <ToggleGroupItem
+              value="bold"
+              aria-label="Bold"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              className={cn("rounded-none")}
+            >
+              <Bold className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="italic"
+              aria-label="Italic"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              className={cn("rounded-none")}
+            >
+              <Italic className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="underline"
+              aria-label="Underline"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              className={cn("rounded-none")}
+            >
+              <Underline className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="code"
+              aria-label="Inline code"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleCode().run()}
+              className={cn("rounded-l-none")}
+            >
+              <Code className="h-4 w-4" />
+            </ToggleGroupItem>
 
-          {/* Commented out for now */}
-          {/* <ToggleGroupItem
+            {/* Commented out for now */}
+            {/* <ToggleGroupItem
             value="strike"
             aria-label="Strikethrough"
             size="sm"
@@ -257,212 +258,213 @@ export default function EditorToolbar({
           >
             <Highlighter className="h-4 w-4" />
           </ToggleGroupItem> */}
-        </ToggleGroup>
-      </div>
+          </ToggleGroup>
+        </div>
 
-      <Separator orientation="vertical" className="h-8" />
+        <Separator orientation="vertical" className="h-8" />
 
-      {/* Group 3: Link/Image/HR */}
-      <div className="flex items-center">
-        <ToggleGroup
-          type="multiple"
-          variant="outline"
-          value={[...(state.isLink ? ["link"] : [])]}
-          className="gap-0"
-        >
-          <ToggleGroupItem
-            value="link"
-            aria-label="Insert link"
-            size="sm"
-            onClick={onLinkClick}
-            className={cn("rounded-r-none")}
+        {/* Group 3: Link/Image/HR */}
+        <div className="flex items-center">
+          <ToggleGroup
+            type="multiple"
+            variant="outline"
+            value={[...(state.isLink ? ["link"] : [])]}
+            className="gap-0"
           >
-            <LinkIcon className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="image"
-            aria-label="Insert image"
-            size="sm"
-            onClick={onImageClick}
-            className={cn("rounded-none")}
-          >
-            <ImageIcon className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="hr"
-            aria-label="Horizontal rule"
-            size="sm"
-            onClick={() => editor.chain().focus().setHorizontalRule().run()}
-            className={cn("rounded-l-none")}
-          >
-            <Minus className="h-4 w-4" />
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
+            <ToggleGroupItem
+              value="link"
+              aria-label="Insert link"
+              size="sm"
+              onClick={onLinkClick}
+              className={cn("rounded-r-none")}
+            >
+              <LinkIcon className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="image"
+              aria-label="Insert image"
+              size="sm"
+              onClick={onImageClick}
+              className={cn("rounded-none")}
+            >
+              <ImageIcon className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="hr"
+              aria-label="Horizontal rule"
+              size="sm"
+              onClick={() => editor.chain().focus().setHorizontalRule().run()}
+              className={cn("rounded-l-none")}
+            >
+              <Minus className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
 
-      <Separator orientation="vertical" className="h-8" />
+        <Separator orientation="vertical" className="h-8" />
 
-      {/* Group 4: Block Elements */}
-      <div className="flex items-center">
-        <ToggleGroup
-          type="multiple"
-          variant="outline"
-          value={[
-            ...(state.isBulletList ? ["bulletList"] : []),
-            ...(state.isOrderedList ? ["orderedList"] : []),
-            ...(state.isBlockquote ? ["blockquote"] : []),
-            ...(state.isCodeBlock ? ["codeBlock"] : []),
-          ]}
-          className="gap-0"
-        >
-          <ToggleGroupItem
-            value="bulletList"
-            aria-label="Bullet list"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={cn("rounded-r-none")}
+        {/* Group 4: Block Elements */}
+        <div className="flex items-center">
+          <ToggleGroup
+            type="multiple"
+            variant="outline"
+            value={[
+              ...(state.isBulletList ? ["bulletList"] : []),
+              ...(state.isOrderedList ? ["orderedList"] : []),
+              ...(state.isBlockquote ? ["blockquote"] : []),
+              ...(state.isCodeBlock ? ["codeBlock"] : []),
+            ]}
+            className="gap-0"
           >
-            <List className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="orderedList"
-            aria-label="Numbered list"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={cn("rounded-none")}
-          >
-            <ListOrdered className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="blockquote"
-            aria-label="Blockquote"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={cn("rounded-none")}
-          >
-            <Quote className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value="codeBlock"
-            aria-label="Code block"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            className={cn("rounded-l-none")}
-          >
-            <Code2 className="h-4 w-4" />
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </div>
+            <ToggleGroupItem
+              value="bulletList"
+              aria-label="Bullet list"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              className={cn("rounded-r-none")}
+            >
+              <List className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="orderedList"
+              aria-label="Numbered list"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              className={cn("rounded-none")}
+            >
+              <ListOrdered className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="blockquote"
+              aria-label="Blockquote"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              className={cn("rounded-none")}
+            >
+              <Quote className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="codeBlock"
+              aria-label="Code block"
+              size="sm"
+              onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+              className={cn("rounded-l-none")}
+            >
+              <Code2 className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
 
-      <Separator orientation="vertical" className="h-8" />
+        <Separator orientation="vertical" className="h-8" />
 
-      {/* Group 5: Menu */}
-      <div className="flex items-center">
-        <ToggleGroup
-          type="multiple"
-          variant="outline"
-          value={[]}
-          className="gap-0"
-        >
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ToggleGroupItem value="menu" aria-label="Menu" size="sm">
-                <Menu className="h-4 w-4" />
-                <span className="ml-1">Menu</span>
-              </ToggleGroupItem>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onPublish} disabled={!canPublish}>
-                <div className="flex flex-row items-center gap-2">
-                  <Send className="size-4" />
-                  Publish
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onNew}>
-                <div className="flex flex-row items-center gap-2">
-                  <FilePlus className="size-4" />
-                  New
-                </div>
-              </DropdownMenuItem>
+        {/* Group 5: Menu */}
+        <div className="flex items-center">
+          <ToggleGroup
+            type="multiple"
+            variant="outline"
+            value={[]}
+            className="gap-0"
+          >
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <ToggleGroupItem value="menu" aria-label="Menu" size="sm">
+                  <Menu className="h-4 w-4" />
+                  <span className="ml-1">Menu</span>
+                </ToggleGroupItem>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={onPublish} disabled={!canPublish}>
+                  <div className="flex flex-row items-center gap-2">
+                    <Send className="size-4" />
+                    Publish
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onNew}>
+                  <div className="flex flex-row items-center gap-2">
+                    <FilePlus className="size-4" />
+                    New
+                  </div>
+                </DropdownMenuItem>
 
-              {/* Drafts submenu */}
-              {drafts.length > 0 && (
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <div className="flex flex-row items-center gap-2">
-                      <FileText className="size-4" />
-                      Drafts ({drafts.length})
-                    </div>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {drafts.map((draft) => (
-                      <div key={draft.id} className="flex items-center group">
-                        <DropdownMenuItem
-                          onClick={() => onLoadDraft(draft.id)}
-                          className="flex-1"
-                          disabled={draft.id === currentDraftId}
-                        >
-                          <div className="flex flex-col items-start">
-                            <span className="text-sm">
-                              {draft.title || "Untitled"}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {formatRelativeTime(draft.updatedAt)}
-                            </span>
-                          </div>
-                        </DropdownMenuItem>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onDeleteDraft(draft.id);
-                          }}
-                          className="p-2 opacity-0 group-hover:opacity-100 hover:bg-destructive/10"
-                          aria-label="Delete draft"
-                        >
-                          <Trash2 className="size-3 text-destructive" />
-                        </button>
+                {/* Drafts submenu */}
+                {drafts.length > 0 && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <div className="flex flex-row items-center gap-2">
+                        <FileText className="size-4" />
+                        Drafts ({drafts.length})
                       </div>
-                    ))}
-                    <DropdownMenuItem
-                      onClick={() => {
-                        if (confirm("Clear all drafts?")) {
-                          clearAllDrafts();
-                          onNew();
-                        }
-                      }}
-                      className="text-destructive"
-                    >
-                      <Trash2 className="size-4 mr-2" />
-                      Clear all drafts
-                    </DropdownMenuItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-              )}
-
-              {/* Published articles submenu */}
-              {timeline && timeline.length > 0 && (
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <div className="flex flex-row items-center gap-2">
-                      <FolderOpen className="size-4" />
-                      Load Published
-                    </div>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {timeline.map((article) => (
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {drafts.map((draft) => (
+                        <div key={draft.id} className="flex items-center group">
+                          <DropdownMenuItem
+                            onClick={() => onLoadDraft(draft.id)}
+                            className="flex-1"
+                            disabled={draft.id === currentDraftId}
+                          >
+                            <div className="flex flex-col items-start">
+                              <span className="text-sm">
+                                {draft.title || "Untitled"}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {formatRelativeTime(draft.updatedAt)}
+                              </span>
+                            </div>
+                          </DropdownMenuItem>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteDraft(draft.id);
+                            }}
+                            className="p-2 opacity-0 group-hover:opacity-100 hover:bg-destructive/10"
+                            aria-label="Delete draft"
+                          >
+                            <Trash2 className="size-3 text-destructive" />
+                          </button>
+                        </div>
+                      ))}
                       <DropdownMenuItem
-                        key={article.id}
-                        onClick={() => onLoad(article)}
+                        onClick={() => {
+                          if (confirm("Clear all drafts?")) {
+                            clearAllDrafts();
+                            onNew();
+                          }
+                        }}
+                        className="text-destructive"
                       >
-                        {article.title || "Untitled"}
+                        <Trash2 className="size-4 mr-2" />
+                        Clear all drafts
                       </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </ToggleGroup>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                )}
+
+                {/* Published articles submenu */}
+                {timeline && timeline.length > 0 && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <div className="flex flex-row items-center gap-2">
+                        <FolderOpen className="size-4" />
+                        Load Published
+                      </div>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {timeline.map((article) => (
+                        <DropdownMenuItem
+                          key={article.id}
+                          onClick={() => onLoad(article)}
+                        >
+                          {article.title || "Untitled"}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </ToggleGroup>
+        </div>
       </div>
     </div>
   );

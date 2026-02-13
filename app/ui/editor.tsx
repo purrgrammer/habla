@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import FileHandler from "@tiptap/extension-file-handler";
 import Highlight from "@tiptap/extension-highlight";
-import { renderToMarkdown } from "@tiptap/static-renderer";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Typography from "@tiptap/extension-typography";
@@ -51,7 +50,7 @@ import { useActionHub } from "applesauce-react/hooks";
 import { firstValueFrom } from "rxjs";
 import { toast } from "sonner";
 import { publishToRelays } from "~/services/publish-article";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { nip19 } from "nostr-tools";
 import { useProfile } from "~/hooks/nostr";
 import store from "~/services/data";
@@ -68,6 +67,7 @@ import {
 import NostrMention from "./editor/extensions/mention";
 import { NEventNode, NAddrNode } from "./editor/extensions/nostr-nodes";
 import { processNostrHTML } from "./editor/utils/process-nostr-html";
+import { renderToMarkdownWithSpacing } from "~/lib/markdown-serializer";
 
 type TextValue = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | undefined;
 
@@ -176,6 +176,7 @@ export default () => {
   const hub = useActionHub();
   const navigate = useNavigate();
   const profile = useProfile(pubkey || "");
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const extensions = [
     CustomDocument,
@@ -433,74 +434,73 @@ export default () => {
     },
   });
 
+  // Handle edit param - load article from URL if specified
+  useEffect(() => {
+    const editParam = searchParams.get("edit");
+    if (!editParam || !editor) return;
+
+    let cancelled = false;
+
+    async function loadArticleFromParam() {
+      try {
+        const decoded = nip19.decode(editParam!);
+        if (decoded.type !== "naddr") {
+          console.error("[editor] Invalid edit param - expected naddr");
+          return;
+        }
+
+        const address = decoded.data;
+        const event = await store.fetchAddress(address);
+        if (cancelled) return;
+
+        if (event) {
+          const title = getArticleTitle(event);
+          setArticle(event);
+          if (title) {
+            setTitle(title);
+          }
+
+          // Convert markdown to HTML
+          let htmlContent = await markdownToHTML(
+            `# ${title}\n${event.content}`,
+          );
+          if (cancelled) return;
+          htmlContent = processNostrHTML(htmlContent);
+          editor!.commands.setContent(htmlContent);
+
+          // Clear only the edit param from URL, preserving others
+          const next = new URLSearchParams(searchParams);
+          next.delete("edit");
+          setSearchParams(next, { replace: true });
+        } else {
+          console.error("[editor] Article not found");
+          toast.error("Article not found");
+        }
+      } catch (error) {
+        if (cancelled) return;
+        console.error(
+          "[editor] Failed to load article from edit param:",
+          error,
+        );
+        toast.error("Failed to load article");
+      }
+    }
+
+    loadArticleFromParam();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor, searchParams.get("edit")]);
+
   function asMarkdown(): string {
     if (!editor) return "";
-    const json = editor.getJSON();
-
-    // Helper to convert custom nostr nodes to text nodes
-    const convertNostrNodes = (node: any): any => {
-      if (node.type === "mention") {
-        const { pubkey, relays } = node.attrs;
-        const identifier =
-          relays && relays.length > 0
-            ? nip19.nprofileEncode({ pubkey, relays })
-            : nip19.npubEncode(pubkey);
-        return {
-          type: "text",
-          text: `nostr:${identifier}`,
-        };
-      }
-
-      if (node.type === "nevent") {
-        const { id, kind, author, relays } = node.attrs;
-        const identifier = nip19.neventEncode({
-          id,
-          kind: kind || undefined,
-          author: author || undefined,
-          relays: relays || [],
-        });
-        return {
-          type: "text",
-          text: `nostr:${identifier}`,
-        };
-      }
-
-      if (node.type === "naddr") {
-        const { identifier, kind, pubkey, relays } = node.attrs;
-        const naddrId = nip19.naddrEncode({
-          identifier,
-          kind,
-          pubkey,
-          relays: relays || [],
-        });
-        return {
-          type: "text",
-          text: `nostr:${naddrId}`,
-        };
-      }
-
-      // Recursively process child nodes
-      if (node.content) {
-        return {
-          ...node,
-          content: node.content.map(convertNostrNodes),
-        };
-      }
-
-      return node;
-    };
-
-    // Convert nostr nodes to text, then render to markdown
-    const convertedJson = {
-      ...json,
-      content: json.content?.map(convertNostrNodes) || [],
-    };
 
     try {
-      return renderToMarkdown({
-        content: convertedJson,
-        extensions,
-      }).trim();
+      // Use our custom serializer that handles all node types
+      // including Nostr nodes (mention, nevent, naddr) with proper spacing
+      return renderToMarkdownWithSpacing(editor.getJSON());
     } catch (error) {
       console.error("[editor] Markdown serialization error:", error);
       return "";
@@ -627,7 +627,7 @@ export default () => {
       };
       saveDraftToStorage(draft);
 
-      // Navigate to the published article
+      // Build the article URL
       // Check if user is a Habla member first
       const members = await store.getMembers();
       const member = members.find((m) => m.pubkey === pubkey);
@@ -645,7 +645,8 @@ export default () => {
           : `/u/${nip19.npubEncode(pubkey!)}/${identifier}`;
       }
 
-      navigate(articleUrl);
+      // Return the URL - dialog will handle navigation after closing
+      return articleUrl;
     } catch (error) {
       console.error("[editor] Failed to publish article:", error);
       toast.error("Failed to publish article", {
