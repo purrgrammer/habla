@@ -173,7 +173,8 @@ This paragraph follows.`;
       };
 
       const expected = `\`\`\`javascript
-const x = 1;\`\`\`
+const x = 1;
+\`\`\`
 
 Explanation here.`;
 
@@ -197,7 +198,8 @@ Explanation here.`;
       };
 
       const expected = `\`\`\`
-some code\`\`\`
+some code
+\`\`\`
 
 ## Next Section`;
 
@@ -927,9 +929,33 @@ Conclusion.`;
         ],
       };
 
-      const result = renderToMarkdownWithSpacing(content);
-      expect(result).toContain("**");
-      expect(result).toContain("*");
+      // Marks are applied in deterministic order: italic inner, bold outer
+      expect(renderToMarkdownWithSpacing(content)).toBe(
+        "***bold and italic***",
+      );
+    });
+
+    it("handles nested marks regardless of input order (italic + bold)", () => {
+      const content: JSONContent = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: "bold and italic",
+                marks: [{ type: "italic" }, { type: "bold" }],
+              },
+            ],
+          },
+        ],
+      };
+
+      // Same output regardless of mark order in input
+      expect(renderToMarkdownWithSpacing(content)).toBe(
+        "***bold and italic***",
+      );
     });
 
     it("handles strikethrough", () => {

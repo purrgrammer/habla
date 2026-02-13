@@ -51,36 +51,8 @@ function renderNode(node: JSONContent, nodeMapping: NodeMapping): string {
     return helpers.renderChildren(node.content);
   }
 
-  // Text node
-  if (node.type === "text" && node.text) {
-    let text = node.text;
-    // Apply marks
-    if (node.marks) {
-      for (const mark of node.marks) {
-        switch (mark.type) {
-          case "bold":
-            text = `**${text}**`;
-            break;
-          case "italic":
-            text = `*${text}*`;
-            break;
-          case "code":
-            text = `\`${text}\``;
-            break;
-          case "strike":
-            text = `~~${text}~~`;
-            break;
-          case "link":
-            text = `[${text}](${mark.attrs?.href || ""})`;
-            break;
-        }
-      }
-    }
-    return text;
-  }
-
-  // Log warning for completely unhandled nodes
-  if (node.type) {
+  // Log warning for completely unhandled nodes (without content or text)
+  if (node.type && node.type !== "text") {
     console.warn(
       `[markdown-serializer] Unhandled node type: ${node.type}. Node will be skipped.`,
     );
@@ -162,7 +134,7 @@ export const nodeMapping: NodeMapping = {
   codeBlock: (node, helpers) => {
     const language = node.attrs?.language || "";
     const content = helpers.renderChildren(node.content);
-    return `\`\`\`${language}\n${content}\`\`\`\n\n`;
+    return `\`\`\`${language}\n${content}\n\`\`\`\n\n`;
   },
 
   bulletList: (node, helpers) => {
@@ -238,7 +210,22 @@ export const nodeMapping: NodeMapping = {
   text: (node) => {
     let text = node.text || "";
     if (node.marks) {
-      for (const mark of node.marks) {
+      // Apply marks in a defined order so nesting is deterministic:
+      // innermost first: code, highlight, strike, italic, bold, underline, link (outermost)
+      const markOrder = [
+        "code",
+        "highlight",
+        "strike",
+        "italic",
+        "bold",
+        "underline",
+        "link",
+      ];
+      const sorted = [...node.marks].sort(
+        (a, b) =>
+          markOrder.indexOf(a.type || "") - markOrder.indexOf(b.type || ""),
+      );
+      for (const mark of sorted) {
         switch (mark.type) {
           case "bold":
             text = `**${text}**`;

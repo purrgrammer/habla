@@ -58,7 +58,6 @@
     "@tiptap/pm": "^3.13.0",
     "@tiptap/react": "^3.2.0",
     "@tiptap/starter-kit": "^3.2.0",
-    "@tiptap/static-renderer": "^3.2.0",
     "@tiptap/suggestion": "^3.2.0",
     "@vercel/react-router": "^1.2.2",
     "applesauce-accounts": "4.1.0",
