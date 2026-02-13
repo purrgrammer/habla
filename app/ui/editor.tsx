@@ -266,14 +266,18 @@ export default () => {
     },
     editorProps: {
       handlePaste: (view, event, slice) => {
-        // Handle pasted nostr: links
+        // Handle pasted nostr: links and bare bech32 entities
         const text = event.clipboardData?.getData("text/plain");
         console.log("[editor] Paste detected:", text);
-        if (text && text.trim().startsWith("nostr:")) {
+        const trimmed = text?.trim() ?? "";
+        const isBech32 =
+          trimmed.startsWith("nostr:") ||
+          /^(npub|nprofile|nevent|note|naddr)1[a-z0-9]+$/i.test(trimmed);
+        if (trimmed && isBech32) {
           console.log("[editor] Nostr link detected, parsing...");
           try {
-            const nostrLink = text.trim();
-            const parsed = nip19.decode(nostrLink.replace(/^nostr:/, ""));
+            const bech32 = trimmed.replace(/^nostr:/, "");
+            const parsed = nip19.decode(bech32);
             console.log("[editor] Parsed nostr link:", parsed);
 
             const { state, dispatch } = view;

@@ -6,7 +6,8 @@ import { nip19 } from "nostr-tools";
 export function processNostrHTML(html: string): string {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
-  const nostrPattern = /nostr:(npub|nprofile|nevent|note|naddr)1[a-z0-9]+/gi;
+  const nostrPattern =
+    /(?:nostr:)?(npub|nprofile|nevent|note|naddr)1[a-z0-9]+/gi;
 
   function createReplacementElement(nostrLink: string): HTMLElement | null {
     try {
