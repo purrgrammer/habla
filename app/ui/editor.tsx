@@ -724,23 +724,13 @@ export default () => {
   function handleImageUpload(url: string) {
     if (!editor) return;
 
-    // Insert image after the current block node.
-    // Using setImage() alone can place the image before the title heading
-    // when the cursor is inside it, since block images can't be nested in headings.
+    // Insert Blossom URL directly
     editor
       .chain()
       .focus()
-      .command(({ tr, state }) => {
-        const { $from } = state.selection;
-        // Find the end of the current top-level block
-        const endOfBlock = $from.end($from.depth === 0 ? 1 : $from.depth);
-        const insertPos = Math.min(endOfBlock + 1, state.doc.content.size);
-        const imageNode = state.schema.nodes.image.create({
-          src: url,
-          alt: "",
-        });
-        tr.insert(insertPos, imageNode);
-        return true;
+      .setImage({
+        src: url,
+        alt: "",
       })
       .run();
   }
