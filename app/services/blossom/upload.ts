@@ -1,9 +1,11 @@
-import { Actions, createUploadAuth } from "blossom-client-sdk";
+import {
+  createUploadAuth,
+  encodeAuthorizationHeader,
+} from "blossom-client-sdk";
+import type { BlobDescriptor, SignedEvent } from "blossom-client-sdk";
 import type { EventTemplate, NostrEvent } from "nostr-tools";
 import type { BlossomFileMetadata } from "./metadata-store";
 import { blossomMetadataStore } from "./metadata-store";
-
-const { uploadBlob } = Actions;
 
 export interface UploadStatus {
   server: string;
@@ -46,6 +48,43 @@ function getExtensionFromType(type: string): string {
     "image/svg+xml": "svg",
   };
   return map[type] || "jpg";
+}
+
+/**
+ * Upload a blob to a single Blossom server, skipping the BUD-06 HEAD pre-check.
+ *
+ * The blossom-client-sdk's uploadBlob sends a HEAD /upload request before
+ * the actual PUT to check auth/payment requirements. Some servers (e.g.
+ * blossom.primal.net) don't include HEAD in their CORS Access-Control-Allow-Methods,
+ * causing the browser to block the request with a network error.
+ *
+ * This implementation goes directly to PUT with auth, avoiding the CORS issue.
+ */
+async function uploadBlob(
+  server: string,
+  file: File,
+  onAuth: (sha256: string) => Promise<SignedEvent>,
+): Promise<BlobDescriptor> {
+  const url = new URL("/upload", server);
+  const sha256 = await calculateFileHash(file);
+
+  // Create auth upfront — we always have a signer available
+  const auth = await onAuth(sha256);
+
+  const res = await fetch(url, {
+    method: "PUT",
+    body: file,
+    headers: {
+      Authorization: encodeAuthorizationHeader(auth),
+    },
+  });
+
+  if (!res.ok) {
+    const reason = res.headers.get("x-reason") || res.statusText;
+    throw new Error(`Upload failed (${res.status}): ${reason}`);
+  }
+
+  return res.json();
 }
 
 /**
@@ -96,12 +135,9 @@ export async function uploadToBlossomServers(
       statuses[index].status = "uploading";
       updateProgress();
 
-      // Upload blob using blossom-client-sdk
-      // Use createUploadAuth to generate the auth event
-      const blob = await uploadBlob(server, file, {
-        onAuth: async (srv, sha256, authType) => {
-          return await createUploadAuth(signer, sha256, { type: authType });
-        },
+      // Upload blob directly via PUT, skipping HEAD pre-check to avoid CORS issues
+      const blob = await uploadBlob(server, file, async (sha256) => {
+        return await createUploadAuth(signer, sha256, { type: "upload" });
       });
 
       statuses[index].status = "success";
