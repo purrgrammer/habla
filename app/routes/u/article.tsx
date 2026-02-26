@@ -6,8 +6,6 @@ import { default as serverStore } from "~/services/data.server";
 import type { DataStore } from "~/services/types";
 import Article from "~/ui/nostr/article";
 import defaults, { articleMeta } from "~/seo";
-import ClientOnly from "~/ui/client-only";
-import ArticleConversation from "~/ui/nostr/article-conversation";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData) return defaults;
@@ -44,9 +42,6 @@ export default function Identifier({ loaderData }: Route.ComponentProps) {
   return (
     <div>
       <Article {...loaderData} />
-      <ClientOnly>
-        {() => <ArticleConversation event={loaderData.event} />}
-      </ClientOnly>
     </div>
   );
 }
