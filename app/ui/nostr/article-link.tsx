@@ -5,7 +5,7 @@ import { getArticleTitle, getTagValue } from "applesauce-core/helpers";
 import { useUsers } from "~/nostr/queries";
 import type { ReactNode } from "react";
 
-function useArticleLink(article: NostrEvent, address: AddressPointer) {
+export function useArticleLink(article: NostrEvent, address: AddressPointer) {
   const { data: users } = useUsers();
   const user = users?.find((u) => u.pubkey === article.pubkey);
   const identifier = getTagValue(article, "d");

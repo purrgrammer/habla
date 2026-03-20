@@ -7,6 +7,7 @@ import {
   getArticleImage,
   getArticleSummary,
   getArticlePublished,
+  getSeenRelays,
 } from "applesauce-core/helpers";
 import Markdown from "~/ui/markdown";
 import UserLink from "~/ui/nostr/user-link";
@@ -17,8 +18,18 @@ import ClientOnly from "../client-only";
 import type { Relay } from "~/types";
 import { TagCloud } from "../tag-cloud";
 import { Link } from "react-router";
-import { Pencil } from "lucide-react";
+import { Pencil, Share2, Copy, Check } from "lucide-react";
 import { useActiveAccount } from "applesauce-react/hooks";
+import { useState, useMemo } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/ui/dialog";
+import { info } from "~/services/notifications";
+import { useArticleLink } from "~/ui/nostr/article-link";
 
 function EditButton({ address }: { address: AddressPointer }) {
   const account = useActiveAccount();
@@ -38,14 +49,95 @@ function EditButton({ address }: { address: AddressPointer }) {
   );
 }
 
+function CopyField({ label, value }: { label: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(value);
+      info("Copied to clipboard");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy to clipboard:", err);
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-sm font-medium text-muted-foreground w-12 shrink-0">
+        {label}
+      </span>
+      <input
+        readOnly
+        value={value}
+        className="flex-1 min-w-0 rounded-md border bg-muted px-3 py-1.5 text-sm truncate"
+      />
+      <button
+        type="button"
+        onClick={copy}
+        className="inline-flex items-center justify-center size-8 shrink-0 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+      >
+        {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+      </button>
+    </div>
+  );
+}
+
+function ShareButton({
+  address,
+  event,
+  relays,
+}: {
+  address: AddressPointer;
+  event: NostrEvent;
+  relays: Relay[];
+}) {
+  const seenRelays = getSeenRelays(event);
+  const naddr = useMemo(() => {
+    return nip19.naddrEncode({
+      ...address,
+      relays: seenRelays?.size ? [...seenRelays] : relays,
+    });
+  }, [address, seenRelays, relays]);
+
+  const articlePath = useArticleLink(event, address);
+  const hablaUrl = `https://habla.news${articlePath}`;
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-accent"
+        >
+          <Share2 className="size-4" />
+          Share
+        </button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Share Article</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-3">
+          <CopyField label="Link" value={hablaUrl} />
+          <CopyField label="Nostr" value={naddr} />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function Author({
   author,
   article,
   address,
+  relays,
 }: {
   author?: ProfileContent;
   article: NostrEvent;
   address?: AddressPointer;
+  relays: Relay[];
 }) {
   const publishedAt = getArticlePublished(article);
   return (
@@ -60,7 +152,18 @@ function Author({
       />
       <div className="flex items-center gap-2">
         {address && (
-          <ClientOnly>{() => <EditButton address={address} />}</ClientOnly>
+          <ClientOnly>
+            {() => (
+              <>
+                <ShareButton
+                  address={address}
+                  event={article}
+                  relays={relays}
+                />
+                <EditButton address={address} />
+              </>
+            )}
+          </ClientOnly>
         )}
         <span className="text-right font-light text-muted-foreground text-sm sm:text-base">
           <Timestamp timestamp={publishedAt} />
@@ -122,7 +225,12 @@ export default function Article(props: {
   ];
   return (
     <div className="flex flex-col gap-4 sm:gap-6 w-full">
-      <Author article={event} author={author} address={address} />
+      <Author
+        article={event}
+        author={author}
+        address={address}
+        relays={props.relays}
+      />
       <PureArticle
         title={title}
         summary={summary}
