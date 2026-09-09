@@ -23,7 +23,7 @@ import { extractTitle, generateIdentifier } from "~/nostr/publish-article";
 import { toast } from "sonner";
 import ImageUploadDialog from "~/ui/image-upload-dialog";
 import store from "~/services/data";
-import { nip19 } from "nostr-tools";
+import { kinds, nip19 } from "nostr-tools";
 import { useNavigate } from "react-router";
 
 interface PublishDialogProps {
@@ -80,24 +80,13 @@ export default function PublishDialog({
       return;
     }
 
-    async function generateUrl() {
-      const members = await store.getMembers();
-      const member = members.find((m) => m.pubkey === account!.pubkey);
-
-      if (member) {
-        // Habla member: /:username/:identifier
-        setArticleUrl(`/${member.nip05}/${identifier}`);
-      } else {
-        // Non-member: /u/:nip05 or /u/:npub
-        const nip05 = profile?.nip05;
-        const url = nip05
-          ? `/u/${nip05}/${identifier}`
-          : `/u/${nip19.npubEncode(account!.pubkey)}/${identifier}`;
-        setArticleUrl(url);
-      }
-    }
-
-    generateUrl();
+    setArticleUrl(
+      `/a/${nip19.naddrEncode({
+        kind: kinds.LongFormArticle,
+        pubkey: account.pubkey,
+        identifier,
+      })}`,
+    );
   }, [open, account?.pubkey, profile?.nip05, identifier]);
 
   // Initialize selected relays (all write relays by default)

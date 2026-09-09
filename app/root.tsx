@@ -12,6 +12,7 @@ import "./app.css";
 import { Toaster } from "~/ui/sonner";
 import { AppProviders } from "./ui/providers";
 import ClientOnly from "./ui/client-only";
+import Logo from "./ui/logo";
 
 function googleFont(font: string) {
   return {
@@ -74,6 +75,23 @@ export default function App() {
       <Outlet />
       <ClientOnly>{() => <Toaster />}</ClientOnly>
     </AppProviders>
+  );
+}
+
+/**
+ * The first thing anyone sees.
+ *
+ * There is no server render, so between the HTML shell arriving and the route's
+ * `clientLoader` resolving there is nothing to show — without this the page is
+ * blank for as long as the relays take. Keep it cheap and dependency-free: it
+ * renders before the app's providers exist.
+ */
+export function HydrateFallback() {
+  return (
+    <div className="flex flex-1 items-center justify-center w-full min-h-[100dvh]">
+      <Logo className="size-12 text-muted-foreground animate-pulse" />
+      <span className="sr-only">Loading</span>
+    </div>
   );
 }
 

@@ -5,7 +5,6 @@ import { type ProfileContent } from "applesauce-core/helpers";
 import { Username, Avatar } from "~/ui/nostr/user";
 import { type Pubkey } from "~/types";
 import ProfileContents from "~/ui/nostr/profile-contents";
-import ClientOnly from "~/ui/client-only";
 import RichText from "./rich-text";
 import { prettify } from "~/lib/url";
 import { Card as SkeletonCard } from "~/ui/skeleton";
@@ -43,15 +42,9 @@ export default function Profile({
         </div>
         <div className="px-4 pt-4 flex flex-col gap-3">
           {about ? (
-            <ClientOnly
-              fallback={<p className="text-md leading-tight">{about}</p>}
-            >
-              {() => (
-                <p className="text-md leading-tight">
-                  <RichText content={about} />
-                </p>
-              )}
-            </ClientOnly>
+            <p className="text-md leading-tight">
+              <RichText content={about} />
+            </p>
           ) : null}
           {profile?.website ? (
             <Link
@@ -67,9 +60,7 @@ export default function Profile({
           ) : null}
         </div>
       </div>
-      <ClientOnly fallback={<SkeletonCard className="my-4" />}>
-        {() => <ProfileContents pubkey={pubkey} profile={profile} />}
-      </ClientOnly>
+      <ProfileContents pubkey={pubkey} profile={profile} />
     </div>
   );
 }

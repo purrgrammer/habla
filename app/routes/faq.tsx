@@ -8,7 +8,6 @@ export function meta() {
   return buildBaseSeoTags({
     title: DEFAULT_SITE_NAME,
     description: "Frequently asked questions",
-    url: "https://habla.news/faq",
     type: "website",
   });
 }

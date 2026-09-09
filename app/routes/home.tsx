@@ -1,11 +1,10 @@
 import { useMemo, type ReactNode } from "react";
 import { Link } from "react-router";
 import { getTagValue } from "applesauce-core/helpers";
-import { type NostrEvent } from "nostr-tools";
+import { type NostrEvent, nip19 } from "nostr-tools";
 import {
   Sprout,
   HandFist,
-  Link as LinkIcon,
   Glasses,
   Feather,
   Highlighter,
@@ -29,6 +28,7 @@ import {
 } from "lucide-react";
 import type { Route } from "./+types/home";
 import {
+  FEATURED_PUBKEYS,
   faq,
   features,
   getArticlesByCategory,
@@ -37,7 +37,6 @@ import {
   testimonials,
 } from "~/featured";
 import defaults from "~/seo";
-import { MEMBERS, type Member } from "~/members";
 import ArticleCard from "~/ui/nostr/article-card";
 import { PureHighlight } from "~/ui/nostr/highlight";
 import Grid from "~/ui/grid";
@@ -53,7 +52,6 @@ import {
 } from "~/ui/card";
 import { FiatAmount } from "~/ui/currency";
 import SatsAmount from "~/ui/sats";
-import ClientOnly from "~/ui/client-only";
 import Logo from "~/ui/logo";
 import { cn } from "~/lib/utils";
 import { TagCloud } from "~/ui/tag-cloud";
@@ -73,7 +71,7 @@ export function meta({}: Route.MetaArgs) {
 /**
  * Nothing here touches the network: the featured articles and highlights are
  * baked into the bundle (`~/featured.ts`) and the member list into
- * `~/members.ts`. Profiles resolve reactively inside the cards, so the home
+ * `~/featured.ts`. Profiles resolve reactively inside the cards, so the home
  * page paints immediately instead of waiting on forty relay round trips.
  */
 export async function clientLoader() {
@@ -82,7 +80,12 @@ export async function clientLoader() {
     getFeaturedArticles(),
     getFeaturedHighlights(),
   ]);
-  return { featured: MEMBERS, articles, categorizedArticles, highlights };
+  return {
+    featured: FEATURED_PUBKEYS,
+    articles,
+    categorizedArticles,
+    highlights,
+  };
 }
 
 function Hero() {
@@ -147,13 +150,7 @@ function Testimonials() {
         {testimonials
           .sort((a, b) => b.created_at - a.created_at)
           .map((ev, index) => {
-            return (
-              <ClientOnly>
-                {() => (
-                  <EventReply key={ev.id} event={ev} includeReplies={false} />
-                )}
-              </ClientOnly>
-            );
+            return <EventReply key={ev.id} event={ev} includeReplies={false} />;
           })}
       </div>
     </div>
@@ -302,10 +299,6 @@ const tiers: Tier[] = [
         text: "nostr address",
       },
       {
-        icon: LinkIcon,
-        text: "habla.news/username page",
-      },
-      {
         icon: Search,
         text: "SEO for your content",
       },
@@ -400,25 +393,11 @@ function TierCard(tier: Tier) {
             <div className="my-4">
               <div className="flex flex-col items-center justify-center">
                 <SatsAmount amount={tier.price} size="xl" />
-                <ClientOnly
-                  fallback={
-                    <SatsAmount
-                      className="text-muted-foreground"
-                      amount={tier.price}
-                      currency="BTC"
-                    />
-                  }
-                >
-                  {() => (
-                    <>
-                      <FiatAmount
-                        className="text-muted-foreground"
-                        amount={tier.price}
-                        currency="USD"
-                      />
-                    </>
-                  )}
-                </ClientOnly>
+                <FiatAmount
+                  className="text-muted-foreground"
+                  amount={tier.price}
+                  currency="USD"
+                />
               </div>
             </div>
             <Button disabled={tier.soon} variant="default" size="lg">
@@ -485,12 +464,13 @@ function FeaturedYou() {
   );
 }
 
-function FeaturedUser({ user }: { user: Member }) {
-  const profile = useProfile(user.pubkey);
+function FeaturedUser({ pubkey }: { pubkey: string }) {
+  const profile = useProfile(pubkey);
+  const name = profile?.display_name || profile?.name;
   return (
     <Link
       className="flex flex-col gap-2 p-2 items-center justify-center"
-      to={user.username}
+      to={`/p/${nip19.nprofileEncode({ pubkey })}`}
     >
       <img
         src={profile?.picture || "/favicon.ico"}
@@ -498,12 +478,14 @@ function FeaturedUser({ user }: { user: Member }) {
       />
       <div className="flex flex-col gap-0 items-center justify-center">
         <h3 className="font-sans text-2xl line-clamp-1">
-          {profile?.display_name || profile?.name || user.username}
+          {name || pubkey.slice(0, 8)}
         </h3>
-        <div className="flex flex-row items-center gap-1">
-          <Logo className="size-4 text-muted-foreground" />
-          <h4 className="font-sans text-md line-clamp-1">{user.username}</h4>
-        </div>
+        {profile?.nip05 ? (
+          <div className="flex flex-row items-center gap-1">
+            <Logo className="size-4 text-muted-foreground" />
+            <h4 className="font-sans text-md line-clamp-1">{profile.nip05}</h4>
+          </div>
+        ) : null}
       </div>
     </Link>
   );
@@ -543,7 +525,7 @@ function Values() {
   );
 }
 
-function FeaturedUsers({ featured }: { featured: readonly Member[] }) {
+function FeaturedUsers({ featured }: { featured: readonly string[] }) {
   return (
     <div id="community" className="flex flex-col gap-8">
       <div className="flex flex-row items-center gap-2">
@@ -551,11 +533,9 @@ function FeaturedUsers({ featured }: { featured: readonly Member[] }) {
         <h3 className="text-2xl uppercase font-light">Community</h3>
       </div>
       <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
-        {featured
-          .filter((user) => user.username !== "_")
-          .map((user) => (
-            <FeaturedUser key={user.pubkey} user={user} />
-          ))}
+        {featured.map((pubkey) => (
+          <FeaturedUser key={pubkey} pubkey={pubkey} />
+        ))}
       </div>
     </div>
   );
@@ -650,7 +630,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
       <FeaturedUsers featured={featured} />
 
-      <ClientOnly>{() => <Donations />}</ClientOnly>
+      <Donations />
 
       <Testimonials />
       {/*

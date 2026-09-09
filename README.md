@@ -12,14 +12,14 @@ on nostr itself as an [nsite](https://nsite.run).
 ## What it does
 
 - **Read** long-form articles (NIP-23, kind `30023`) from any relay, by author,
-  by hashtag, or by relay.
+  by hashtag, or by relay. Everything is addressed by nostr identifier —
+  `/a/<naddr>` for an article, `/p/<nprofile>` for an author — so no copy of
+  Habla depends on owning a domain.
 - **Write and publish** with a rich-text editor that round-trips Markdown, with
   drafts saved to `localStorage` and images uploaded to
   [Blossom](https://github.com/hzrd149/blossom) servers.
 - **Highlight** passages (kind `9802`) and comment on them (NIP-22).
 - **Zap** authors over lightning, with a built-in NWC wallet.
-- **Named URLs**: members in `app/members.ts` get `habla.news/<name>` and
-  `habla.news/<name>/<article>`, backed by a static NIP-05 file.
 
 ## Running it
 
@@ -32,30 +32,22 @@ pnpm dev          # http://localhost:5173
 
 Other scripts:
 
-| Command             | What it does                                                      |
-| ------------------- | ----------------------------------------------------------------- |
-| `pnpm build`        | Regenerates static files, then builds to `build/client`           |
-| `pnpm preview`      | Serves the built site with SPA fallback on `:4173`                |
-| `pnpm typecheck`    | Route typegen + `tsc`                                             |
-| `pnpm test`         | Vitest                                                            |
-| `pnpm gen:static`   | Rewrites `public/.well-known/nostr.json` and `public/sitemap.xml` |
-| `pnpm deploy:nsite` | Builds and publishes to nostr with `nsyte`                        |
+| Command             | What it does                                       |
+| ------------------- | -------------------------------------------------- |
+| `pnpm build`        | Builds to `build/client`                           |
+| `pnpm preview`      | Serves the built site with SPA fallback on `:4173` |
+| `pnpm typecheck`    | Route typegen + `tsc`                              |
+| `pnpm test`         | Vitest                                             |
+| `pnpm deploy:nsite` | Builds and publishes to nostr with `nsyte`         |
 
-There are no required environment variables. `SITE_URL` (default
-`https://habla.news`) only affects the absolute URLs in the generated sitemap.
+There are no environment variables.
 
 ## Deploying
 
 `pnpm build` produces `build/client`: plain HTML, JS, CSS and assets. Serve it
-from anything, with two requirements:
-
-- **Unknown paths must fall back to `/index.html`**, or client-side routes like
-  `/verbiricha/grimoire` will 404.
-- **`/.well-known/nostr.json` must be served with
-  `Access-Control-Allow-Origin: *`.** Other nostr web clients fetch it
-  cross-origin to verify `<name>@habla.news`, and without the header every
-  member's NIP-05 badge fails elsewhere. This used to be a response header set
-  by the server route; on a static host it is host configuration.
+from anything, with one requirement — **unknown paths must fall back to
+`/index.html`**, or a link like `/a/naddr1...` will 404 instead of booting the
+app.
 
 ### As an nsite
 
@@ -72,21 +64,12 @@ deno install -Afg jsr:@nsyte/cli   # once
 pnpm deploy:nsite
 ```
 
-nsite gateways serve `.well-known` and the SPA fallback for you.
+nsite gateways handle the SPA fallback for you.
 
 ### Anywhere else
 
 Any static host works — Vercel, Netlify, Cloudflare Pages, S3, nginx — as long
 as you configure the SPA fallback.
-
-## Adding a member
-
-Members get a vanity URL and a NIP-05 identity at `habla.news`.
-
-1. Add `{ username, pubkey }` to `app/members.ts`.
-2. Run `pnpm gen:static` and commit the regenerated
-   `public/.well-known/nostr.json` and `public/sitemap.xml`.
-3. Deploy.
 
 ## How it's built
 
@@ -106,8 +89,7 @@ app/
 ├── nostr/       # Actions (publish, comment, zap request) and queries
 ├── ui/          # Components; ui/nostr/* is the nostr-aware layer
 ├── hooks/       # useProfile, useEvent, useTimeline, useZaps, ...
-├── members.ts   # The NIP-05 registry
-└── featured.ts  # Articles and highlights baked into the home page
+└── featured.ts  # Featured articles, highlights and authors, baked in
 ```
 
 For the longer version, see `CLAUDE.md` and `claudedocs/`.
@@ -119,7 +101,8 @@ things:
 
 - **No server-rendered meta tags.** `meta()` runs in the browser, so crawlers
   and chat previews that do not execute JavaScript see the generic site title
-  rather than the article's.
+  rather than the article's. There is no sitemap either — the URLs are nostr
+  identifiers, not a list anyone could enumerate ahead of time.
 - **First paint waits on relays.** There is no cache in front of the network;
   a page shows its skeleton until the events arrive.
 

@@ -1,4 +1,3 @@
-import ClientOnly from "~/ui/client-only";
 import { ConnectWallet } from "~/ui/nostr/nwc";
 import Wallet from "~/ui/wallet";
 
@@ -12,5 +11,5 @@ export function meta() {
 }
 
 export default function Route() {
-  return <ClientOnly>{() => <Wallet />}</ClientOnly>;
+  return <Wallet />;
 }

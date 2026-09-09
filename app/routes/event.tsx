@@ -10,7 +10,6 @@ import type { ProfileContent } from "applesauce-core/helpers";
 import type { ReactNode } from "react";
 import { EventReply } from "~/ui/nostr/reply";
 import { Conversation } from "~/ui/nostr/article-conversation";
-import ClientOnly from "~/ui/client-only";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   if (!loaderData) return defaults;
@@ -74,12 +73,12 @@ export default function Event({ loaderData, params }: Route.ComponentProps) {
       >
         <Component profile={profile} event={event} />
       </NostrCard>
-      <ClientOnly>{() => <Conversation event={event} />}</ClientOnly>
+      <Conversation event={event} />
     </div>
   ) : (
     <>
       <EventReply event={event} />
-      <ClientOnly>{() => <Conversation event={event} />}</ClientOnly>
+      <Conversation event={event} />
     </>
   );
 }

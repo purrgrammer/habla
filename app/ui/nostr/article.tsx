@@ -13,7 +13,6 @@ import UserLink from "~/ui/nostr/user-link";
 import Timestamp from "~/ui/timestamp";
 import Blockquote from "../blockquote";
 import ArticleConversation from "./article-conversation";
-import ClientOnly from "../client-only";
 import type { Relay } from "~/types";
 import { TagCloud } from "../tag-cloud";
 import { Link } from "react-router";
@@ -101,7 +100,8 @@ function ShareButton({
   }, [address, seenRelays, relays]);
 
   const articlePath = useArticleLink(event, address);
-  const hablaUrl = `https://habla.news${articlePath}`;
+  // No fixed domain: share whatever host this copy of Habla is served from.
+  const hablaUrl = `${window.location.origin}${articlePath}`;
 
   return (
     <Dialog>
@@ -151,18 +151,10 @@ function Author({
       />
       <div className="flex items-center gap-2">
         {address && (
-          <ClientOnly>
-            {() => (
-              <>
-                <ShareButton
-                  address={address}
-                  event={article}
-                  relays={relays}
-                />
-                <EditButton address={address} />
-              </>
-            )}
-          </ClientOnly>
+          <>
+            <ShareButton address={address} event={article} relays={relays} />
+            <EditButton address={address} />
+          </>
         )}
         <span className="text-right font-light text-muted-foreground text-sm sm:text-base">
           <Timestamp timestamp={publishedAt} />
@@ -243,7 +235,7 @@ export default function Article(props: {
           }, {})}
         />
       </div>
-      <ClientOnly>{() => <ArticleConversation event={event} />}</ClientOnly>
+      <ArticleConversation event={event} />
     </div>
   );
 }

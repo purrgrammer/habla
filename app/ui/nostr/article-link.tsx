@@ -1,18 +1,11 @@
 import { Link } from "react-router";
 import { type NostrEvent, nip19 } from "nostr-tools";
 import { type AddressPointer } from "nostr-tools/nip19";
-import { getTagValue } from "applesauce-core/helpers";
 import { getArticleTitle } from "applesauce-common/helpers";
-import { useMembers } from "~/nostr/queries";
 import type { ReactNode } from "react";
 
-export function useArticleLink(article: NostrEvent, address: AddressPointer) {
-  const users = useMembers();
-  const user = users?.find((u) => u.pubkey === article.pubkey);
-  const identifier = getTagValue(article, "d");
-  if (user && identifier) {
-    return `/${user.username}/${encodeURIComponent(identifier)}`;
-  }
+/** Articles are addressed by naddr; Habla has no domain to hang vanity URLs off. */
+export function useArticleLink(_article: NostrEvent, address: AddressPointer) {
   return `/a/${nip19.naddrEncode(address)}`;
 }
 

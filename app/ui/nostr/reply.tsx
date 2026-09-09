@@ -360,7 +360,7 @@ export function Reply({
             ? `${kindNames[event.kind] || event.kind} - ${profile?.name || profile?.display_name}`
             : `${kindNames[event.kind] || event.kind}`,
           text: event.content,
-          url: `https://habla.news${bech32Link}`,
+          url: `${window.location.origin}${bech32Link}`,
         };
         await navigator.share(shareData);
       } catch (error) {

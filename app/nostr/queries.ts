@@ -1,13 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryProfile } from "nostr-tools/nip05";
 import { fetchRelayInformation } from "nostr-tools/nip11";
-import { MEMBERS } from "~/members";
-
-/** The NIP-05 member registry. Bundled, so this is not really a query. */
-export function useMembers() {
-  return MEMBERS;
-}
-
 export function useRelayInfo(relay: string) {
   return useQuery({
     queryKey: ["nip11", relay],

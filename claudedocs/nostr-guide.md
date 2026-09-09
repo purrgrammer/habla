@@ -222,16 +222,15 @@ Relevant NIPs used in Habla:
 
 ## URL Schemes in Habla
 
+Every URL is a nostr identifier. Habla has no domain of its own, so there are
+no vanity or NIP-05 routes.
+
 ```
-/a/:naddr              # Nostr address viewer
-/e/:nevent             # Event viewer
-/p/:nprofile           # Profile viewer
-/u/:nip05              # NIP-05 profile
-/u/:nip05/:identifier  # NIP-05 article
-/:username             # Username profile
-/:username/:identifier # Username article
-/t/:tag                # Hashtag feed
-/relay/:relay          # Relay feed
+/a/:naddr      # Article / addressable event
+/e/:nevent     # Event
+/p/:nprofile   # Profile
+/t/:tag        # Hashtag feed
+/relay/:relay  # Relay feed
 ```
 
 ## Best Practices

@@ -627,26 +627,12 @@ export default () => {
       };
       saveDraftToStorage(draft);
 
-      // Build the article URL
-      // Check if user is a Habla member first
-      const members = await store.getMembers();
-      const member = members.find((m) => m.pubkey === pubkey);
-
-      let articleUrl: string;
-      if (member) {
-        // Habla member: /:username/:identifier
-        const username = member.nip05;
-        articleUrl = `/${username}/${identifier}`;
-      } else {
-        // Non-member: /u/:nip05 or /u/:npub
-        const nip05 = profile?.nip05;
-        articleUrl = nip05
-          ? `/u/${nip05}/${identifier}`
-          : `/u/${nip19.npubEncode(pubkey!)}/${identifier}`;
-      }
-
       // Return the URL - dialog will handle navigation after closing
-      return articleUrl;
+      return `/a/${nip19.naddrEncode({
+        kind: kinds.LongFormArticle,
+        pubkey: pubkey!,
+        identifier,
+      })}`;
     } catch (error) {
       console.error("[editor] Failed to publish article:", error);
       toast.error("Failed to publish article", {

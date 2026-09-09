@@ -6,9 +6,8 @@ import { type NostrEvent } from "nostr-tools";
 //import NEvent from "~/ui/nostr/nevent";
 //import NAddr from "~/ui/nostr/naddr";
 //import A from "~/ui/a";
-import ClientOnly from "../client-only";
 import RichText from "./rich-text";
 
 export default function Note({ event }: { event: NostrEvent }) {
-  return <ClientOnly>{() => <RichText event={event} />}</ClientOnly>;
+  return <RichText event={event} />;
 }

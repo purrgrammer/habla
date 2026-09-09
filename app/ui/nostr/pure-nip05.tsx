@@ -1,6 +1,5 @@
 import { Link } from "react-router";
 import { Verified, LoaderCircle, TriangleAlert } from "lucide-react";
-import Logo from "../logo";
 import { cn } from "~/lib/utils";
 
 export interface Nip05Props {
@@ -71,7 +70,6 @@ export default function PureNip05({
   const [username, domain] = nip05.includes("@")
     ? nip05.split("@")
     : ["_", nip05];
-  const isHabla = domain.toLowerCase().trim() === "habla.news";
   const icon = "size-4 text-muted-foreground";
   const isUnverified = !isLoading && !isVerified;
 
@@ -79,8 +77,6 @@ export default function PureNip05({
     <div className="flex flex-row items-center gap-1 font-sans font-light">
       {isLoading ? (
         <LoaderCircle className={cn(icon, "animate-spin")} />
-      ) : isHabla && isVerified ? (
-        <Logo className={icon} />
       ) : isVerified ? (
         <Verified className={icon} />
       ) : (
@@ -95,17 +91,12 @@ export default function PureNip05({
       >
         {username === "_" ? (
           <Domain noAt domain={domain} />
-        ) : isVerified && isHabla ? (
-          <Link
-            to={`/${username}`}
-            className="text-primary hover:underline hover:decoration-dotted"
-          >
-            {username}
-          </Link>
         ) : (
-          <span>{username}</span>
+          <>
+            <span>{username}</span>
+            <Domain domain={domain} />
+          </>
         )}
-        {username !== "_" && !isHabla ? <Domain domain={domain} /> : null}
       </span>
     </div>
   );

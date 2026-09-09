@@ -6,7 +6,6 @@ import NEvent from "~/ui/nostr/nevent";
 import NAddr from "~/ui/nostr/naddr";
 import A from "~/ui/a";
 import Hashtag from "~/ui/hashtag";
-import ClientOnly from "../client-only";
 
 const components: ComponentMap = {
   text: ({ node }) => <span>{node.value}</span>,
@@ -75,9 +74,5 @@ export default function RichText({
   event?: NostrEvent;
   content?: string;
 }) {
-  return (
-    <ClientOnly fallback={content || event?.content}>
-      {() => <PureRichText event={event} content={content} />}
-    </ClientOnly>
-  );
+  return <PureRichText event={event} content={content} />;
 }

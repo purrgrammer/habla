@@ -36,7 +36,8 @@ interface SeoOptions {
 export const DEFAULT_SITE_NAME = "Habla";
 export const DEFAULT_SITE_DESCRIPTION =
   "Read, Highlight, Write, Bookmark, Earn";
-export const DEFAULT_IMAGE = "https://habla.news/og.png";
+// Relative: the site has no fixed domain, it is served from wherever it lands.
+export const DEFAULT_IMAGE = "/og.png";
 
 export function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
   const {

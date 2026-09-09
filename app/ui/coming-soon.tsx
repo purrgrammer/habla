@@ -1,5 +1,4 @@
 import { Shovel } from "lucide-react";
-import ClientOnly from "./client-only";
 import { DonateButton } from "./donate";
 import UserLink from "./nostr/user-link";
 
@@ -22,7 +21,7 @@ export default function ComingSoon() {
         </p>
       </div>
       <div className="w-full">
-        <ClientOnly>{() => <DonateButton />}</ClientOnly>
+        <DonateButton />
       </div>
     </div>
   );

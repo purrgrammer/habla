@@ -6,7 +6,6 @@ import { Server } from "lucide-react";
 import UserLink from "~/ui/nostr/user-link";
 import Timestamp from "~/ui/timestamp";
 import { cn } from "~/lib/utils";
-import ClientOnly from "../client-only";
 import { Button } from "../button";
 import {
   DropdownMenu,
@@ -84,20 +83,7 @@ export default function NostrCard({
       <CardContent className="font-sans text-md px-2">{children}</CardContent>
       {noFooter ? null : (
         <CardFooter className="px-2 pt-0 pb-1 flex justify-end">
-          {relays ? (
-            <ClientOnly
-              fallback={
-                <Button variant="ghost" size="icon">
-                  <div className="flex flex-row items-center gap-1 text-muted-foreground">
-                    <Server className="size-4" />
-                    <span className="font-mono text-sm">{relays?.size}</span>
-                  </div>
-                </Button>
-              }
-            >
-              {() => <Relays relays={relays} />}
-            </ClientOnly>
-          ) : null}
+          {relays ? <Relays relays={relays} /> : null}
         </CardFooter>
       )}
     </Card>

@@ -14,15 +14,9 @@ export default [
     route("/p/:nprofile", "./routes/pubkey.tsx"),
     // route("/c/:naddr") community
 
-    route("/u/:nip05", "./routes/u/nip05.tsx"),
-    route("/u/:nip05/:identifier", "./routes/u/article.tsx"),
-
     route("/t/:tag", "./routes/hashtag.tsx"),
     //route("/r/:ref", "./routes/ref.tsx"),
     route("/relay/:relay", "./routes/relay.tsx"),
-
-    route(":username", "./routes/username.tsx"),
-    route(":username/:identifier", "./routes/identifier.tsx"),
 
     // todo: some require auth, client side rendered
     route("wallet", "./routes/wallet.tsx"),

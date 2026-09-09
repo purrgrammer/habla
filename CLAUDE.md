@@ -9,7 +9,7 @@ with no backend, deployable to any static host or to nostr itself as an
 
 ```bash
 pnpm dev          # http://localhost:5173
-pnpm build        # gen:static + build to build/client
+pnpm build        # static build to build/client
 pnpm preview      # serve the build with SPA fallback on :4173
 pnpm typecheck    # route typegen + tsc
 pnpm test         # vitest
@@ -32,6 +32,8 @@ material assumes otherwise.
   static files only.
 - Routes export **`clientLoader`**, never `loader`. A `loader`, `action` or
   `headers` export in a non-root route is a build error.
+- No canonical URLs or absolute links. The app does not know what host it is
+  served from; use `window.location.origin` if you need one at runtime.
 - `meta()` still works but runs in the browser, so it sets `document.title` and
   tags after hydration. Crawlers that do not run JS see the generic shell.
 - `app/entry.server.tsx` exists only to render `index.html` at build time. It
@@ -39,8 +41,11 @@ material assumes otherwise.
 - There is no Redis, no `/api/*`, no `.server.ts` modules. If you find yourself
   writing one, you have taken a wrong turn.
 
-`.well-known/nostr.json` and `sitemap.xml` are generated into `public/` from
-`app/members.ts` by `pnpm gen:static` (which `pnpm build` runs first).
+There are also no NIP-05 handles. Habla has no domain of its own, so it issues
+no `<name>@habla.news` addresses and no `habla.news/<name>` pages. Everything is
+addressed by nostr identifier: `/a/<naddr>`, `/p/<nprofile>`, `/e/<nevent>`.
+An author's _own_ NIP-05 (from their kind-0) is still displayed and verified —
+that identity belongs to them, not to us.
 
 ## Tech Stack
 
@@ -64,7 +69,7 @@ route clientLoader ──> ~/services/data ──> loaders ──> relays
 ```
 
 **`app/services/data.ts`** is the route-level store (`DataStore` in
-`services/types.ts`): `getMembers`, `fetchRelays`, `fetchProfile`, `fetchEvent`,
+`services/types.ts`): `fetchRelays`, `fetchProfile`, `fetchEvent`,
 `fetchAddress`. Every call has a `CLIENT_TIMEOUT` ceiling and resolves to
 `undefined` rather than hanging or throwing, so a route falls back to its
 skeleton instead of spinning forever.
@@ -106,15 +111,6 @@ a zap total — belongs in a hook inside the component, where it streams in.
 | `useTimeline(id, filters, relays)`             | Timeline, live                        |
 | `useZaps(event)`                               | Zaps with realtime updates            |
 
-## Members
-
-`app/members.ts` is the NIP-05 registry — the `username -> pubkey` map behind
-`habla.news/<username>`. To add someone: append to `MEMBERS`, run
-`pnpm gen:static`, commit the regenerated files in `public/`.
-
-`MEMBER_NAMES`, `findMember(username)` and `memberFor(pubkey)` are the accessors;
-`useMembers()` in `app/nostr/queries.ts` exposes the list to components.
-
 ## Constants (`app/const.ts`)
 
 ```
@@ -135,18 +131,16 @@ app/
 ├── ui/           # Components; ui/nostr/* is the nostr-aware layer
 ├── hooks/nostr.ts
 ├── lib/          # event.ts, url.ts, markdown-serializer.ts, utils.ts, http.ts
-├── members.ts    # NIP-05 registry
-├── featured.ts   # Home-page articles and highlights, hardcoded
+├── featured.ts   # Home-page articles, highlights and authors, hardcoded
 └── const.ts
-scripts/gen-static.ts   # writes public/.well-known/nostr.json + sitemap.xml
-.nsite/config.json      # nsyte deploy target
+.nsite/config.json  # nsyte deploy target
 ```
 
 ## Conventions
 
-- `.client.tsx` is still used for browser-only components, but note that in SPA
-  mode _everything_ is browser-only. Reach for `~/ui/client-only` when a
-  component must not run during the build's `index.html` render.
+- In SPA mode _everything_ is browser-only, so `~/ui/client-only` is needed in
+  exactly one place: inside `root.tsx`, the only route rendered during the
+  build's `index.html` pass. Do not reintroduce it elsewhere.
 - Style with `cn()` from `~/lib/utils`.
 - Errors surface through `toast` from `sonner`.
 - Applesauce helpers cache internally — no `useMemo` around them.
