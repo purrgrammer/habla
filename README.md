@@ -47,19 +47,32 @@ There are no required environment variables. `SITE_URL` (default
 ## Deploying
 
 `pnpm build` produces `build/client`: plain HTML, JS, CSS and assets. Serve it
-from anything, with one requirement — **unknown paths must fall back to
-`/index.html`**, or client-side routes like `/verbiricha/grimoire` will 404.
+from anything, with two requirements:
+
+- **Unknown paths must fall back to `/index.html`**, or client-side routes like
+  `/verbiricha/grimoire` will 404.
+- **`/.well-known/nostr.json` must be served with
+  `Access-Control-Allow-Origin: *`.** Other nostr web clients fetch it
+  cross-origin to verify `<name>@habla.news`, and without the header every
+  member's NIP-05 badge fails elsewhere. This used to be a response header set
+  by the server route; on a static host it is host configuration.
 
 ### As an nsite
 
 [nsyte](https://github.com/sandwichfarm/nsyte) uploads the build to Blossom
 servers and publishes the file map to relays, so the site is addressed by a
 nostr pubkey rather than a domain. The relays, Blossom servers and the
-`/index.html` fallback live in `.nsite/config.json`.
+`/index.html` fallback live in `.nsite/config.json` — review them before your
+first deploy.
+
+nsyte is a Deno CLI, not an npm package:
 
 ```bash
+deno install -Afg jsr:@nsyte/cli   # once
 pnpm deploy:nsite
 ```
+
+nsite gateways serve `.well-known` and the SPA fallback for you.
 
 ### Anywhere else
 

@@ -11,7 +11,7 @@
     "gen:static": "tsx ./scripts/gen-static.ts",
     "build": "pnpm gen:static && react-router build",
     "preview": "sirv build/client --single --port 4173",
-    "deploy:nsite": "pnpm build && npx nsyte deploy build/client",
+    "deploy:nsite": "pnpm build && nsyte deploy build/client",
     "typecheck": "react-router typegen && tsc",
     "test": "vitest run",
     "test:watch": "vitest"
