@@ -1,10 +1,7 @@
 import type { Route } from "./+types/nip05";
 import { queryProfile } from "nostr-tools/nip05";
-import { default as clientStore } from "~/services/data";
-import { default as serverStore } from "~/services/data.server";
+import { default as store } from "~/services/data";
 import type { DataStore } from "~/services/types";
-import { ssrDeadline } from "~/lib/ssr";
-import { hydrateFromServer } from "~/lib/client-loader";
 import Profile from "~/ui/nostr/profile";
 import Debug from "~/ui/debug";
 import defaults, { profileMeta } from "~/seo";
@@ -14,7 +11,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return profileMeta(loaderData.pubkey, loaderData.profile);
 }
 
-type LoadArgs = Pick<Route.LoaderArgs, "params">;
+type LoadArgs = Pick<Route.ClientLoaderArgs, "params">;
 
 async function loadData(store: DataStore, { params }: LoadArgs) {
   const { nip05 } = params;
@@ -31,13 +28,9 @@ async function loadData(store: DataStore, { params }: LoadArgs) {
   }
 }
 
-export async function loader(args: Route.LoaderArgs) {
-  return ssrDeadline("u/nip05", () => loadData(serverStore, args));
+export async function clientLoader(args: Route.ClientLoaderArgs) {
+  return loadData(store, args);
 }
-
-export const clientLoader = hydrateFromServer((args: Route.ClientLoaderArgs) =>
-  loadData(clientStore, args),
-);
 
 export default function Pubkey({ loaderData }: Route.ComponentProps) {
   return loaderData ? <Profile {...loaderData} /> : <Debug>{loaderData}</Debug>;

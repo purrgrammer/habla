@@ -1,10 +1,7 @@
 import type { Route } from "./+types/address";
 import { kinds, nip19 } from "nostr-tools";
-import { default as clientStore } from "~/services/data";
-import { default as serverStore } from "~/services/data.server";
+import { default as store } from "~/services/data";
 import type { DataStore } from "~/services/types";
-import { ssrDeadline } from "~/lib/ssr";
-import { hydrateFromServer } from "~/lib/client-loader";
 import Article from "~/ui/nostr/article";
 import defaults, { articleMeta } from "~/seo";
 import Debug from "~/ui/debug";
@@ -18,7 +15,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return defaults;
 }
 
-type LoadArgs = Pick<Route.LoaderArgs, "params">;
+type LoadArgs = Pick<Route.ClientLoaderArgs, "params">;
 
 async function loadData(store: DataStore, { params }: LoadArgs) {
   const { naddr } = params;
@@ -35,13 +32,9 @@ async function loadData(store: DataStore, { params }: LoadArgs) {
   }
 }
 
-export async function loader(args: Route.LoaderArgs) {
-  return ssrDeadline("address", () => loadData(serverStore, args));
+export async function clientLoader(args: Route.ClientLoaderArgs) {
+  return loadData(store, args);
 }
-
-export const clientLoader = hydrateFromServer((args: Route.ClientLoaderArgs) =>
-  loadData(clientStore, args),
-);
 
 const components: Record<number, any> = {
   [kinds.LongFormArticle]: Article,

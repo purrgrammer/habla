@@ -25,7 +25,6 @@ export interface User {
 }
 
 export interface DataStore {
-  getUsers(): Promise<User[]>;
   getMembers(): Promise<Nip05Pointer[]>;
 
   fetchRelays(pubkey: Pubkey): Promise<Relay[]>;

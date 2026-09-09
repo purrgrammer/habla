@@ -3,7 +3,6 @@ import {
   index,
   route,
   layout,
-  prefix,
 } from "@react-router/dev/routes";
 
 export default [
@@ -31,13 +30,4 @@ export default [
     route("faq", "./routes/faq.tsx"),
     route("settings", "./routes/settings.tsx"),
   ]),
-
-  ...prefix("api", [
-    route("members", "./routes/members.ts"),
-    route("markdown", "./routes/markdown.ts"),
-    route("users", "./routes/users.ts"),
-  ]),
-
-  route(".well-known/nostr.json", "./routes/nip05.ts"),
-  route("sitemap.xml", "./routes/sitemap.ts"),
 ] satisfies RouteConfig;

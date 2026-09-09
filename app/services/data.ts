@@ -17,7 +17,8 @@ import type { ProfileContent } from "applesauce-core/helpers";
 import { profileLoader, eventLoader, addressLoader } from "./loaders";
 import { getProfileContent } from "applesauce-core/helpers";
 import { type DataStore } from "./types";
-import { getUsers, getMembers } from "~/lib/api";
+import { MEMBERS } from "~/members";
+import type { Nip05Pointer } from "./types";
 import type { Pubkey, Relay } from "~/types";
 import { getRelayURLs } from "~/lib/url";
 
@@ -65,9 +66,17 @@ function fetchAddress(
   return firstOrNothing(addressLoader(pointer));
 }
 
+/** The member registry ships in the bundle; nothing to fetch. */
+async function getMembers(): Promise<Nip05Pointer[]> {
+  return MEMBERS.map(({ username, pubkey }) => ({
+    nip05: username,
+    pubkey,
+    relays: [],
+  }));
+}
+
 const store: DataStore = {
   getMembers,
-  getUsers,
   fetchRelays,
   fetchProfile,
   fetchEvent,

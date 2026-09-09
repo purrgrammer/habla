@@ -1,20 +1,21 @@
 import { HABLA_PUBKEY } from "./const";
 
 /**
- * Static NIP-05 member registry.
+ * The NIP-05 member registry.
  *
- * This is the source of truth for the `username -> pubkey` mapping when no
- * Redis backend is configured (`REDIS_URL` unset). When Redis *is* available
- * it is used instead, and this list only seeds it.
+ * Habla is a static app with no backend, so the `username -> pubkey` mapping
+ * that powers `habla.news/<username>` lives here, in the bundle. Add an entry
+ * and the name works on the next deploy.
  *
- * Add a member here and it works in a Redis-less deployment immediately.
+ * `pnpm gen:static` regenerates `public/.well-known/nostr.json` and
+ * `public/sitemap.xml` from this list.
  */
-export interface StaticMember {
+export interface Member {
   username: string;
   pubkey: string;
 }
 
-export const STATIC_MEMBERS: StaticMember[] = [
+export const MEMBERS: Member[] = [
   { username: "_", pubkey: HABLA_PUBKEY },
   {
     username: "awayuki",
@@ -174,7 +175,17 @@ export const STATIC_MEMBERS: StaticMember[] = [
   },
 ];
 
-/** `username -> pubkey`, for NIP-05 lookups. */
-export const STATIC_NAMES: Record<string, string> = Object.fromEntries(
-  STATIC_MEMBERS.map(({ username, pubkey }) => [username, pubkey]),
+/** `username -> pubkey`, the body of `.well-known/nostr.json`. */
+export const MEMBER_NAMES: Record<string, string> = Object.fromEntries(
+  MEMBERS.map(({ username, pubkey }) => [username, pubkey]),
 );
+
+/** Look up a member by the name in their Habla URL. */
+export function findMember(username?: string): Member | undefined {
+  return username ? MEMBERS.find((m) => m.username === username) : undefined;
+}
+
+/** The member who owns this pubkey, if any. */
+export function memberFor(pubkey: string): Member | undefined {
+  return MEMBERS.find((m) => m.pubkey === pubkey);
+}

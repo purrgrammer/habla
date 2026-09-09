@@ -4,11 +4,8 @@ import Highlight from "~/ui/nostr/highlight";
 import Note from "~/ui/nostr/note";
 import NostrCard from "~/ui/nostr/card";
 import defaults, { eventMeta } from "~/seo";
-import { default as clientStore } from "~/services/data";
-import { default as serverStore } from "~/services/data.server";
+import { default as store } from "~/services/data";
 import type { DataStore } from "~/services/types";
-import { ssrDeadline } from "~/lib/ssr";
-import { hydrateFromServer } from "~/lib/client-loader";
 import type { ProfileContent } from "applesauce-core/helpers";
 import type { ReactNode } from "react";
 import { EventReply } from "~/ui/nostr/reply";
@@ -20,7 +17,7 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return eventMeta(loaderData.event, loaderData.profile);
 }
 
-type LoadArgs = Pick<Route.LoaderArgs, "params">;
+type LoadArgs = Pick<Route.ClientLoaderArgs, "params">;
 
 async function loadData(store: DataStore, { params }: LoadArgs) {
   const { nevent } = params;
@@ -42,13 +39,9 @@ async function loadData(store: DataStore, { params }: LoadArgs) {
   }
 }
 
-export async function loader(args: Route.LoaderArgs) {
-  return ssrDeadline("event", () => loadData(serverStore, args));
+export async function clientLoader(args: Route.ClientLoaderArgs) {
+  return loadData(store, args);
 }
-
-export const clientLoader = hydrateFromServer((args: Route.ClientLoaderArgs) =>
-  loadData(clientStore, args),
-);
 
 interface ComponentProps {
   profile?: ProfileContent;

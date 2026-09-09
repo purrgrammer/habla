@@ -1,0 +1,25 @@
+{
+  "id": "habla",
+  "title": "Habla",
+  "description": "Read, write and publish long-form articles on nostr.",
+  "relays": [
+    "wss://relay.damus.io",
+    "wss://nos.lol",
+    "wss://relay.primal.net",
+    "wss://nostr.wine"
+  ],
+  "servers": [
+    "https://nostr.download",
+    "https://blossom.band",
+    "https://cdn.hzrd149.com"
+  ],
+  "gatewayHostnames": ["nsite.lol"],
+  "fallback": "/index.html",
+  "publishAppHandler": false,
+  "appHandler": {
+    "id": "habla",
+    "name": "Habla",
+    "description": "Read, write and publish long-form articles on nostr.",
+    "kinds": [30023, 30024]
+  }
+}

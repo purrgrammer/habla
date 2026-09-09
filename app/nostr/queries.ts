@@ -1,15 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryProfile } from "nostr-tools/nip05";
 import { fetchRelayInformation } from "nostr-tools/nip11";
-import { getUsers } from "~/lib/api";
+import { MEMBERS } from "~/members";
 
-export function useUsers() {
-  return useQuery({
-    queryKey: ["users"],
-    queryFn: () => getUsers(),
-    refetchOnMount: false,
-    retryOnMount: true,
-  });
+/** The NIP-05 member registry. Bundled, so this is not really a query. */
+export function useMembers() {
+  return MEMBERS;
 }
 
 export function useRelayInfo(relay: string) {

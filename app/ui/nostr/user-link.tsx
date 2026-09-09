@@ -5,12 +5,12 @@ import { nip19 } from "nostr-tools";
 import { Avatar, Username } from "~/ui/nostr/user";
 import { useProfile, useRelays } from "~/hooks/nostr";
 import { INDEX_RELAYS } from "~/const";
-import { useUsers } from "~/nostr/queries";
+import { useMembers } from "~/nostr/queries";
 import Nip05 from "./nip05";
 import type { ProfileContent } from "applesauce-core/helpers";
 
 function useUserLink(pubkey: string, relays?: string[]) {
-  const { data: users } = useUsers();
+  const users = useMembers();
   const user = users?.find((u) => u.pubkey === pubkey);
   const nprofile = useMemo(() => {
     if (relays) {

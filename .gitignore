@@ -9,3 +9,6 @@ DESIGN.md
 # React Router
 /.react-router/
 /build/
+
+# nsyte deploy state
+/.nsite/*.backup

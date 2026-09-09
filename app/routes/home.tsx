@@ -37,13 +37,11 @@ import {
   testimonials,
 } from "~/featured";
 import defaults from "~/seo";
+import { MEMBERS, type Member } from "~/members";
 import ArticleCard from "~/ui/nostr/article-card";
 import { PureHighlight } from "~/ui/nostr/highlight";
 import Grid from "~/ui/grid";
 import NostrCard from "~/ui/nostr/card";
-import { type DataStore, type User } from "~/services/types";
-import { default as serverStore } from "~/services/data.server";
-import { default as clientStore } from "~/services/data";
 import { Button } from "~/ui/button";
 import { Badge } from "~/ui/badge";
 import {
@@ -59,7 +57,7 @@ import ClientOnly from "~/ui/client-only";
 import Logo from "~/ui/logo";
 import { cn } from "~/lib/utils";
 import { TagCloud } from "~/ui/tag-cloud";
-import { parseZap, useProfileZaps, type Zap } from "~/hooks/nostr";
+import { parseZap, useProfile, useProfileZaps, type Zap } from "~/hooks/nostr";
 import { HABLA_PUBKEY, HABLA_REPO_URL } from "~/const";
 import { ZapPill } from "~/ui/zaps";
 import Donate from "~/ui/donate";
@@ -67,48 +65,25 @@ import Note from "~/ui/nostr/note";
 import Blockquote from "~/ui/blockquote";
 import UserLink from "~/ui/nostr/user-link";
 import { EventReply } from "~/ui/nostr/reply";
-import { ssrDeadlineOr, SSR_LIST_TIMEOUT } from "~/lib/ssr";
-import { hydrateFromServer } from "~/lib/client-loader";
 
 export function meta({}: Route.MetaArgs) {
   return defaults;
 }
 
 /**
- * Everything but `featured` is baked into the bundle (`~/featured.ts`), so the
- * home page always has something to render. The member list is the only part
- * that talks to relays, and it is allowed to come back empty.
+ * Nothing here touches the network: the featured articles and highlights are
+ * baked into the bundle (`~/featured.ts`) and the member list into
+ * `~/members.ts`. Profiles resolve reactively inside the cards, so the home
+ * page paints immediately instead of waiting on forty relay round trips.
  */
-export async function loadData(store: DataStore, featured: User[]) {
+export async function clientLoader() {
   const [categorizedArticles, articles, highlights] = await Promise.all([
     getArticlesByCategory(),
     getFeaturedArticles(),
     getFeaturedHighlights(),
   ]);
-  return { featured, articles, categorizedArticles, highlights };
+  return { featured: MEMBERS, articles, categorizedArticles, highlights };
 }
-
-export async function loader() {
-  const featured = await ssrDeadlineOr(
-    "home:members",
-    () => serverStore.getUsers(),
-    [] as User[],
-    SSR_LIST_TIMEOUT,
-  );
-  return loadData(serverStore, featured);
-}
-
-export const clientLoader = hydrateFromServer(
-  async (args: Route.ClientLoaderArgs) => {
-    const server = (await args.serverLoader().catch(() => null)) as Awaited<
-      ReturnType<typeof loader>
-    > | null;
-    // Only the member list can be missing; refetch just that.
-    if (server && server.featured.length > 0) return server;
-    const featured = await clientStore.getUsers().catch(() => []);
-    return loadData(clientStore, featured);
-  },
-);
 
 function Hero() {
   return (
@@ -222,13 +197,11 @@ function CategorySection({
   title,
   icon,
   articles,
-  featured,
   iconColor = "text-orange-200 dark:text-orange-100",
 }: {
   title: string;
   icon: React.ReactNode;
   articles: NostrEvent[];
-  featured: User[];
   iconColor?: string;
 }) {
   if (articles.length === 0) return null;
@@ -247,7 +220,6 @@ function CategorySection({
           <ArticleCard
             key={article.id}
             article={article}
-            author={featured.find((u) => u.pubkey === article.pubkey)?.profile}
             address={{
               kind: article.kind,
               pubkey: article.pubkey,
@@ -513,19 +485,20 @@ function FeaturedYou() {
   );
 }
 
-function FeaturedUser({ user }: { user: User }) {
+function FeaturedUser({ user }: { user: Member }) {
+  const profile = useProfile(user.pubkey);
   return (
     <Link
       className="flex flex-col gap-2 p-2 items-center justify-center"
       to={user.username}
     >
       <img
-        src={user.profile.picture || "/favicon.ico"}
+        src={profile?.picture || "/favicon.ico"}
         className="size-18 sm:size-24 rounded-full object-cover"
       />
       <div className="flex flex-col gap-0 items-center justify-center">
         <h3 className="font-sans text-2xl line-clamp-1">
-          {user.profile.display_name || user.profile.name}
+          {profile?.display_name || profile?.name || user.username}
         </h3>
         <div className="flex flex-row items-center gap-1">
           <Logo className="size-4 text-muted-foreground" />
@@ -570,7 +543,7 @@ function Values() {
   );
 }
 
-function FeaturedUsers({ featured }: { featured: User[] }) {
+function FeaturedUsers({ featured }: { featured: readonly Member[] }) {
   return (
     <div id="community" className="flex flex-col gap-8">
       <div className="flex flex-row items-center gap-2">
@@ -629,7 +602,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         title="Welcome"
         icon={<HeartHandshake />}
         articles={[faq, features]}
-        featured={featured}
         iconColor="text-red-400 dark:text-red-200"
       />
 
@@ -637,7 +609,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         title="Social Media"
         icon={<Globe />}
         articles={categorizedArticles.socialMedia}
-        featured={featured}
         iconColor="text-blue-500 dark:text-blue-400"
       />
 
@@ -645,7 +616,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         title="Nostr"
         icon={<Network />}
         articles={categorizedArticles.nostrTech}
-        featured={featured}
         iconColor="text-purple-500 dark:text-purple-400"
       />
 
@@ -653,7 +623,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         title="Technology & AI"
         icon={<Bot />}
         articles={categorizedArticles.tech}
-        featured={featured}
         iconColor="text-slate-600 dark:text-slate-400"
       />
 
@@ -661,7 +630,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         title="Health & Diet"
         icon={<Apple />}
         articles={categorizedArticles.health}
-        featured={featured}
         iconColor="text-emerald-500 dark:text-emerald-400"
       />
 
@@ -669,7 +637,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         title="Art"
         icon={<Brush />}
         articles={categorizedArticles.art}
-        featured={featured}
         iconColor="text-amber-600 dark:text-amber-400"
       />
 
@@ -677,7 +644,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         title="Parenting"
         icon={<Baby />}
         articles={categorizedArticles.parenting}
-        featured={featured}
       />
 
       <FeaturedHighlights {...loaderData} />
