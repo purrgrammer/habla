@@ -4,41 +4,41 @@ Step-by-step guides for common development tasks in Habla.
 
 ## Adding a New Route
 
-1. **Create route file** in `app/routes/`
+1. Register the URL in `app/routes.ts`.
+2. Create `app/routes/<name>.tsx` with a `clientLoader`, a `meta()` and a
+   component. There is no server, so there is no `loader`.
 
-```typescript
-// app/routes/my-new-route.tsx
-import type { Route } from "./+types/my-new-route";
+```tsx
+import type { Route } from "./+types/name";
+import { default as store } from "~/services/data";
+import type { DataStore } from "~/services/types";
+import defaults from "~/seo";
 
-export async function loader({ params, request }: Route.LoaderArgs) {
-  // Fetch data server-side
-  const data = await fetchSomeData(params.id);
-  return { data };
+type LoadArgs = Pick<Route.ClientLoaderArgs, "params">;
+
+export function meta({ loaderData }: Route.MetaArgs) {
+  if (!loaderData) return defaults;
+  return [{ title: loaderData.title }];
 }
 
-export default function MyNewRoute({ loaderData }: Route.ComponentProps) {
-  return <div>{loaderData.data}</div>;
+async function loadData(store: DataStore, { params }: LoadArgs) {
+  /* fetch only what the page cannot render without */
+}
+
+export async function clientLoader(args: Route.ClientLoaderArgs) {
+  return loadData(store, args);
+}
+
+export default function Name({ loaderData }: Route.ComponentProps) {
+  if (!loaderData) return <Skeleton />;
+  return <div>{/* ... */}</div>;
 }
 ```
 
-2. **Register route** in `app/routes.ts`
+3. `pnpm typecheck` to regenerate `./+types/name`.
 
-```typescript
-import { type RouteConfig, route, layout } from "@react-router/dev/routes";
-
-export default [
-  layout("routes/layouts/main.tsx", [
-    route("/my-new-route", "routes/my-new-route.tsx"),
-    // ... other routes
-  ]),
-] satisfies RouteConfig;
-```
-
-3. **Run type generation**
-
-```bash
-npm run typecheck
-```
+`clientLoader` blocks first paint. Per-item data — an author's profile, a zap
+total — belongs in a hook inside the component instead, so it streams in.
 
 ## Adding a UI Component
 
@@ -111,115 +111,86 @@ export default function MyRoute() {
 
 ## Fetching Nostr Data
 
-### Server-Side (in loader)
+### In a route (blocking, for the page's own subject)
 
-```typescript
-import { dataStore } from "~/services/data.server";
-import { INDEX_RELAYS } from "~/const";
-import type { Route } from "./+types/profile";
+```tsx
+import { default as store } from "~/services/data";
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const profile = await dataStore.fetchProfile({
-    pubkey: params.pubkey,
-    relays: INDEX_RELAYS
-  });
-
+export async function clientLoader({ params }: Route.ClientLoaderArgs) {
+  const profile = await store.fetchProfile({ pubkey: params.pubkey });
   return { profile };
 }
+```
 
-export default function Profile({ loaderData }: Route.ComponentProps) {
-  return <div>{loaderData.profile.name}</div>;
+Every `DataStore` method has a timeout and resolves to `undefined` rather than
+throwing, so the route falls back to its skeleton on a slow relay.
+
+### In a component (streaming, for everything else)
+
+```tsx
+import { useProfile, useTimeline } from "~/hooks/nostr";
+
+function AuthorLine({ pubkey }: { pubkey: string }) {
+  const profile = useProfile(pubkey); // undefined until it arrives, then re-renders
+  return <span>{profile?.display_name ?? pubkey.slice(0, 8)}</span>;
 }
 ```
 
-### Client-Side (with React Query)
-
-```typescript
-import { useQuery } from "@tanstack/react-query";
-import { fetchEvent } from "~/services/nostr";
-import { INDEX_RELAYS } from "~/const";
-
-export function EventDisplay({ id }: { id: string }) {
-  const { data: event, isLoading, error } = useQuery({
-    queryKey: ["event", id],
-    queryFn: () => fetchEvent({ id, relays: INDEX_RELAYS })
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-  if (!event) return <div>Event not found</div>;
-
-  return <div>{event.content}</div>;
-}
-```
+These hooks subscribe to the `EventStore` and trigger a loader; see the
+`applesauce` skill for the pattern behind them.
 
 ## Publishing Events
 
-### Publish a Note
+Publishing goes through an **action** run by the shared `ActionRunner`. Actions
+live in `app/nostr/actions.ts`.
 
-```typescript
-import { usePublisher, useEventFactory } from "applesauce-react/hooks";
-import { COMMON_RELAYS } from "~/const";
-import { toast } from "sonner";
+### Define the action
 
-export function PublishNote({ content }: { content: string }) {
-  const publisher = usePublisher();
-  const factory = useEventFactory();
+```ts
+import type { Action } from "applesauce-actions";
+import factory from "~/services/event-factory";
+import { modifyPublicTags } from "applesauce-factory/operations";
+import { addPubkeyTag } from "applesauce-factory/operations/tag";
 
-  async function handlePublish() {
-    try {
-      const note = factory.note(content);
-      await publisher.publish(note, COMMON_RELAYS);
-      toast.success("Note published!");
-    } catch (error) {
-      toast.error("Failed to publish");
-      console.error(error);
-    }
-  }
-
-  return <button onClick={handlePublish}>Publish</button>;
+export function Note({ message }: { message: string }): Action {
+  return async ({ sign, publish }) => {
+    const draft = await factory.build({
+      kind: kinds.ShortTextNote,
+      content: message,
+    });
+    await publish(await sign(draft));
+  };
 }
 ```
 
-### Publish an Article
+The context has `events`, `self`, `user`, `sign`, `publish` and `run` — but no
+`factory`; import the singleton.
 
-```typescript
-import { usePublisher, useEventFactory } from "applesauce-react/hooks";
-import { COMMON_RELAYS } from "~/const";
-import { toast } from "sonner";
+### Run it and publish
 
-export function PublishArticle({ title, content, identifier }) {
-  const publisher = usePublisher();
-  const factory = useEventFactory();
-  const [isPublishing, setIsPublishing] = useState(false);
+`runner.exec()` hands back the signed events instead of sending them, which is
+what lets the UI report per-relay progress.
 
-  async function handlePublish() {
-    setIsPublishing(true);
-    try {
-      const article = factory.longFormArticle({
-        title,
-        content,
-        identifier,
-        tags: ["nostr", "technology"]  // Optional tags
-      });
+```tsx
+const runner = useActionRunner();
 
-      await publisher.publish(article, COMMON_RELAYS);
-      toast.success("Article published!");
-    } catch (error) {
-      toast.error("Failed to publish");
-      console.error(error);
-    } finally {
-      setIsPublishing(false);
-    }
-  }
-
-  return (
-    <button onClick={handlePublish} disabled={isPublishing}>
-      {isPublishing ? "Publishing..." : "Publish"}
-    </button>
-  );
-}
+const signed = await firstValueFrom(runner.exec(Note, { message }));
+const result = await publishToRelays(signed, relays, (progress) => {
+  progress.statuses
+    .filter((s) => s.status === "error")
+    .forEach((s) =>
+      toast.error(`Failed to publish to ${s.relay}`, {
+        description: s.message,
+      }),
+    );
+});
+if (result.successCount === 0)
+  throw new Error("Failed to publish to any relay");
 ```
+
+For articles specifically, use the existing `PublishArticle` action rather than
+building a kind 30023 by hand — it handles `d`, `published_at`, imeta tags,
+mentions and tag deduplication.
 
 ## Working with TipTap Editor
 
@@ -307,7 +278,7 @@ export const kinds = {
 2. **Create loader** (if needed)
 
 ```typescript
-// In app/services/loaders.client.ts or loaders.server.ts
+// In app/services/loaders.ts
 export async function fetchMyCustomKind(pointer: AddressPointer) {
   return dataStore.fetchAddress({
     ...pointer,
@@ -455,7 +426,7 @@ export function StyledComponent({ variant, className }) {
 
 ## Error Handling
 
-### Server-Side Errors (in loaders)
+### Loader errors
 
 ```typescript
 import { redirect } from "react-router";
@@ -471,7 +442,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 }
 ```
 
-### Client-Side Errors
+### Component errors
 
 ```typescript
 import { toast } from "sonner";
@@ -498,9 +469,12 @@ npm run dev
 ### Test Production Build
 
 ```bash
-npm run build
-npm run start
+pnpm build     # -> build/client
+pnpm preview   # serves it with the SPA fallback on :4173
 ```
+
+The fallback matters: without it, a deep link like `/verbiricha/grimoire`
+404s instead of booting the app.
 
 ### Type Check
 

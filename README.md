@@ -1,87 +1,115 @@
-# Welcome to React Router!
+# Habla
 
-A modern, production-ready template for building full-stack React applications using React Router.
+Long-form writing on [nostr](https://nostr.com). Read, highlight, write and
+publish articles that live on relays instead of on someone's server — and get
+paid for them in bitcoin over lightning.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+Habla is a **static single-page app**. There is no backend: the browser talks
+to nostr relays directly, signs with the reader's own key, and stores drafts
+locally. The whole thing is a folder of files you can host anywhere, including
+on nostr itself as an [nsite](https://nsite.run).
 
-## Features
+## What it does
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+- **Read** long-form articles (NIP-23, kind `30023`) from any relay, by author,
+  by hashtag, or by relay.
+- **Write and publish** with a rich-text editor that round-trips Markdown, with
+  drafts saved to `localStorage` and images uploaded to
+  [Blossom](https://github.com/hzrd149/blossom) servers.
+- **Highlight** passages (kind `9802`) and comment on them (NIP-22).
+- **Zap** authors over lightning, with a built-in NWC wallet.
+- **Named URLs**: members in `app/members.ts` get `habla.news/<name>` and
+  `habla.news/<name>/<article>`, backed by a static NIP-05 file.
 
-## Getting Started
+## Running it
 
-### Installation
-
-Install the dependencies:
-
-```bash
-npm install
-```
-
-### Development
-
-Start the development server with HMR:
+Requires Node 20+ and pnpm.
 
 ```bash
-npm run dev
+pnpm install
+pnpm dev          # http://localhost:5173
 ```
 
-Your application will be available at `http://localhost:5173`.
+Other scripts:
 
-## Building for Production
+| Command             | What it does                                                      |
+| ------------------- | ----------------------------------------------------------------- |
+| `pnpm build`        | Regenerates static files, then builds to `build/client`           |
+| `pnpm preview`      | Serves the built site with SPA fallback on `:4173`                |
+| `pnpm typecheck`    | Route typegen + `tsc`                                             |
+| `pnpm test`         | Vitest                                                            |
+| `pnpm gen:static`   | Rewrites `public/.well-known/nostr.json` and `public/sitemap.xml` |
+| `pnpm deploy:nsite` | Builds and publishes to nostr with `nsyte`                        |
 
-Create a production build:
+There are no required environment variables. `SITE_URL` (default
+`https://habla.news`) only affects the absolute URLs in the generated sitemap.
+
+## Deploying
+
+`pnpm build` produces `build/client`: plain HTML, JS, CSS and assets. Serve it
+from anything, with one requirement — **unknown paths must fall back to
+`/index.html`**, or client-side routes like `/verbiricha/grimoire` will 404.
+
+### As an nsite
+
+[nsyte](https://github.com/sandwichfarm/nsyte) uploads the build to Blossom
+servers and publishes the file map to relays, so the site is addressed by a
+nostr pubkey rather than a domain. The relays, Blossom servers and the
+`/index.html` fallback live in `.nsite/config.json`.
 
 ```bash
-npm run build
+pnpm deploy:nsite
 ```
 
-## Deployment
+### Anywhere else
 
-### Docker Deployment
+Any static host works — Vercel, Netlify, Cloudflare Pages, S3, nginx — as long
+as you configure the SPA fallback.
 
-To build and run using Docker:
+## Adding a member
 
-```bash
-docker build -t my-app .
+Members get a vanity URL and a NIP-05 identity at `habla.news`.
 
-# Run the container
-docker run -p 3000:3000 my-app
-```
+1. Add `{ username, pubkey }` to `app/members.ts`.
+2. Run `pnpm gen:static` and commit the regenerated
+   `public/.well-known/nostr.json` and `public/sitemap.xml`.
+3. Deploy.
 
-The containerized application can be deployed to any platform that supports Docker, including:
+## How it's built
 
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
+- **[React Router v7](https://reactrouter.com)** in framework mode with
+  `ssr: false`. Routes still get `meta()`, layouts and typed params; data comes
+  from `clientLoader` instead of a server `loader`.
+- **[applesauce](https://github.com/hzrd149/applesauce) v6** for everything
+  nostr: `EventStore` as the single source of truth, loaders that batch and
+  deduplicate relay requests, and RxJS observables for reactive updates.
+- **[TipTap v3](https://tiptap.dev)** for the editor, serializing to Markdown.
+- **Tailwind v4** and **Radix UI** for the interface.
 
 ```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
+app/
+├── routes/      # One file per URL; clientLoader + component
+├── services/    # Relay pool, event store, loaders, accounts, wallet, drafts
+├── nostr/       # Actions (publish, comment, zap request) and queries
+├── ui/          # Components; ui/nostr/* is the nostr-aware layer
+├── hooks/       # useProfile, useEvent, useTimeline, useZaps, ...
+├── members.ts   # The NIP-05 registry
+└── featured.ts  # Articles and highlights baked into the home page
 ```
 
-## Styling
+For the longer version, see `CLAUDE.md` and `claudedocs/`.
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
+## Tradeoffs worth knowing
 
----
+Dropping the server bought simplicity and censorship resistance, and cost two
+things:
 
-Built with ❤️ using React Router.
+- **No server-rendered meta tags.** `meta()` runs in the browser, so crawlers
+  and chat previews that do not execute JavaScript see the generic site title
+  rather than the article's.
+- **First paint waits on relays.** There is no cache in front of the network;
+  a page shows its skeleton until the events arrive.
+
+## License
+
+See [LICENSE](./LICENSE).

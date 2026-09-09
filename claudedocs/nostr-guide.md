@@ -129,30 +129,20 @@ const { events } = useSubscription({
 
 ### Publish an Event
 
-```typescript
-import { usePublisher } from "applesauce-react/hooks";
-import { useEventFactory } from "applesauce-react/hooks";
+Publishing goes through an action run by the shared `ActionRunner`; see
+`claudedocs/common-tasks.md` and the `applesauce` skill.
 
-const publisher = usePublisher();
-const factory = useEventFactory();
-
-const event = factory.note("Hello Nostr!");
-await publisher.publish(event, relays);
+```ts
+const runner = useActionRunner();
+const signed = await firstValueFrom(runner.exec(Note, { message }));
+await publishToRelays(signed, relays);
 ```
 
 ### Create an Article
 
-```typescript
-const factory = useEventFactory();
-const article = factory.longFormArticle({
-  title: "My Article",
-  content: "Article content in markdown...",
-  identifier: "my-article-slug",
-  tags: ["nostr", "decentralization"],
-});
-
-await publisher.publish(article, relays);
-```
+Use the `PublishArticle` action in `app/nostr/publish-article.ts` rather than
+assembling a kind 30023 by hand — it owns the `d`, `published_at`, `imeta`,
+mention and hashtag tags.
 
 ## Event Filters
 
@@ -248,7 +238,7 @@ Relevant NIPs used in Habla:
 
 1. **Always validate signatures** - Don't trust unverified events
 2. **Connect to multiple relays** - Increases availability and censorship resistance
-3. **Cache aggressively** - Use IndexedDB and Redis to minimize network requests
+3. **Cache aggressively** - the `EventStore` is the client-side cache; read from it rather than refetching
 4. **Close subscriptions** - Prevent memory leaks by closing when components unmount
 5. **Handle relay failures** - Not all relays are always available
 6. **Never expose private keys** - Keep nsec secure, use signers
