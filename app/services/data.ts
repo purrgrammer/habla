@@ -1,4 +1,11 @@
-import { firstValueFrom } from "rxjs";
+import {
+  catchError,
+  defaultIfEmpty,
+  firstValueFrom,
+  of,
+  timeout,
+  type Observable,
+} from "rxjs";
 import type { NostrEvent } from "nostr-tools";
 import { kinds } from "nostr-tools";
 import type {
@@ -14,28 +21,48 @@ import { getUsers, getMembers } from "~/lib/api";
 import type { Pubkey, Relay } from "~/types";
 import { getRelayURLs } from "~/lib/url";
 
+/**
+ * Client fetches get a longer leash than SSR does — nobody is waiting on a
+ * TTFB here — but they still have to end, or a route sits on its skeleton
+ * forever.
+ */
+const CLIENT_TIMEOUT = Number(import.meta.env?.VITE_CLIENT_TIMEOUT ?? 10_000);
+
+/** First event from a loader, or `undefined` — never hangs, never throws. */
+function firstOrNothing(
+  source: Observable<NostrEvent>,
+): Promise<NostrEvent | undefined> {
+  return firstValueFrom(
+    source.pipe(
+      timeout(CLIENT_TIMEOUT),
+      catchError(() => of(undefined)),
+      defaultIfEmpty(undefined),
+    ),
+  );
+}
+
 function fetchProfile(
   pointer: ProfilePointer,
 ): Promise<ProfileContent | undefined> {
-  return firstValueFrom(
+  return firstOrNothing(
     profileLoader({ kind: kinds.Metadata, ...pointer }),
-  ).then(getProfileContent);
+  ).then((event) => (event ? getProfileContent(event) : undefined));
 }
 
 function fetchRelays(pubkey: Pubkey): Promise<Relay[]> {
-  return firstValueFrom(profileLoader({ kind: kinds.RelayList, pubkey })).then(
-    getRelayURLs,
+  return firstOrNothing(profileLoader({ kind: kinds.RelayList, pubkey })).then(
+    (event) => (event ? getRelayURLs(event) : []),
   );
 }
 
 function fetchEvent(pointer: EventPointer): Promise<NostrEvent | undefined> {
-  return firstValueFrom(eventLoader(pointer));
+  return firstOrNothing(eventLoader(pointer));
 }
 
 function fetchAddress(
   pointer: AddressPointer,
 ): Promise<NostrEvent | undefined> {
-  return firstValueFrom(addressLoader(pointer));
+  return firstOrNothing(addressLoader(pointer));
 }
 
 const store: DataStore = {

@@ -1,4 +1,13 @@
-import { firstValueFrom, lastValueFrom, map, timeout, toArray } from "rxjs";
+import {
+  catchError,
+  defaultIfEmpty,
+  firstValueFrom,
+  lastValueFrom,
+  map,
+  of,
+  timeout,
+  toArray,
+} from "rxjs";
 import { completeOnEose } from "applesauce-relay/operators";
 import {
   getProfileContent,
@@ -19,23 +28,52 @@ import type {
   AddressPointer,
 } from "nostr-tools/nip19";
 import type { DataStore, Nip05Data, Nip05Pointer, User } from "./types";
+import { STATIC_NAMES } from "../members";
+
+/**
+ * Redis is an OPTIONAL cache/registry backend.
+ *
+ * - `REDIS_URL` set   -> Redis is used as a read-through cache and as the
+ *                        NIP-05 member registry.
+ * - `REDIS_URL` unset -> the app never opens a connection. Every cache read
+ *                        misses, every cache write is a no-op, and the member
+ *                        registry falls back to the static list in
+ *                        `app/members.ts`.
+ *
+ * Nothing in the request path may block on Redis: connect/command timeouts are
+ * short, and a failure flips the whole client into offline mode for a minute.
+ */
+/**
+ * Per-relay-request deadline. Kept comfortably below `SSR_TIMEOUT` so a slow
+ * relay resolves as "no data" rather than blowing the whole loader deadline.
+ */
+const NOSTR_TIMEOUT = Number(process.env.NOSTR_TIMEOUT ?? 2_500);
 
 const redisUrl = process.env.REDIS_URL;
-const url = redisUrl || "localhost";
+export const REDIS_ENABLED = Boolean(redisUrl);
+
+const REDIS_CONNECT_TIMEOUT = Number(
+  process.env.REDIS_CONNECT_TIMEOUT ?? 1_000,
+);
+const REDIS_COMMAND_TIMEOUT = Number(
+  process.env.REDIS_COMMAND_TIMEOUT ?? 1_000,
+);
+
 const redisOptions = {
   maxRetriesPerRequest: 1,
+  connectTimeout: REDIS_CONNECT_TIMEOUT,
+  commandTimeout: REDIS_COMMAND_TIMEOUT,
+  enableOfflineQueue: false,
+  lazyConnect: true,
 };
-const host = url.replace(/:6379$/, "");
 
 let redisInstance: Redis | undefined;
 let isRedisOffline = false;
 
-function getRedis(): Redis {
+function getRedis(): Redis | undefined {
+  if (!redisUrl) return undefined;
   if (!redisInstance) {
-    console.log(`[redis] ${host}`);
-    redisInstance = redisUrl
-      ? new Redis(redisUrl, { ...redisOptions, lazyConnect: true })
-      : new Redis(6379, host, { ...redisOptions, lazyConnect: true });
+    redisInstance = new Redis(redisUrl, redisOptions);
 
     // Add error listener to prevent unhandled 'error' events
     redisInstance.on("error", (err) => {
@@ -58,9 +96,9 @@ function getRedis(): Redis {
   return redisInstance;
 }
 
-// Helper to check if redis is available before every call
+/** Whether a Redis command may be attempted right now. */
 function isAvailable() {
-  return !isRedisOffline;
+  return REDIS_ENABLED && !isRedisOffline;
 }
 
 // ============================================================================
@@ -68,18 +106,37 @@ function isAvailable() {
 // ============================================================================
 
 /**
+ * Run a Redis command. Returns `fallback` when Redis is disabled, offline, or
+ * the command throws — callers never have to care whether Redis exists.
+ */
+async function withRedis<T>(
+  label: string,
+  fn: (redis: Redis) => Promise<T>,
+  fallback: T,
+): Promise<T> {
+  const redis = isAvailable() ? getRedis() : undefined;
+  if (!redis) return fallback;
+  try {
+    return await fn(redis);
+  } catch (e) {
+    console.warn(`[cache] ${label} failed:`, e);
+    return fallback;
+  }
+}
+
+/**
  * Cache a value in Redis with the given key.
  * Returns true if the value was cached successfully, false otherwise.
  */
 async function cacheValue<T>(key: string, value: T): Promise<boolean> {
-  if (!isAvailable()) return false;
-  try {
-    await getRedis().set(key, JSON.stringify(value));
-    return true;
-  } catch (e) {
-    console.warn(`[cache] failed to cache ${key}:`, e);
-    return false;
-  }
+  return withRedis(
+    `set ${key}`,
+    async (redis) => {
+      await redis.set(key, JSON.stringify(value));
+      return true;
+    },
+    false,
+  );
 }
 
 /**
@@ -87,14 +144,14 @@ async function cacheValue<T>(key: string, value: T): Promise<boolean> {
  * Returns the parsed value if found, null otherwise.
  */
 async function getCachedValue<T>(key: string): Promise<T | null> {
-  if (!isAvailable()) return null;
-  try {
-    const json = await getRedis().get(key);
-    return json ? (safeParse(json) ?? null) : null;
-  } catch (e) {
-    console.warn(`[cache] failed to get ${key}:`, e);
-    return null;
-  }
+  return withRedis<T | null>(
+    `get ${key}`,
+    async (redis) => {
+      const json = await redis.get(key);
+      return json ? (safeParse<T>(json) ?? null) : null;
+    },
+    null,
+  );
 }
 
 /**
@@ -106,14 +163,12 @@ async function cacheHashField<T>(
   field: string,
   value: T,
 ): Promise<boolean> {
-  if (!isAvailable()) return false;
-  try {
-    const result = await getRedis().hset(key, field, JSON.stringify(value));
-    return result === 1;
-  } catch (e) {
-    console.warn(`[cache] failed to cache hash ${key}:${field}:`, e);
-    return false;
-  }
+  return withRedis(
+    `hset ${key}:${field}`,
+    async (redis) =>
+      (await redis.hset(key, field, JSON.stringify(value))) === 1,
+    false,
+  );
 }
 
 /**
@@ -124,14 +179,14 @@ async function getCachedHashField<T>(
   key: string,
   field: string,
 ): Promise<T | null> {
-  if (!isAvailable()) return null;
-  try {
-    const json = await getRedis().hget(key, field);
-    return json ? (safeParse(json) ?? null) : null;
-  } catch (e) {
-    console.warn(`[cache] failed to get hash ${key}:${field}:`, e);
-    return null;
-  }
+  return withRedis<T | null>(
+    `hget ${key}:${field}`,
+    async (redis) => {
+      const json = await redis.hget(key, field);
+      return json ? (safeParse<T>(json) ?? null) : null;
+    },
+    null,
+  );
 }
 
 /**
@@ -141,16 +196,16 @@ async function getCachedHashField<T>(
 async function cacheMulti(
   operations: (multi: ReturnType<Redis["multi"]>) => void,
 ): Promise<boolean> {
-  if (!isAvailable()) return false;
-  try {
-    const multi = getRedis().multi();
-    operations(multi);
-    await multi.exec();
-    return true;
-  } catch (e) {
-    console.warn(`[cache] multi operation failed:`, e);
-    return false;
-  }
+  return withRedis(
+    "multi",
+    async (redis) => {
+      const multi = redis.multi();
+      operations(multi);
+      await multi.exec();
+      return true;
+    },
+    false,
+  );
 }
 
 // ============================================================================
@@ -344,13 +399,12 @@ const INVALID_USERNAMES = new Set([
 ]);
 
 export async function getUsername(username: string): Promise<string | null> {
-  if (!isAvailable()) return null;
-  try {
-    return getRedis().hget(NIP05_NAMES, username);
-  } catch (e) {
-    console.warn(`[cache] failed to get username ${username}:`, e);
-    return null;
-  }
+  const cached = await withRedis<string | null>(
+    `hget ${NIP05_NAMES}:${username}`,
+    (redis) => redis.hget(NIP05_NAMES, username),
+    null,
+  );
+  return cached ?? STATIC_NAMES[username] ?? null;
 }
 
 export async function saveUser({
@@ -377,40 +431,33 @@ async function cacheNip05Relays(
 }
 
 export async function getNip05(): Promise<Nip05Data> {
-  if (!isAvailable()) return { names: {}, relays: {} };
+  const cached = await withRedis<Nip05Data | null>(
+    "nip05",
+    async (redis) => {
+      const response = await redis
+        .multi()
+        .hgetall(NIP05_NAMES)
+        .hgetall(NIP05_RELAYS)
+        .exec();
 
-  try {
-    const response = await getRedis()
-      .multi()
+      const names = (response?.[0]?.[1] as Record<string, string>) || {};
+      const relaysRaw = (response?.[1]?.[1] as Record<string, string>) || {};
 
-      .hgetall(NIP05_NAMES)
-
-      .hgetall(NIP05_RELAYS)
-
-      .exec();
-
-    const names = (response?.[0]?.[1] as Record<string, string>) || {};
-
-    const relaysRaw = (response?.[1]?.[1] as Record<string, string>) || {};
-
-    const relays: Record<string, string[]> = {};
-
-    for (const [pubkey, relaysJson] of Object.entries(relaysRaw)) {
-      try {
-        relays[pubkey] = safeParse(relaysJson) ?? [];
-      } catch {
-        relays[pubkey] = [];
+      const relays: Record<string, string[]> = {};
+      for (const [pubkey, relaysJson] of Object.entries(relaysRaw)) {
+        relays[pubkey] = safeParse<string[]>(relaysJson) ?? [];
       }
-    }
 
-    return { names, relays };
-  } catch (e) {
-    if (!isRedisOffline) {
-      console.warn("[cache] failed to get nip05 data (Redis offline)");
-    }
+      return { names, relays };
+    },
+    null,
+  );
 
-    return { names: {}, relays: {} };
-  }
+  // Static members are always present; Redis entries win on conflict.
+  return {
+    names: { ...STATIC_NAMES, ...(cached?.names ?? {}) },
+    relays: cached?.relays ?? {},
+  };
 }
 
 export async function getMembers(): Promise<Nip05Pointer[]> {
@@ -426,45 +473,39 @@ export async function getMembers(): Promise<Nip05Pointer[]> {
 // TODO: get members with full profile info: { username, pubkey, profile }
 
 export async function getUsers(): Promise<User[]> {
-  if (!isAvailable()) return [];
-  try {
-    const result = await getRedis().hgetall(NIP05_NAMES);
-    const results = await Promise.allSettled(
-      Object.entries(result).map(async ([username, pubkey]) => {
-        const profile = await fetchProfile({ pubkey });
-        if (profile) return { username, pubkey, profile };
-        throw new Error(
-          `profile for ${username} with pubkey ${pubkey} not found`,
-        );
-      }),
-    );
-    return results.filter((r) => r.status === "fulfilled").map((r) => r.value);
-  } catch (e) {
-    console.warn("[cache] failed to get users:", e);
-    return [];
-  }
+  const { names } = await getNip05();
+  const results = await Promise.allSettled(
+    Object.entries(names).map(async ([username, pubkey]) => {
+      const profile = await fetchProfile({ pubkey });
+      if (profile) return { username, pubkey, profile };
+      throw new Error(
+        `profile for ${username} with pubkey ${pubkey} not found`,
+      );
+    }),
+  );
+  return results.filter((r) => r.status === "fulfilled").map((r) => r.value);
 }
 
 export async function getArticles(
   pointer: Nip05Pointer,
 ): Promise<NostrEvent[]> {
-  if (!isAvailable()) return [];
-  try {
-    const { pubkey } = pointer;
-    const identifiers = await getRedis().smembers(articlesKey(pubkey));
-    if (identifiers.length === 0) return [];
-    const results = await getRedis().mget(
-      identifiers.map((identifier) =>
-        addressKey({ pubkey, kind: kinds.LongFormArticle, identifier }),
-      ),
-    );
-    return results
-      .map((result) => (result ? safeParse(result) : null))
-      .filter(Boolean);
-  } catch (e) {
-    console.warn(`[cache] failed to get articles for ${pointer.pubkey}:`, e);
-    return [];
-  }
+  const { pubkey } = pointer;
+  return withRedis<NostrEvent[]>(
+    `articles ${pubkey}`,
+    async (redis) => {
+      const identifiers = await redis.smembers(articlesKey(pubkey));
+      if (identifiers.length === 0) return [];
+      const results = await redis.mget(
+        identifiers.map((identifier) =>
+          addressKey({ pubkey, kind: kinds.LongFormArticle, identifier }),
+        ),
+      );
+      return results
+        .map((result) => (result ? safeParse<NostrEvent>(result) : null))
+        .filter((e): e is NostrEvent => Boolean(e));
+    },
+    [],
+  );
 }
 
 export async function fetchArticles({
@@ -627,9 +668,12 @@ async function fetchNostrRelays(
         limit: 1,
       })
       .pipe(
-        timeout(10_000),
+        timeout(NOSTR_TIMEOUT),
         completeOnEose(),
         map((ev) => getRelayURLs(ev).filter((r) => !r.startsWith("ws://"))),
+        // A missing or slow relay list must not fail the whole page.
+        catchError(() => of([] as string[])),
+        defaultIfEmpty([] as string[]),
       ),
   );
 }
@@ -645,7 +689,13 @@ async function fetchNostrProfile(
         authors: [pubkey],
         limit: 1,
       })
-      .pipe(timeout(10_000), completeOnEose(), map(getProfileContent)),
+      .pipe(
+        timeout(NOSTR_TIMEOUT),
+        completeOnEose(),
+        map(getProfileContent),
+        catchError(() => of(undefined)),
+        defaultIfEmpty(undefined),
+      ),
   );
 }
 
@@ -658,7 +708,7 @@ function fetchNostrAddress(pointer: AddressPointer): Promise<NostrEvent> {
         authors: [pubkey],
         "#d": [identifier],
       })
-      .pipe(timeout(10_000), completeOnEose()),
+      .pipe(timeout(NOSTR_TIMEOUT), completeOnEose()),
   );
 }
 
@@ -671,7 +721,7 @@ function fetchNostrEvent(pointer: EventPointer): Promise<NostrEvent> {
         ...(kind ? { kinds: [kind] } : { kinds: [kinds.ShortTextNote] }),
         ...(author ? { authors: [author] } : {}),
       })
-      .pipe(timeout(10_000), completeOnEose()),
+      .pipe(timeout(NOSTR_TIMEOUT), completeOnEose()),
   );
 }
 
@@ -682,7 +732,7 @@ function fetchNostrArticles(pubkey: string, relays: string[]) {
         kinds: [kinds.LongFormArticle],
         authors: [pubkey],
       })
-      .pipe(timeout(10_000), completeOnEose(), toArray()),
+      .pipe(timeout(NOSTR_TIMEOUT), completeOnEose(), toArray()),
   );
 }
 

@@ -7,6 +7,8 @@ import defaults, { eventMeta } from "~/seo";
 import { default as clientStore } from "~/services/data";
 import { default as serverStore } from "~/services/data.server";
 import type { DataStore } from "~/services/types";
+import { ssrDeadline } from "~/lib/ssr";
+import { hydrateFromServer } from "~/lib/client-loader";
 import type { ProfileContent } from "applesauce-core/helpers";
 import type { ReactNode } from "react";
 import { EventReply } from "~/ui/nostr/reply";
@@ -18,7 +20,9 @@ export function meta({ loaderData }: Route.MetaArgs) {
   return eventMeta(loaderData.event, loaderData.profile);
 }
 
-async function loadData(store: DataStore, { params }: Route.MetaArgs) {
+type LoadArgs = Pick<Route.LoaderArgs, "params">;
+
+async function loadData(store: DataStore, { params }: LoadArgs) {
   const { nevent } = params;
   const decoded = nip19.decode(nevent);
   if (decoded?.type === "nevent" && decoded?.data.author) {
@@ -38,13 +42,13 @@ async function loadData(store: DataStore, { params }: Route.MetaArgs) {
   }
 }
 
-export async function loader(args: Route.MetaArgs) {
-  return loadData(serverStore, args);
+export async function loader(args: Route.LoaderArgs) {
+  return ssrDeadline("event", () => loadData(serverStore, args));
 }
 
-export async function clientLoader(args: Route.MetaArgs) {
-  return loadData(clientStore, args);
-}
+export const clientLoader = hydrateFromServer((args: Route.ClientLoaderArgs) =>
+  loadData(clientStore, args),
+);
 
 interface ComponentProps {
   profile?: ProfileContent;

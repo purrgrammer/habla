@@ -1,6 +1,9 @@
 import type { Route } from "./+types/sitemap";
 import { getMembers, getArticles } from "~/services/data.server";
 import { getArticlePublished, getTagValue } from "applesauce-core/helpers";
+import type { NostrEvent } from "nostr-tools";
+import { ssrDeadlineOr } from "~/lib/ssr";
+import type { Nip05Pointer } from "~/services/types";
 
 // Escape special XML characters in URLs
 function escapeXml(unsafe: string): string {
@@ -56,7 +59,11 @@ export async function loader({ request }: Route.LoaderArgs) {
   const lastModified = new Date().toISOString();
 
   // Get all featured users and their articles
-  const users = await getMembers();
+  const users = await ssrDeadlineOr(
+    "sitemap:members",
+    getMembers,
+    [] as Nip05Pointer[],
+  );
   const urls: Array<{
     url: string;
     lastmod: string;
@@ -85,7 +92,11 @@ export async function loader({ request }: Route.LoaderArgs) {
 
     // Add user's articles
     try {
-      const articles = await getArticles(user);
+      const articles = await ssrDeadlineOr(
+        `sitemap:articles ${user.nip05}`,
+        () => getArticles(user),
+        [] as NostrEvent[],
+      );
       for (const article of articles) {
         const identifier = getTagValue(article, "d");
         if (!isValidIdentifier(identifier)) continue;

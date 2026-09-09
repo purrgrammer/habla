@@ -1,6 +1,10 @@
 import { vercelPreset } from "@vercel/react-router/vite";
 import type { Config } from "@react-router/dev/config";
-import { getMembers, getArticles } from "./app/services/data.server";
+import {
+  getMembers,
+  getArticles,
+  REDIS_ENABLED,
+} from "./app/services/data.server";
 import { getTagValue } from "applesauce-core/helpers";
 
 // Validate identifier for URL safety
@@ -20,7 +24,17 @@ export default {
   ssr: true,
   presets: [vercelPreset()],
   async prerender() {
-    let result = ["/", "/sitemap.xml", "/.well-known/nostr.json"];
+    const result = ["/", "/sitemap.xml", "/.well-known/nostr.json"];
+
+    // Prerendering member pages only pays off when there is a warm Redis cache
+    // to read them from. Without one, every page would be built from a live
+    // relay round trip — slow, flaky, and the result would be a client-side
+    // shell anyway.
+    if (!REDIS_ENABLED) {
+      console.log("[prerender] REDIS_URL unset, prerendering static routes only");
+      return result;
+    }
+
     try {
       const users = await getMembers();
       for (const user of users) {

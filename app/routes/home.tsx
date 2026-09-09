@@ -67,27 +67,48 @@ import Note from "~/ui/nostr/note";
 import Blockquote from "~/ui/blockquote";
 import UserLink from "~/ui/nostr/user-link";
 import { EventReply } from "~/ui/nostr/reply";
+import { ssrDeadlineOr, SSR_LIST_TIMEOUT } from "~/lib/ssr";
+import { hydrateFromServer } from "~/lib/client-loader";
 
 export function meta({}: Route.MetaArgs) {
   return defaults;
 }
 
-export async function loadData(store: DataStore) {
-  const featured = await store.getUsers();
-  const categorizedArticles = await getArticlesByCategory();
-  const articles = await getFeaturedArticles();
-  const highlights = await getFeaturedHighlights();
+/**
+ * Everything but `featured` is baked into the bundle (`~/featured.ts`), so the
+ * home page always has something to render. The member list is the only part
+ * that talks to relays, and it is allowed to come back empty.
+ */
+export async function loadData(store: DataStore, featured: User[]) {
+  const [categorizedArticles, articles, highlights] = await Promise.all([
+    getArticlesByCategory(),
+    getFeaturedArticles(),
+    getFeaturedHighlights(),
+  ]);
   return { featured, articles, categorizedArticles, highlights };
 }
 
 export async function loader() {
-  return loadData(serverStore);
+  const featured = await ssrDeadlineOr(
+    "home:members",
+    () => serverStore.getUsers(),
+    [] as User[],
+    SSR_LIST_TIMEOUT,
+  );
+  return loadData(serverStore, featured);
 }
 
-export async function clientLoader() {
-  return loadData(clientStore);
-}
-//clientLoader.hydrate = true as const;
+export const clientLoader = hydrateFromServer(
+  async (args: Route.ClientLoaderArgs) => {
+    const server = (await args.serverLoader().catch(() => null)) as Awaited<
+      ReturnType<typeof loader>
+    > | null;
+    // Only the member list can be missing; refetch just that.
+    if (server && server.featured.length > 0) return server;
+    const featured = await clientStore.getUsers().catch(() => []);
+    return loadData(clientStore, featured);
+  },
+);
 
 function Hero() {
   return (
