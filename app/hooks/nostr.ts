@@ -10,11 +10,10 @@ import {
   getSeenRelays,
   getAddressPointerForEvent,
   getEventPointerForEvent,
-  getZapPayment,
-  getZapSender,
   getInboxes,
 } from "applesauce-core/helpers";
-import { EventZapsModel } from "applesauce-core/models/zaps";
+import { getZapPayment, getZapSender } from "applesauce-common/helpers";
+import { EventZapsModel } from "applesauce-common/models/zaps";
 import { getRelayURLs } from "~/lib/url";
 import {
   createTimelineLoader,
@@ -24,7 +23,7 @@ import type { ProfileContent } from "applesauce-core/helpers/profile";
 import pool from "~/services/relay-pool";
 import { useEventStore } from "applesauce-react/hooks";
 import { eventLoader, addressLoader, profileLoader } from "~/services/loaders";
-import { getArticlePublished } from "applesauce-core/helpers";
+import { getArticlePublished } from "applesauce-common/helpers";
 import { isReplaceableKind } from "nostr-tools/kinds";
 import { AGGREGATOR_RELAYS } from "~/const";
 import { ProfileModel } from "applesauce-core/models";
@@ -248,9 +247,10 @@ export function usePubkeyZaps(pubkey: string) {
 
 export function useZaps(event: NostrEvent) {
   const relays = useInboxRelays(event.pubkey);
-  const pointer = isReplaceableKind(event.kind)
-    ? getAddressPointerForEvent(event)
-    : getEventPointerForEvent(event);
+  // v6 returns null for a non-addressable event; fall back to the event pointer.
+  const pointer =
+    (isReplaceableKind(event.kind) ? getAddressPointerForEvent(event) : null) ??
+    getEventPointerForEvent(event);
   const eventStore = useEventStore();
 
   useEffect(() => {
@@ -281,10 +281,8 @@ export function useZaps(event: NostrEvent) {
 
     const realtimeSubscription = pool
       .subscription(AGGREGATOR_RELAYS.concat(relays), zapFilters)
-      .subscribe((zapEvent) => {
-        if (zapEvent === "EOSE") return;
-        eventStore.add(zapEvent);
-      });
+      // v6 subscriptions emit events only; EOSE is no longer inlined in the stream.
+      .subscribe((zapEvent) => eventStore.add(zapEvent));
 
     return () => {
       loaderSubscription.unsubscribe();

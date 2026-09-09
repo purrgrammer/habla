@@ -1,14 +1,13 @@
 import { type NostrEvent, nip19 } from "nostr-tools";
 import { cn } from "~/lib/utils";
 import { type AddressPointer } from "nostr-tools/nip19";
+import { type ProfileContent, getSeenRelays } from "applesauce-core/helpers";
 import {
-  type ProfileContent,
   getArticleTitle,
   getArticleImage,
   getArticleSummary,
   getArticlePublished,
-  getSeenRelays,
-} from "applesauce-core/helpers";
+} from "applesauce-common/helpers";
 import Markdown from "~/ui/markdown";
 import UserLink from "~/ui/nostr/user-link";
 import Timestamp from "~/ui/timestamp";

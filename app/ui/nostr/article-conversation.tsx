@@ -14,10 +14,12 @@ import Note from "./note";
 import {
   getAddressPointerForEvent,
   getReplaceableAddress,
+} from "applesauce-core/helpers";
+import {
   getZapPayment,
   getZapRequest,
   getZapSender,
-} from "applesauce-core/helpers";
+} from "applesauce-common/helpers";
 import Zaps, { ZapButton } from "../zaps";
 import Debug from "../debug";
 import { EventReply, Reply } from "./reply";
@@ -26,6 +28,7 @@ import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import { isReplaceableKind } from "nostr-tools/kinds";
 import { Bookmark, MessageCircle, Share } from "lucide-react";
 import { Button } from "../button";
+import { addressOrId } from "~/lib/event";
 import { COMMENT } from "~/const";
 import CommentDialog from "./comment-dialog";
 import ArticleCard from "./article-card";
@@ -65,7 +68,7 @@ function Highlights({
   event: NostrEvent;
   relays: string[];
 }) {
-  const a = getReplaceableAddress(event);
+  const a = addressOrId(event);
   const filters = {
     kinds: [kinds.Highlights],
     "#a": [a],
@@ -84,7 +87,7 @@ function Highlights({
 }
 
 function Comments({ event, relays }: { event: NostrEvent; relays: string[] }) {
-  const a = getReplaceableAddress(event);
+  const a = addressOrId(event);
   const filters = {
     kinds: [kinds.ShortTextNote],
     "#a": [a],
@@ -114,9 +117,7 @@ export default function EventConversation({ event }: { event: NostrEvent }) {
   const inboxRelays = useInboxRelays(event.pubkey);
   useZaps(event);
   const [showCommentDialog, setShowCommentDialog] = useState(false);
-  const id = isReplaceableKind(event.kind)
-    ? getReplaceableAddress(event)
-    : event.id;
+  const id = isReplaceableKind(event.kind) ? addressOrId(event) : event.id;
   const filters = [
     {
       kinds: [1111],

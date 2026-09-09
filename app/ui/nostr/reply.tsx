@@ -14,10 +14,12 @@ import {
   getReplaceableAddress,
   getSeenRelays,
   getTagValue,
+} from "applesauce-core/helpers";
+import {
   getZapPayment,
   getZapRequest,
   getZapSender,
-} from "applesauce-core/helpers";
+} from "applesauce-common/helpers";
 import { useMemo, useState } from "react";
 import { Button } from "../button";
 import {
@@ -45,6 +47,7 @@ import {
   DropdownMenuTrigger,
 } from "~/ui/dropdown-menu";
 import ZapDialog from "./zap";
+import { addressOrId, displayPubkey } from "~/lib/event";
 import { AGGREGATOR_RELAYS, COMMENT } from "~/const";
 import { useNavigate } from "react-router";
 import { info } from "~/services/notifications";
@@ -181,8 +184,7 @@ function Repliers({ replies }: { replies: NostrEvent[] }) {
   const repliers = [
     ...new Set(
       replies.map((r) => {
-        if (r.kind === kinds.Zap) return getZapSender(r);
-        return r.pubkey;
+        return displayPubkey(r);
       }),
     ),
   ];
@@ -224,7 +226,7 @@ function Replies({ author, event }: { author: Pubkey; event?: NostrEvent }) {
   const tagFilter =
     event && isReplaceableKind(event.kind)
       ? {
-          "#a": [getReplaceableAddress(event)],
+          "#a": [addressOrId(event)],
         }
       : event
         ? {
@@ -280,9 +282,7 @@ function EventDialog({
             {kindNames[event.kind] || `Kind ${event.kind}`}
           </div>
         </DialogTitle>
-        <UserLink
-          pubkey={event.kind === kinds.Zap ? getZapSender(event) : event.pubkey}
-        />
+        <UserLink pubkey={displayPubkey(event)} />
         <pre className="text-xs bg-muted/40 p-2 rounded-sm font-mono overflow-scroll pretty-scrollbar">
           {JSON.stringify(event, null, 2)}
         </pre>
@@ -303,7 +303,7 @@ export function Reply({
   includeReplies,
 }: {
   author: Pubkey;
-  comment: string;
+  comment?: string;
   amount?: number;
   event?: NostrEvent;
   includeReplies?: boolean;
@@ -311,9 +311,7 @@ export function Reply({
   const [showZapDialog, setShowZapDialog] = useState(false);
   const [showCommentDialog, setShowCommentDialog] = useState(false);
   const [viewEvent, setViewEvent] = useState(false);
-  const profile = useProfile(
-    event?.kind === kinds.Zap ? getZapSender(event) : author,
-  );
+  const profile = useProfile(event ? displayPubkey(event) : author);
   const navigate = useNavigate();
   const canShare = typeof window !== "undefined" && window.navigator.share;
   const seenRelays = event ? getSeenRelays(event) : AGGREGATOR_RELAYS;
@@ -394,9 +392,7 @@ export function Reply({
           <ZapDialog
             open={showZapDialog}
             onOpenChange={setShowZapDialog}
-            pubkey={
-              event.kind === kinds.Zap ? getZapSender(event) : event.pubkey
-            }
+            pubkey={displayPubkey(event)}
             event={event}
             //hideTitle
             trigger={null}

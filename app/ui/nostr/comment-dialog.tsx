@@ -4,7 +4,7 @@ import { firstValueFrom } from "rxjs";
 import type { NostrEvent } from "nostr-tools";
 import { kinds } from "nostr-tools";
 import {
-  useActionHub,
+  useActionRunner,
   useActiveAccount,
   useEventStore,
 } from "applesauce-react/hooks";
@@ -32,7 +32,7 @@ export default function CommentDialog({
 }) {
   const [comment, setComment] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
-  const hub = useActionHub();
+  const hub = useActionRunner();
   const account = useActiveAccount();
   const eventStore = useEventStore();
   const userRelays = useRelays(account?.pubkey || "");

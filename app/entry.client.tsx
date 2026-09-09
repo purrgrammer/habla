@@ -6,7 +6,7 @@ import pool from "~/services/relay-pool";
 
 // Setup global methods for NostrConnectSigner as early as possible
 NostrConnectSigner.subscriptionMethod = (relays, filters) =>
-  pool.req(relays, filters);
+  pool.subscription(relays, filters);
 NostrConnectSigner.publishMethod = (relays, event) =>
   pool.publish(relays, event);
 

@@ -8,7 +8,6 @@ import {
   timeout,
   toArray,
 } from "rxjs";
-import { completeOnEose } from "applesauce-relay/operators";
 import {
   getProfileContent,
   getTagValue,
@@ -662,14 +661,13 @@ async function fetchNostrRelays(
 ): Promise<string[]> {
   return lastValueFrom(
     pool
-      .req(INDEX_RELAYS, {
+      .request(INDEX_RELAYS, {
         kinds: [kinds.RelayList],
         authors: [pubkey],
         limit: 1,
       })
       .pipe(
         timeout(NOSTR_TIMEOUT),
-        completeOnEose(),
         map((ev) => getRelayURLs(ev).filter((r) => !r.startsWith("ws://"))),
         // A missing or slow relay list must not fail the whole page.
         catchError(() => of([] as string[])),
@@ -684,14 +682,13 @@ async function fetchNostrProfile(
 ): Promise<ProfileContent | undefined> {
   return lastValueFrom(
     pool
-      .req(INDEX_RELAYS.concat(relays ?? []), {
+      .request(INDEX_RELAYS.concat(relays ?? []), {
         kinds: [kinds.Metadata],
         authors: [pubkey],
         limit: 1,
       })
       .pipe(
         timeout(NOSTR_TIMEOUT),
-        completeOnEose(),
         map(getProfileContent),
         catchError(() => of(undefined)),
         defaultIfEmpty(undefined),
@@ -703,12 +700,12 @@ function fetchNostrAddress(pointer: AddressPointer): Promise<NostrEvent> {
   const { kind, pubkey, relays, identifier } = pointer;
   return firstValueFrom(
     pool
-      .req(AGGREGATOR_RELAYS.concat(relays || []), {
+      .request(AGGREGATOR_RELAYS.concat(relays || []), {
         kinds: [kind],
         authors: [pubkey],
         "#d": [identifier],
       })
-      .pipe(timeout(NOSTR_TIMEOUT), completeOnEose()),
+      .pipe(timeout(NOSTR_TIMEOUT)),
   );
 }
 
@@ -716,23 +713,23 @@ function fetchNostrEvent(pointer: EventPointer): Promise<NostrEvent> {
   const { kind, author, id, relays } = pointer;
   return lastValueFrom(
     pool
-      .req(AGGREGATOR_RELAYS.concat(relays || []), {
+      .request(AGGREGATOR_RELAYS.concat(relays || []), {
         ids: [id],
         ...(kind ? { kinds: [kind] } : { kinds: [kinds.ShortTextNote] }),
         ...(author ? { authors: [author] } : {}),
       })
-      .pipe(timeout(NOSTR_TIMEOUT), completeOnEose()),
+      .pipe(timeout(NOSTR_TIMEOUT)),
   );
 }
 
 function fetchNostrArticles(pubkey: string, relays: string[]) {
   return lastValueFrom(
     pool
-      .req(relays, {
+      .request(relays, {
         kinds: [kinds.LongFormArticle],
         authors: [pubkey],
       })
-      .pipe(timeout(NOSTR_TIMEOUT), completeOnEose(), toArray()),
+      .pipe(timeout(NOSTR_TIMEOUT), toArray()),
   );
 }
 

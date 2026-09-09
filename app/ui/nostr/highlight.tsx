@@ -7,12 +7,14 @@ import { cn } from "~/lib/utils";
 import {
   type ProfileContent,
   getEventPointerForEvent,
+} from "applesauce-core/helpers";
+import {
   getHighlightAttributions,
   getHighlightComment,
   getHighlightSourceAddressPointer,
   getHighlightSourceEventPointer,
   getHighlightSourceUrl,
-} from "applesauce-core/helpers";
+} from "applesauce-common/helpers";
 import NAddr from "./naddr";
 import NEvent from "./nevent";
 import NEventLink from "./nevent-link";

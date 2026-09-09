@@ -22,7 +22,9 @@ export function hydrateFromServer<
     if (hydrating) {
       hydrating = false;
       // During hydration this resolves from the embedded SSR payload, not the network.
-      const server = (await args.serverLoader().catch(() => null)) as Data | null;
+      const server = (await args
+        .serverLoader()
+        .catch(() => null)) as Data | null;
       if (server) return server;
     }
     return load(args);

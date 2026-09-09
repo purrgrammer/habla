@@ -1,4 +1,10 @@
+.git
+.github
 .react-router
+.vercel
 build
+dist
 node_modules
-README.md
+*.md
+.env
+.env.*

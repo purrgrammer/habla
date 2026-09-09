@@ -1,5 +1,5 @@
 import { type NostrEvent } from "nostr-tools";
-import { getArticlePublished } from "applesauce-core/helpers";
+import { getArticlePublished } from "applesauce-common/helpers";
 
 export const testimonials = [
   {

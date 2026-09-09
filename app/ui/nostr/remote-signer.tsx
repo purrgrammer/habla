@@ -5,7 +5,7 @@ import QRCode from "react-qr-code";
 import { NostrConnectSigner, Helpers } from "applesauce-signers";
 import { NostrConnectAccount } from "applesauce-accounts/accounts";
 import { useAccountManager } from "applesauce-react/hooks";
-import { kinds } from "nostr-tools";
+import { kinds, type Filter, type NostrEvent } from "nostr-tools";
 import { generateSecretKey } from "nostr-tools/pure";
 import { bytesToHex } from "@noble/hashes/utils.js";
 import { Button } from "~/ui/button";
@@ -35,9 +35,9 @@ export default function RemoteSignerLogin({
 
   // Adapter for applesauce-signers
   const signerPool = useMemo(() => {
-    const sub = (relays: string[], filters: any[]) => {
+    const sub = (relays: string[], filters: Filter[]) => {
       console.log("[RemoteSigner] Subscribing to", relays, filters);
-      return pool.req(relays, filters).pipe(
+      return pool.subscription(relays, filters).pipe(
         tap((ev) => {
           if (typeof ev === "string") {
             console.log("[RemoteSigner] Received control message:", ev);
@@ -47,7 +47,7 @@ export default function RemoteSignerLogin({
         }),
       );
     };
-    const pub = (relays: string[], event: any) => {
+    const pub = (relays: string[], event: NostrEvent) => {
       console.log("[RemoteSigner] Publishing to", relays, event);
       return pool.publish(relays, event).then((res) => {
         console.log("[RemoteSigner] Publish result:", res);
@@ -163,9 +163,9 @@ function QRCodeFlow({
     abortedRef.current = false;
 
     const secret = bytesToHex(generateSecretKey());
-    const sub = (relays: string[], filters: any[]) => {
+    const sub = (relays: string[], filters: Filter[]) => {
       console.log("[RemoteSigner:QR] Subscribing to", relays, filters);
-      return pool.req(relays, filters).pipe(
+      return pool.subscription(relays, filters).pipe(
         tap((ev) => {
           if (typeof ev === "string") {
             console.log("[RemoteSigner:QR] Received control message:", ev);
@@ -179,7 +179,7 @@ function QRCodeFlow({
         }),
       );
     };
-    const pub = (relays: string[], event: any) => {
+    const pub = (relays: string[], event: NostrEvent) => {
       console.log("[RemoteSigner:QR] Publishing to", relays, event);
       return pool.publish(relays, event).then((res) => {
         console.log("[RemoteSigner:QR] Publish result:", res);

@@ -5,6 +5,7 @@ import { nip19 } from "nostr-tools";
 import { setSingletonTag } from "applesauce-factory/operations/tag";
 import { modifyPublicTags } from "applesauce-factory/operations";
 import { blossomMetadataStore } from "~/services/blossom/metadata-store";
+import factory from "~/services/event-factory";
 
 interface PublishArticleParams {
   identifier: string;
@@ -205,7 +206,7 @@ export function PublishArticle({
   existingEvent,
   alt,
 }: PublishArticleParams): Action {
-  return async function* ({ factory }: any) {
+  return async ({ sign, publish }) => {
     const tags: string[][] = [];
 
     // Required tags
@@ -279,6 +280,6 @@ export function PublishArticle({
       tags: uniqueTags,
     });
 
-    yield await factory.sign(draft);
+    await publish(await sign(draft));
   };
 }

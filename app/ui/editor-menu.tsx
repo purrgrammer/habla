@@ -35,7 +35,7 @@ import { useProfile, useRelays, useTimeline } from "~/hooks/nostr";
 import { profileLoader } from "~/services/loaders";
 import { Button } from "~/ui/button";
 import { useTheme } from "~/ui/theme-provider";
-import { getArticleTitle } from "applesauce-core/helpers";
+import { getArticleTitle } from "applesauce-common/helpers";
 
 // TODO: drafts
 

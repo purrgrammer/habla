@@ -8,11 +8,8 @@ import {
   HandHeart,
 } from "lucide-react";
 import { kinds, type NostrEvent, type Filter } from "nostr-tools";
-import {
-  getArticlePublished,
-  getTagValue,
-  type ProfileContent,
-} from "applesauce-core/helpers";
+import { getTagValue, type ProfileContent } from "applesauce-core/helpers";
+import { getArticlePublished } from "applesauce-common/helpers";
 import type { Pubkey } from "~/types";
 import { useRelays } from "~/hooks/nostr";
 import ArticleCard from "./article-card";

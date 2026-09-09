@@ -15,8 +15,7 @@ export const SSR_LIST_TIMEOUT = envNumber("SSR_LIST_TIMEOUT", 4_000);
 
 /** Read a numeric env var without assuming `process` exists (this module is isomorphic). */
 function envNumber(name: string, fallback: number): number {
-  const raw =
-    typeof process !== "undefined" ? process.env?.[name] : undefined;
+  const raw = typeof process !== "undefined" ? process.env?.[name] : undefined;
   const parsed = raw === undefined ? NaN : Number(raw);
   return Number.isFinite(parsed) ? parsed : fallback;
 }

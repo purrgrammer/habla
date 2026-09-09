@@ -1,7 +1,8 @@
 import { Link } from "react-router";
 import { type NostrEvent, nip19 } from "nostr-tools";
 import { type AddressPointer } from "nostr-tools/nip19";
-import { getArticleTitle, getTagValue } from "applesauce-core/helpers";
+import { getTagValue } from "applesauce-core/helpers";
+import { getArticleTitle } from "applesauce-common/helpers";
 import { useUsers } from "~/nostr/queries";
 import type { ReactNode } from "react";
 

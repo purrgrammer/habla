@@ -36,7 +36,7 @@ import {
   getArticleImage,
   getArticleTitle,
   getArticleSummary,
-} from "applesauce-core/helpers";
+} from "applesauce-common/helpers";
 import type {
   EventPointer,
   AddressPointer,
@@ -46,7 +46,7 @@ import type {
 import { Label } from "./label";
 import { Button } from "./button";
 import { PublishArticle, generateIdentifier } from "~/nostr/publish-article";
-import { useActionHub } from "applesauce-react/hooks";
+import { useActionRunner } from "applesauce-react/hooks";
 import { firstValueFrom } from "rxjs";
 import { toast } from "sonner";
 import { publishToRelays } from "~/services/publish-article";
@@ -173,7 +173,7 @@ export default () => {
     },
     relays,
   );
-  const hub = useActionHub();
+  const hub = useActionRunner();
   const navigate = useNavigate();
   const profile = useProfile(pubkey || "");
   const [searchParams, setSearchParams] = useSearchParams();

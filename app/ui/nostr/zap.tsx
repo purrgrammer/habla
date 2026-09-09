@@ -27,11 +27,11 @@ import { ConnectWallet } from "./nwc";
 import { queries, useWallet } from "~/services/wallet";
 import { WalletName } from "../wallet";
 import { useProfile } from "~/hooks/nostr";
-import { getInvoice, parseLNURLOrAddress } from "applesauce-core/helpers";
+import { getInvoice, parseLNURLOrAddress } from "applesauce-common/helpers";
 import type { Pubkey } from "~/types";
 import { Avatar, Username } from "./user";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useActionHub } from "applesauce-react/hooks";
+import { useActionRunner } from "applesauce-react/hooks";
 import { firstValueFrom } from "rxjs";
 import type { DialogProps } from "@radix-ui/react-dialog";
 import Debug from "../debug";
@@ -114,7 +114,7 @@ export default function ZapDialog({
   children?: ReactNode;
 } & DialogProps) {
   const queryClient = useQueryClient();
-  const hub = useActionHub();
+  const hub = useActionRunner();
   const activeAccount = useActiveAccount();
   const profile = useProfile(pubkey);
   const lnUrl = profile?.lud16 || profile?.lud06;

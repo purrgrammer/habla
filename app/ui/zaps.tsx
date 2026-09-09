@@ -3,16 +3,17 @@ import { useZaps, type Zap } from "~/hooks/nostr";
 import UserLink from "./nostr/user-link";
 import { Badge } from "~/ui/badge";
 import { CurrencyAmount } from "~/ui/currency";
-import { getZapRequest, getZapSender } from "applesauce-core/helpers";
+import { getZapRequest, getZapSender } from "applesauce-common/helpers";
 import { Button } from "~/ui/button";
 import ZapDialog from "~/ui/nostr/zap";
 import { useState } from "react";
 import { Reply } from "./nostr/reply";
 import { cn } from "~/lib/utils";
+import { displayPubkey } from "~/lib/event";
 import { BIG_ZAP_AMOUNT } from "~/const";
 
 export function ZapReply({ zap }: { zap: Zap }) {
-  const sender = getZapSender(zap);
+  const sender = displayPubkey(zap);
   const req = getZapRequest(zap);
   const comment = req?.content;
   return (
@@ -46,7 +47,7 @@ export function ZapPill({
   size?: "sm" | "lg";
 }) {
   const { avatar, text, amount, icon } = pillSizes[size];
-  const sender = getZapSender(zap);
+  const sender = displayPubkey(zap);
   const isBig = zap.amount >= BIG_ZAP_AMOUNT;
   const req = getZapRequest(zap);
   const comment = req?.content;

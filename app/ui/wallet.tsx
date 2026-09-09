@@ -19,7 +19,8 @@ import {
 } from "lucide-react";
 import { CurrencyAmount } from "./currency";
 import { ScrollArea } from "./scroll-area";
-import { parseBolt11, safeParse } from "applesauce-core/helpers";
+import { safeParse } from "applesauce-core/helpers";
+import { parseBolt11 } from "applesauce-common/helpers";
 import UserLink from "./nostr/user-link";
 import { cn } from "~/lib/utils";
 import { useMemo, useState } from "react";

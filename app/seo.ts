@@ -3,11 +3,13 @@ import {
   type ProfileContent,
   getDisplayName,
   getProfilePicture,
+} from "applesauce-core/helpers";
+import {
   getArticleTitle,
   getArticleImage,
   getArticleSummary,
   getArticlePublished,
-} from "applesauce-core/helpers";
+} from "applesauce-common/helpers";
 import { COMMENT } from "./const";
 
 interface MetaTag {

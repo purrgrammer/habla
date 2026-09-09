@@ -7,13 +7,16 @@ import {
 import * as Signers from "applesauce-signers";
 import { NostrConnectSigner } from "applesauce-signers";
 import pool from "./relay-pool";
+import type { Filter, NostrEvent } from "nostr-tools";
 
 const ACCOUNTS = "accounts";
 const ACTIVE_ACCOUNT = "active-account";
 
 // Setup global methods for NostrConnectSigner
-const sub = (relays: string[], filters: any[]) => pool.req(relays, filters);
-const pub = (relays: string[], event: any) => pool.publish(relays, event);
+const sub = (relays: string[], filters: Filter[]) =>
+  pool.subscription(relays, filters);
+const pub = (relays: string[], event: NostrEvent) =>
+  pool.publish(relays, event);
 
 // Aggressively set on all signer classes
 for (const key in Signers) {

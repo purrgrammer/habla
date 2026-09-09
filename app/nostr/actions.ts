@@ -14,6 +14,7 @@ import {
   setSingletonTag,
 } from "applesauce-factory/operations/tag";
 import { modifyPublicTags } from "applesauce-factory/operations";
+import factory from "~/services/event-factory";
 import { COMMENT } from "~/const";
 
 export {
@@ -22,6 +23,13 @@ export {
   extractContent,
   generateIdentifier,
 } from "./publish-article";
+
+/** An `a` tag for `event`, if it is addressable at all. */
+function addressTagFor(event?: NostrEvent) {
+  if (!event || !isReplaceable(event.kind)) return [];
+  const pointer = getAddressPointerForEvent(event);
+  return pointer ? [addAddressTag(pointer)] : [];
+}
 
 export function ZapRequest({
   amount,
@@ -36,7 +44,7 @@ export function ZapRequest({
   lnurl?: string;
   message?: string;
 }): Action {
-  return async function* ({ events, factory, self }) {
+  return async ({ events, self, sign, publish }) => {
     const otherRelayList = events.getReplaceable(kinds.RelayList, pubkey);
     const otherRelays = otherRelayList ? getInboxes(otherRelayList) : [];
     const myRelaysList =
@@ -68,13 +76,11 @@ export function ZapRequest({
           ...(event
             ? [addEventTag(event), setSingletonTag(["k", String(event.kind)])]
             : []),
-          ...(event && isReplaceable(event.kind)
-            ? [addAddressTag(getAddressPointerForEvent(event))]
-            : []),
+          ...addressTagFor(event),
         ],
       ),
     );
-    yield await factory.sign(draft);
+    await publish(await sign(draft));
   };
 }
 
@@ -85,7 +91,7 @@ export function Comment({
   event: NostrEvent;
   message: string;
 }): Action {
-  return async function* ({ events, factory, self }) {
+  return async ({ events, self, sign, publish }) => {
     const otherRelayList = events.getReplaceable(kinds.RelayList, event.pubkey);
     const otherRelays = otherRelayList ? getInboxes(otherRelayList) : [];
     const myRelaysList =
@@ -129,12 +135,10 @@ export function Comment({
               ? [setSingletonTag(["E", E])]
               : []),
           setSingletonTag(["k", String(event.kind)]),
-          ...(event && isReplaceable(event.kind)
-            ? [addAddressTag(getAddressPointerForEvent(event))]
-            : []),
+          ...addressTagFor(event),
         ],
       ),
     );
-    yield await factory.sign(draft);
+    await publish(await sign(draft));
   };
 }

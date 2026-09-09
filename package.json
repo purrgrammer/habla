@@ -2,6 +2,10 @@
   "name": "habla",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "react-router build",
     "sync": "npx tsx ./app/sync.ts",
@@ -15,15 +19,7 @@
   "pnpm": {
     "overrides": {
       "react": "19.2.1",
-      "react-dom": "19.2.1",
-      "applesauce-core": "3.1.0",
-      "applesauce-accounts": "4.1.0",
-      "applesauce-signers": "4.1.0",
-      "applesauce-relay": "3.1.0",
-      "applesauce-factory": "3.1.0",
-      "applesauce-actions": "3.1.0",
-      "applesauce-content": "3.1.0",
-      "applesauce-react": "3.1.0"
+      "react-dom": "19.2.1"
     }
   },
   "dependencies": {
@@ -60,16 +56,17 @@
     "@tiptap/starter-kit": "^3.2.0",
     "@tiptap/suggestion": "^3.2.0",
     "@vercel/react-router": "^1.2.2",
-    "applesauce-accounts": "4.1.0",
-    "applesauce-actions": "3.1.0",
-    "applesauce-content": "3.1.0",
-    "applesauce-core": "3.1.0",
-    "applesauce-factory": "3.1.0",
-    "applesauce-loaders": "^3.0.0",
-    "applesauce-react": "3.1.0",
-    "applesauce-relay": "3.1.0",
-    "applesauce-signers": "4.1.0",
-    "applesauce-wallet-connect": "^3.0.0",
+    "applesauce-accounts": "^6.2.0",
+    "applesauce-actions": "^6.2.0",
+    "applesauce-common": "^6.2.0",
+    "applesauce-content": "^6.2.0",
+    "applesauce-core": "^6.2.0",
+    "applesauce-factory": "^4.0.0",
+    "applesauce-loaders": "^6.2.0",
+    "applesauce-react": "^6.0.0",
+    "applesauce-relay": "^6.2.1",
+    "applesauce-signers": "^6.2.2",
+    "applesauce-wallet-connect": "^6.2.0",
     "blossom-client-sdk": "^4.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

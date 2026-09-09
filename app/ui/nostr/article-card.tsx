@@ -1,12 +1,12 @@
 import { Link } from "react-router";
 import { type NostrEvent, nip19 } from "nostr-tools";
 import { type AddressPointer } from "nostr-tools/nip19";
+import { type ProfileContent } from "applesauce-core/helpers";
 import {
-  type ProfileContent,
   getArticleTitle,
   getArticleImage,
   getArticleSummary,
-} from "applesauce-core/helpers";
+} from "applesauce-common/helpers";
 import UserLink from "~/ui/nostr/user-link";
 import { Card, CardHeader, CardContent } from "~/ui/card";
 import { Tags } from "~/ui/tag";
