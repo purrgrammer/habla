@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useEventStore, useObservableMemo } from "applesauce-react/hooks";
 import { map } from "rxjs";
 import { useRelays } from "~/hooks/nostr";
-import { blossomServerListLoader } from "~/services/loaders";
+import { profileLoader } from "~/services/loaders";
 import { BLOSSOM_SERVER_LIST_KIND } from "~/const";
 
 const DEFAULT_BLOSSOM_SERVER = "https://blossom.band";
@@ -47,7 +47,7 @@ export function useBlossomServers(pubkey?: string) {
   useEffect(() => {
     if (!pubkey) return;
 
-    const subscription = blossomServerListLoader({
+    const subscription = profileLoader({
       kind: BLOSSOM_SERVER_LIST_KIND,
       pubkey,
       relays: userRelays,

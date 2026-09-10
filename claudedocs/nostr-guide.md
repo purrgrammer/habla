@@ -44,10 +44,19 @@ WebSocket servers that store and distribute events:
 
 ```typescript
 // From app/const.ts
-export const INDEX_RELAYS = ["wss://purplepag.es", "wss://relay.nostr.band"];
+// Indexers: cheap, replaceable-only, and the answer to "where does this pubkey
+// publish". Kinds 0, 10002 and 10063 go here first.
+export const INDEX_RELAYS = [
+  "wss://purplepag.es",
+  "wss://user.kindpag.es",
+  "wss://indexer.coracle.social",
+  "wss://relay.vertexlab.io",
+];
 
+// Content, and the fallback tier when the indexers have never seen a pubkey.
 export const AGGREGATOR_RELAYS = [
-  "wss://relay.nostr.band",
+  "wss://relay.damus.io",
+  "wss://nos.lol",
   "wss://relay.primal.net",
 ];
 ```

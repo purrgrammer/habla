@@ -8,7 +8,19 @@ export const HABLA_CHAT_URL =
 export const BOOK = 30_040;
 export const BOOK_CHAPTER = 30_041;
 
-export const INDEX_RELAYS = ["wss://purplepag.es", "wss://relay.vertexlab.io"];
+/**
+ * Relays that exist to answer "where does this pubkey publish, and who are
+ * they" — kinds 0, 3 and 10002. They hold replaceable events and little else,
+ * so asking them is cheap and drags no firehose behind it. More than one on
+ * purpose: a single indexer is both a privacy funnel and a single point of
+ * failure for every profile on the site.
+ */
+export const INDEX_RELAYS = [
+  "wss://purplepag.es",
+  "wss://user.kindpag.es",
+  "wss://indexer.coracle.social",
+  "wss://relay.vertexlab.io",
+];
 export const AGGREGATOR_RELAYS = [
   "wss://relay.damus.io",
   "wss://nos.lol",

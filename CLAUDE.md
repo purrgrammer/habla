@@ -114,8 +114,11 @@ a zap total — belongs in a hook inside the component, where it streams in.
 ## Constants (`app/const.ts`)
 
 ```
-INDEX_RELAYS       purplepag.es, vertexlab.io — profile and relay-list lookups
-AGGREGATOR_RELAYS  damus.io, nos.lol, primal.net — content
+INDEX_RELAYS       purplepag.es, user.kindpag.es, indexer.coracle.social,
+                   vertexlab.io — kinds 0/10002/10063, asked before content
+                   relays because routing them by NIP-65 would be circular
+AGGREGATOR_RELAYS  damus.io, nos.lol, primal.net — content, and the last-resort
+                   tier for a pubkey the indexers have never seen
 COMMENT            1111
 BOOK / BOOK_CHAPTER 30040 / 30041
 ```
