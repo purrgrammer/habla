@@ -865,4 +865,3 @@ export async function getFeaturedHighlights(): Promise<NostrEvent[]> {
     (a, b) => getArticlePublished(b) - getArticlePublished(a),
   );
 }
-

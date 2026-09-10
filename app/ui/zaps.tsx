@@ -39,13 +39,7 @@ const pillSizes: Record<
   },
 };
 
-function ZapPill({
-  zap,
-  size = "lg",
-}: {
-  zap: Zap;
-  size?: "sm" | "lg";
-}) {
+function ZapPill({ zap, size = "lg" }: { zap: Zap; size?: "sm" | "lg" }) {
   const { avatar, text, amount, icon } = pillSizes[size];
   const sender = displayPubkey(zap);
   const isBig = zap.amount >= BIG_ZAP_AMOUNT;

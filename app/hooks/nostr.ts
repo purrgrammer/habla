@@ -251,4 +251,3 @@ export function useZaps(event: NostrEvent) {
     );
   }, [event.id]);
 }
-

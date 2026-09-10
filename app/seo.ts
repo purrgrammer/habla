@@ -31,8 +31,7 @@ interface SeoOptions {
 }
 
 export const DEFAULT_SITE_NAME = "Habla";
-const DEFAULT_SITE_DESCRIPTION =
-  "Read, Highlight, Write, Bookmark, Earn";
+const DEFAULT_SITE_DESCRIPTION = "Read, Highlight, Write, Bookmark, Earn";
 // Relative: the site has no fixed domain, it is served from wherever it lands.
 const DEFAULT_IMAGE = "/og.png";
 

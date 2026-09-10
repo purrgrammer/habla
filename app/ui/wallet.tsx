@@ -223,4 +223,3 @@ export function WalletName() {
     </div>
   );
 }
-

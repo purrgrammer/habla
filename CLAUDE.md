@@ -142,8 +142,7 @@ app/
 
 Two fields in `.nsite/config.json` are decisions rather than settings:
 
-- **`fallback: "/index.html"`** — without it every URL past `/` is a gateway
-  404. An nsite serves what its manifest lists, and every Habla address below
+- **`fallback: "/index.html"`** — without it every URL past `/` is a gateway 404. An nsite serves what its manifest lists, and every Habla address below
   the root (`/a/<naddr>`, `/p/<nprofile>`, `/e/<nevent>`) is a client route
   that only exists once the app has booted.
 - **`publishAppHandler: false`** — a NIP-89 handler needs a URL, and the site
