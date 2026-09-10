@@ -39,9 +39,15 @@ function PureUserLink({
 }) {
   const relays = useRelays(pubkey);
   const link = useUserLink(pubkey, relays);
+  // Spans, not divs. Callers pass `wrapper="inline"` / `"inline-block"` because
+  // this is rendered mid-sentence — inside a react-markdown <p> for a `nostr:`
+  // mention, and inside RichText — and a <div> there is illegal, which the
+  // browser fixes by closing the paragraph early. `block` keeps the default for
+  // the callers that pass no wrapper at all; `cn` is tailwind-merge, so an
+  // explicit inline wrapper still wins.
   return (
-    <div className={wrapper}>
-      <div className={cn("flex flex-row items-center gap-1", className)}>
+    <span className={cn("block", wrapper)}>
+      <span className={cn("flex flex-row items-center gap-1", className)}>
         <Link to={link} className="flex-shrink-0">
           <Avatar
             profile={profile}
@@ -51,7 +57,7 @@ function PureUserLink({
             )}
           />
         </Link>
-        <div className="flex flex-col gap-0">
+        <span className="flex flex-col gap-0">
           <Link to={link}>
             <Username
               pubkey={pubkey}
@@ -65,9 +71,9 @@ function PureUserLink({
           {withNip05 && profile?.nip05 ? (
             <Nip05 pubkey={pubkey} nip05={profile?.nip05} className={nip05} />
           ) : null}
-        </div>
-      </div>
-    </div>
+        </span>
+      </span>
+    </span>
   );
 }
 
