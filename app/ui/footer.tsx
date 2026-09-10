@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import Logo from "./logo";
 import UserLink from "./nostr/user-link";
 import { Code } from "lucide-react";
+import { HABLA_REPO_URL } from "~/const";
 
 export default function Footer() {
   return (
@@ -10,7 +11,7 @@ export default function Footer() {
       <div className="flex flex-col gap-2 items-center justify-center">
         <p className="font-light text-sm">
           <Link
-            to="https://github.com/purrgrammer/habla"
+            to={HABLA_REPO_URL}
             className="flex flex-row items-center gap-1 hover:underline hover:decoration-dotted"
             target="_blank"
           >

@@ -1,10 +1,6 @@
-import { useMemo, type ReactNode } from "react";
-import { Link } from "react-router";
 import { getTagValue } from "applesauce-core/helpers";
-import { type NostrEvent, nip19 } from "nostr-tools";
+import type { NostrEvent } from "nostr-tools";
 import {
-  Sprout,
-  HandFist,
   Glasses,
   Feather,
   Highlighter,
@@ -14,25 +10,16 @@ import {
   Bot,
   Apple,
   HeartHandshake,
-  AtSign,
   Bookmark,
-  Heart,
-  Search,
-  Code,
-  ShieldCheck,
   Speech,
-  EyeOff,
   Brush,
-  HandHeart,
   Baby,
 } from "lucide-react";
 import type { Route } from "./+types/home";
 import {
-  FEATURED_PUBKEYS,
   faq,
   features,
   getArticlesByCategory,
-  getFeaturedArticles,
   getFeaturedHighlights,
   testimonials,
 } from "~/featured";
@@ -41,27 +28,6 @@ import ArticleCard from "~/ui/nostr/article-card";
 import { PureHighlight } from "~/ui/nostr/highlight";
 import Grid from "~/ui/grid";
 import NostrCard from "~/ui/nostr/card";
-import { Button } from "~/ui/button";
-import { Badge } from "~/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/ui/card";
-import { FiatAmount } from "~/ui/currency";
-import SatsAmount from "~/ui/sats";
-import Logo from "~/ui/logo";
-import { cn } from "~/lib/utils";
-import { TagCloud } from "~/ui/tag-cloud";
-import { parseZap, useProfile, useProfileZaps, type Zap } from "~/hooks/nostr";
-import { HABLA_PUBKEY, HABLA_REPO_URL } from "~/const";
-import { ZapPill } from "~/ui/zaps";
-import Donate from "~/ui/donate";
-import Note from "~/ui/nostr/note";
-import Blockquote from "~/ui/blockquote";
-import UserLink from "~/ui/nostr/user-link";
 import { EventReply } from "~/ui/nostr/reply";
 
 export function meta({}: Route.MetaArgs) {
@@ -70,22 +36,16 @@ export function meta({}: Route.MetaArgs) {
 
 /**
  * Nothing here touches the network: the featured articles and highlights are
- * baked into the bundle (`~/featured.ts`) and the member list into
- * `~/featured.ts`. Profiles resolve reactively inside the cards, so the home
- * page paints immediately instead of waiting on forty relay round trips.
+ * baked into the bundle (`~/featured.ts`). Profiles resolve reactively inside
+ * the cards, so the home page paints immediately instead of waiting on relay
+ * round trips.
  */
 export async function clientLoader() {
-  const [categorizedArticles, articles, highlights] = await Promise.all([
+  const [categorizedArticles, highlights] = await Promise.all([
     getArticlesByCategory(),
-    getFeaturedArticles(),
     getFeaturedHighlights(),
   ]);
-  return {
-    featured: FEATURED_PUBKEYS,
-    articles,
-    categorizedArticles,
-    highlights,
-  };
+  return { categorizedArticles, highlights };
 }
 
 function Hero() {
@@ -157,39 +117,6 @@ function Testimonials() {
   );
 }
 
-function Donations() {
-  const { timeline } = useProfileZaps(HABLA_PUBKEY);
-  const zaps = timeline?.map((ev) => parseZap(ev)).filter(Boolean) as Zap[];
-  return (
-    <div id="donations" className="flex flex-col gap-6">
-      <div className="flex flex-row items-center gap-2">
-        <HandHeart className="size-6 text-muted-foreground" />
-        <h3 className="text-2xl uppercase font-light">Donations</h3>
-      </div>
-      <p>
-        Habla is a free,{" "}
-        <Link
-          target="_blank"
-          className="hover:underline decoration-dotted text-primary"
-          to={HABLA_REPO_URL}
-        >
-          open-source
-        </Link>{" "}
-        tool for reading, writing, <mark>highlighting</mark>, bookmarking and
-        earning.
-      </p>
-      <div className="flex flex-row flex-wrap gap-2">
-        {zaps
-          ?.sort((a, b) => b.amount - a.amount)
-          .map((zap) => {
-            return <ZapPill key={zap.id} zap={zap} />;
-          })}
-      </div>
-      <Donate />
-    </div>
-  );
-}
-
 function CategorySection({
   title,
   icon,
@@ -252,315 +179,6 @@ function FeaturedHighlights({ highlights }: { highlights: NostrEvent[] }) {
   );
 }
 
-// patreon features:
-// - nip05 and vanity URL
-// - featured on the home page
-
-// premium features:
-// - relay soon
-
-// pro features:
-// - priority support
-// - analytics
-
-type Icon = any;
-
-type Feature = {
-  icon: Icon;
-  text: ReactNode;
-  soon?: boolean;
-};
-
-type Tier = {
-  id: string;
-  soon?: boolean;
-  icon: Icon;
-  description: string;
-  title: string;
-  features: Feature[];
-  price: number;
-};
-
-const tiers: Tier[] = [
-  {
-    id: "sprout",
-    description:
-      "Get a username, nostr address and an indexed profile, highlights and articles. One time pay.",
-    title: "Sprout",
-    icon: Sprout,
-    price: 21_000,
-    features: [
-      {
-        icon: Logo,
-        text: "Featured on the home page",
-      },
-      {
-        icon: AtSign,
-        text: "nostr address",
-      },
-      {
-        icon: Search,
-        text: "SEO for your content",
-      },
-    ],
-  },
-  //{
-  //  id: "sprout",
-  //  description:
-  //    "Get a username, nostr address and an indexed profile, highlights and articles. One time pay.",
-  //  title: "Sprout",
-  //  icon: Sprout,
-  //  price: 21_000,
-  //  features: [
-  //    {
-  //      icon: Logo,
-  //      text: "Featured on the home page",
-  //    },
-  //    {
-  //      icon: AtSign,
-  //      text: "nostr address",
-  //    },
-  //    {
-  //      icon: LinkIcon,
-  //      text: "habla.news/username page",
-  //    },
-  //    {
-  //      icon: Search,
-  //      text: "SEO for your content",
-  //    },
-  //    {
-  //      icon: ChartColumnStacked,
-  //      text: "Nostr analytics",
-  //      soon: true,
-  //    },
-  //  ],
-  //},
-  //{
-  //  id: "tree",
-  //  description:
-  //    "Get everything in Sprout and much more: a media server and network & page view analytics. Billed yearly.",
-  //  title: "Tree",
-  //  icon: TreeDeciduous,
-  //  price: 100_000,
-  //  soon: true,
-  //  features: [
-  //    {
-  //      icon: Sprout,
-  //      text: "everything in Sprout",
-  //    },
-  //    {
-  //      icon: Server,
-  //      text: "High availability relay",
-  //    },
-  //    {
-  //      icon: HardDriveUpload,
-  //      text: "Media Server",
-  //    },
-  //    {
-  //      icon: ChartSpline,
-  //      text: "Page view insights",
-  //    },
-  //    {
-  //      icon: Award,
-  //      text: "Badge",
-  //    },
-  //  ],
-  //},
-];
-
-function TierCard(tier: Tier) {
-  return (
-    <Card className={tier.soon ? "opacity-60" : ""}>
-      <CardHeader>
-        <div className="flex flex-row items-center justify-between">
-          <div className="flex flex-row items-center gap-1">
-            <tier.icon className="size-9 text-muted-foreground" />
-            <CardTitle className="text-4xl">{tier.title}</CardTitle>
-          </div>
-          {tier.soon ? (
-            <Badge variant="secondary" className="uppercase">
-              soon
-            </Badge>
-          ) : null}
-        </div>
-        <CardDescription className="text-md">
-          {tier.description}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <div className="my-4">
-              <div className="flex flex-col items-center justify-center">
-                <SatsAmount amount={tier.price} size="xl" />
-                <FiatAmount
-                  className="text-muted-foreground"
-                  amount={tier.price}
-                  currency="USD"
-                />
-              </div>
-            </div>
-            <Button disabled={tier.soon} variant="default" size="lg">
-              <HandCoins />
-              Contribute
-            </Button>
-          </div>
-          <hr />
-          <ol className="">
-            {tier.features.map((f, index) => (
-              <li key={index}>
-                <div
-                  className={cn(
-                    "flex flex-row items-center gap-2",
-                    f.soon ? "opacity-60" : "",
-                  )}
-                >
-                  <f.icon className="size-5 text-muted-foreground" />
-                  <span className="text-lg">{f.text}</span>
-                  {f.soon ? <Badge variant="secondary">soon</Badge> : null}
-                </div>
-              </li>
-            ))}
-          </ol>
-          <hr />
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function JoinNow() {
-  return (
-    <div id="join-now" className="flex flex-col gap-6">
-      <div className="flex flex-row items-center gap-2">
-        <HandFist className="size-6 text-primary" />
-        <h3 className="text-2xl uppercase font-light">Support the project</h3>
-      </div>
-      <p className="text-lg">
-        Your contributions go towards funding the Habla development team and you
-        get some perks in exchange.
-      </p>
-      <Grid>
-        {tiers.map((tier) => (
-          <TierCard key={tier.id} {...tier} />
-        ))}
-      </Grid>
-    </div>
-  );
-}
-
-function FeaturedYou() {
-  return (
-    <div className="flex flex-col gap-2 items-center justify-center">
-      <img src="/favicon.ico" className="size-24 rounded-full object-cover" />
-      <div className="flex flex-col gap-0 items-center justify-center">
-        <h3 className="font-sans text-2xl line-clamp-1">You</h3>
-        <div className="flex flex-row items-center gap-1">
-          <Logo className="size-4 text-muted-foreground" />
-          <h4 className="font-sans text-md line-clamp-1">username</h4>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FeaturedUser({ pubkey }: { pubkey: string }) {
-  const profile = useProfile(pubkey);
-  const name = profile?.display_name || profile?.name;
-  return (
-    <Link
-      className="flex flex-col gap-2 p-2 items-center justify-center"
-      to={`/p/${nip19.nprofileEncode({ pubkey })}`}
-    >
-      <img
-        src={profile?.picture || "/favicon.ico"}
-        className="size-18 sm:size-24 rounded-full object-cover"
-      />
-      <div className="flex flex-col gap-0 items-center justify-center">
-        <h3 className="font-sans text-2xl line-clamp-1">
-          {name || pubkey.slice(0, 8)}
-        </h3>
-        {profile?.nip05 ? (
-          <div className="flex flex-row items-center gap-1">
-            <Logo className="size-4 text-muted-foreground" />
-            <h4 className="font-sans text-md line-clamp-1">{profile.nip05}</h4>
-          </div>
-        ) : null}
-      </div>
-    </Link>
-  );
-}
-
-const values = [
-  {
-    icon: Speech,
-    text: "Free Speech",
-  },
-  {
-    icon: Code,
-    text: "Open Source",
-  },
-  {
-    icon: ShieldCheck,
-    text: "Ad-Free",
-  },
-  {
-    icon: EyeOff,
-    text: "No tracking",
-  },
-];
-
-function Values() {
-  return (
-    <Grid className="w-full p-2 gap-4 grid-cols-2 md:grid-cols-2">
-      {values.map((f, index) => (
-        <div key={index}>
-          <div className="flex flex-col items-center gap-2">
-            <f.icon className="size-8 text-muted-foreground" />
-            <span className="text-lg">{f.text}</span>
-          </div>
-        </div>
-      ))}
-    </Grid>
-  );
-}
-
-function FeaturedUsers({ featured }: { featured: readonly string[] }) {
-  return (
-    <div id="community" className="flex flex-col gap-8">
-      <div className="flex flex-row items-center gap-2">
-        <Heart className="size-6 text-red-400 dark:text-red-200" />
-        <h3 className="text-2xl uppercase font-light">Community</h3>
-      </div>
-      <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
-        {featured.map((pubkey) => (
-          <FeaturedUser key={pubkey} pubkey={pubkey} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Tags({ featured }: { featured: NostrEvent[] }) {
-  const tags = useMemo(() => {
-    return featured.reduce(
-      (acc, ev) => {
-        const tags = [
-          ...new Set(
-            ev.tags.filter((t) => t[0] === "t" && t[1]).map((t) => t[1]),
-          ),
-        ];
-        for (const tag of tags) {
-          acc[tag] = (acc[tag] || 0) + 1;
-        }
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-  }, []);
-  return <TagCloud tags={tags} />;
-}
-
 // after hero, a section that briefly explains the value prop:
 // - open source, open standards
 // - no platform lock-in
@@ -570,7 +188,7 @@ function Tags({ featured }: { featured: NostrEvent[] }) {
 
 export default function Home({ loaderData }: Route.ComponentProps) {
   // TODO: preload  all of this on the client to avoid flickering
-  const { featured, articles, categorizedArticles } = loaderData;
+  const { categorizedArticles } = loaderData;
   return (
     <div className="py-12 pb-32 flex flex-col gap-24">
       <div className="flex flex-col gap-16 md:gap-64 md:flex-row items-center justify-between">
@@ -628,15 +246,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
       <FeaturedHighlights {...loaderData} />
 
-      <FeaturedUsers featured={featured} />
-
-      <Donations />
-
       <Testimonials />
-      {/*
-        <Tags featured={articles} />
-        <JoinNow />
-       */}
     </div>
   );
 }

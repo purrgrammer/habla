@@ -6,7 +6,7 @@ import { useCurrency, useExchangeRate } from "~/services/currency";
 import { type AmountSize, amounts } from "./amount";
 import SatsAmount from "~/ui/sats";
 
-export function FiatAmount({
+function FiatAmount({
   amount,
   currency = "EUR",
   size = "lg",

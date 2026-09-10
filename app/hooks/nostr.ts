@@ -27,7 +27,6 @@ import { getArticlePublished } from "applesauce-common/helpers";
 import { isReplaceableKind } from "nostr-tools/kinds";
 import { AGGREGATOR_RELAYS } from "~/const";
 import { ProfileModel } from "applesauce-core/models";
-import type { Pubkey } from "~/types";
 
 export function useProfile(pubkey: string): ProfileContent | undefined {
   const relays = useRelays(pubkey);
@@ -253,15 +252,3 @@ export function useZaps(event: NostrEvent) {
   }, [event.id]);
 }
 
-export function useProfileZaps(pubkey: Pubkey) {
-  const relays = useInboxRelays(pubkey);
-  const eventStore = useEventStore();
-  return useTimeline(
-    `${pubkey}-zaps`,
-    {
-      kinds: [kinds.Zap],
-      "#p": [pubkey],
-    },
-    relays,
-  );
-}

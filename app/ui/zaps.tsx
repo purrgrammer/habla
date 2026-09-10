@@ -39,7 +39,7 @@ const pillSizes: Record<
   },
 };
 
-export function ZapPill({
+function ZapPill({
   zap,
   size = "lg",
 }: {
