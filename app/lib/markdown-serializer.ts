@@ -105,7 +105,7 @@ function renderListItem(
  * Node mappings with proper block spacing.
  * Each block element ends with \n\n to ensure separation.
  */
-export const nodeMapping: NodeMapping = {
+const nodeMapping: NodeMapping = {
   doc: (node, helpers) => {
     return helpers.renderChildren(node.content);
   },

@@ -30,23 +30,6 @@ export function extractTitle(markdown: string): string {
 /**
  * Extract content after first H1 heading
  */
-export function extractContent(markdown: string): string {
-  const lines = markdown.split("\n");
-  let foundH1 = false;
-  const contentLines: string[] = [];
-
-  for (const line of lines) {
-    if (!foundH1 && /^#\s+/.test(line)) {
-      foundH1 = true;
-      continue;
-    }
-    if (foundH1) {
-      contentLines.push(line);
-    }
-  }
-
-  return contentLines.join("\n").trim();
-}
 
 /**
  * Generate URL-safe identifier from title
@@ -64,7 +47,7 @@ export function generateIdentifier(title: string): string {
  * Parse nostr mentions from content
  * Returns arrays of pubkeys, event IDs, and address pointers
  */
-export function parseNostrMentions(content: string): {
+function parseNostrMentions(content: string): {
   pubkeys: string[];
   eventIds: string[];
   addresses: string[];
@@ -123,7 +106,7 @@ export function parseNostrMentions(content: string): {
 /**
  * Extract Blossom image URLs and generate imeta tags
  */
-export function extractBlossomImages(content: string): string[][] {
+function extractBlossomImages(content: string): string[][] {
   const imetaTags: string[][] = [];
 
   // Match image URLs in markdown: ![alt](url)

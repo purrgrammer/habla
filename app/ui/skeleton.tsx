@@ -10,11 +10,3 @@ export function Card({ className }: { className?: string }) {
     ></div>
   );
 }
-
-export function Avatar({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn("bg-accent animate-pulse size-9 rounded-full", className)}
-    ></div>
-  );
-}

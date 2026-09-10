@@ -1,7 +1,7 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import type { ProfilePointer } from "nostr-tools/nip19";
 
-export type MentionOptions = {
+type MentionOptions = {
   HTMLAttributes: Record<string, any>;
   renderLabel: (props: { node: any }) => string;
 };

@@ -18,15 +18,12 @@ interface MetaTag {
   property?: string;
   content?: string;
   type?: string;
-  rel?: string;
-  href?: string;
 }
 
 interface SeoOptions {
   title: string;
   description?: string;
   image?: string;
-  url?: string;
   type?: string;
   publishedTime?: string;
   author?: string;
@@ -34,17 +31,16 @@ interface SeoOptions {
 }
 
 export const DEFAULT_SITE_NAME = "Habla";
-export const DEFAULT_SITE_DESCRIPTION =
+const DEFAULT_SITE_DESCRIPTION =
   "Read, Highlight, Write, Bookmark, Earn";
 // Relative: the site has no fixed domain, it is served from wherever it lands.
-export const DEFAULT_IMAGE = "/og.png";
+const DEFAULT_IMAGE = "/og.png";
 
 export function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
   const {
     title,
     description = DEFAULT_SITE_DESCRIPTION,
     image = DEFAULT_IMAGE,
-    url,
     type = "website",
     publishedTime,
     author,
@@ -76,13 +72,6 @@ export function buildBaseSeoTags(options: SeoOptions): MetaTag[] {
     tags.push(
       { property: "og:description", content: description },
       { name: "twitter:description", content: description },
-    );
-  }
-
-  if (url) {
-    tags.push(
-      { property: "og:url", content: url },
-      { rel: "canonical", href: url },
     );
   }
 
@@ -131,11 +120,7 @@ export default [
   { name: "twitter:image", content: DEFAULT_IMAGE },
 ];
 
-export function profileMeta(
-  pubkey: string,
-  profile: ProfileContent,
-  url?: string,
-) {
+export function profileMeta(pubkey: string, profile: ProfileContent) {
   const title = getDisplayName(profile) || pubkey;
   const description = profile?.about;
   const image = getProfilePicture(profile);
@@ -144,16 +129,11 @@ export function profileMeta(
     title,
     description,
     image,
-    url,
     type: "profile",
   });
 }
 
-export function articleMeta(
-  event: NostrEvent,
-  author: ProfileContent,
-  url?: string,
-) {
+export function articleMeta(event: NostrEvent, author: ProfileContent) {
   const title = `${getArticleTitle(event)} - ${getDisplayName(author)}`;
   const description = getArticleSummary(event);
   const image = getArticleImage(event);
@@ -168,34 +148,9 @@ export function articleMeta(
     title,
     description,
     image,
-    url,
     type: "article",
     publishedTime,
     author: authorName,
-  });
-}
-
-export function relayMeta(relayUrl: string, url?: string) {
-  const title = `${relayUrl} - Relay`;
-  const description = `Browse posts and discover content from the ${relayUrl} Nostr relay`;
-
-  return buildBaseSeoTags({
-    title,
-    description,
-    url,
-    type: "website",
-  });
-}
-
-export function tagMeta(tag: string, url?: string) {
-  const title = `#${tag}`;
-  const description = `Explore posts tagged with #${tag} on Habla`;
-
-  return buildBaseSeoTags({
-    title,
-    description,
-    url,
-    type: "website",
   });
 }
 
@@ -214,11 +169,7 @@ const eventKinds: Record<number, any> = {
   },
 };
 
-export function eventMeta(
-  event: NostrEvent,
-  profile?: ProfileContent,
-  url?: string,
-) {
+export function eventMeta(event: NostrEvent, profile?: ProfileContent) {
   const { title } = eventKinds[event.kind] || { title: `Kind ${event.kind}` };
   const name = getDisplayName(profile) || event.pubkey;
   const image = getProfilePicture(profile);
@@ -227,7 +178,6 @@ export function eventMeta(
     title: `${title} by ${name}`,
     description: event.content, // TODO: trim?
     image,
-    url,
     //type: ""
   });
 }

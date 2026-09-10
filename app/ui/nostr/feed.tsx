@@ -8,7 +8,7 @@ import { Card as SkeletonCard } from "../skeleton";
 import Grid from "../grid";
 import Debug from "../debug";
 
-export interface FeedComponentProps {
+interface FeedComponentProps {
   event: NostrEvent;
   profile?: ProfileContent;
 }

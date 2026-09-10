@@ -33,28 +33,6 @@ function Domain({
   );
 }
 
-export function Invalid({ nip05, className = "text-sm" }: Nip05Props) {
-  return (
-    <PureNip05
-      nip05={nip05}
-      isLoading={false}
-      isVerified={false}
-      className={className}
-    />
-  );
-}
-
-export function Loading({ nip05, className = "text-sm" }: Nip05Props) {
-  return (
-    <PureNip05
-      nip05={nip05}
-      isLoading={false}
-      isVerified={false}
-      className={className}
-    />
-  );
-}
-
 interface PureNip05Props extends Nip05Props {
   isLoading: boolean;
   isVerified: boolean;

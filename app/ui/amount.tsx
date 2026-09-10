@@ -1,4 +1,3 @@
-import NumberFlow from "@number-flow/react";
 export type AmountSize = "sm" | "lg" | "xl";
 export type AmountProps = {
   wrapper: string;
@@ -23,18 +22,3 @@ export const amounts: Record<AmountSize, AmountProps> = {
     text: "font-mono text-4xl",
   },
 };
-
-export default function Amount({
-  amount,
-  size = "lg",
-}: {
-  amount: number;
-  size?: AmountSize;
-}) {
-  const { text } = amounts[size];
-  return (
-    <span className={text}>
-      <NumberFlow value={amount} />
-    </span>
-  );
-}

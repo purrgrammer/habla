@@ -224,14 +224,3 @@ export function WalletName() {
   );
 }
 
-export function WalletBalance() {
-  const { data: walletBalance } = useWalletBalance();
-  return walletBalance ? (
-    <div className="flex flex-row items-center gap-4 justify-between">
-      <WalletName />
-      <CurrencyAmount amount={walletBalance} className="items-end" />
-    </div>
-  ) : (
-    <WalletName />
-  );
-}

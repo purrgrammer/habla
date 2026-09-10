@@ -473,8 +473,9 @@ pnpm build     # -> build/client
 pnpm preview   # serves it with the SPA fallback on :4173
 ```
 
-The fallback matters: without it, a deep link like `/verbiricha/grimoire`
-404s instead of booting the app.
+The fallback matters: without it, a deep link like `/a/<naddr>` 404s instead
+of booting the app. The same applies to the nsite deploy — see `fallback` in
+`.nsite/config.json`.
 
 ### Type Check
 

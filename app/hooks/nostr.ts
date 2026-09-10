@@ -12,7 +12,7 @@ import {
   getEventPointerForEvent,
   getInboxes,
 } from "applesauce-core/helpers";
-import { getZapPayment, getZapSender } from "applesauce-common/helpers";
+import { getZapPayment } from "applesauce-common/helpers";
 import { EventZapsModel } from "applesauce-common/models/zaps";
 import { getRelayURLs } from "~/lib/url";
 import {
@@ -188,61 +188,6 @@ export function parseZap(event: NostrEvent): Zap | null {
   const amount = getZapPayment(event)?.amount;
   if (!amount) return null;
   return { ...event, amount: amount / 1000 };
-}
-
-export function usePubkeyZaps(pubkey: string) {
-  const relays = useInboxRelays(pubkey);
-  const eventStore = useEventStore();
-  const filters = {
-    kinds: [kinds.Zap],
-    "#p": [pubkey],
-  };
-  // todo: exhaust loader to load all
-
-  useEffect(() => {
-    const loader = createTimelineLoader(
-      pool,
-      relays.concat(AGGREGATOR_RELAYS),
-      filters,
-      { eventStore },
-    );
-    const subscription = loader().subscribe();
-    return () => subscription.unsubscribe();
-  }, [pubkey]);
-
-  return useObservableMemo(() => {
-    return eventStore.timeline(filters).pipe(
-      map((items) => {
-        const sorted = [...items];
-        return (sorted.map(parseZap).filter(Boolean) as Zap[]).sort(
-          (a, b) => b.amount - a.amount,
-        );
-      }),
-      map((items) => {
-        // todo: use scan?
-        const senders = items.reduce(
-          (acc, z) => {
-            const sender = getZapSender(z);
-            if (!sender) return acc;
-            acc[sender] = (acc[sender] || 0) + z.amount;
-            return acc;
-          },
-          {} as Record<string, number>,
-        );
-        const zappers = Object.entries(senders)
-          .map((kv) => {
-            const [k, v] = kv;
-            return { pubkey: k, amount: v };
-          })
-          .sort((a, b) => b.amount - a.amount);
-        return {
-          zaps: items,
-          total: items.reduce((acc, z) => acc + z.amount, 0),
-          zappers,
-        };
-      }),
-    );
-  }, [pubkey]);
 }
 
 export function useZaps(event: NostrEvent) {

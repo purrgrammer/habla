@@ -164,7 +164,7 @@ function Author({
   );
 }
 
-export function PureArticle({
+function PureArticle({
   title,
   image,
   summary,

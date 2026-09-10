@@ -19,7 +19,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/ui/tabs";
 import { BOOK } from "~/const";
 import RelayLink from "./relay-link";
 import Feed, { type FeedComponent } from "~/ui/nostr/feed";
-//import ZapLeaderboard from "../zap-leaderboard";
 
 const components: Record<number, FeedComponent> = {
   [kinds.Highlights]: ({ event, profile }) => {

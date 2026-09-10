@@ -12,7 +12,7 @@ import { cn } from "~/lib/utils";
 import { displayPubkey } from "~/lib/event";
 import { BIG_ZAP_AMOUNT } from "~/const";
 
-export function ZapReply({ zap }: { zap: Zap }) {
+function ZapReply({ zap }: { zap: Zap }) {
   const sender = displayPubkey(zap);
   const req = getZapRequest(zap);
   const comment = req?.content;

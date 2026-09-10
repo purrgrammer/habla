@@ -7,7 +7,7 @@ import type { EventTemplate, NostrEvent } from "nostr-tools";
 import type { BlossomFileMetadata } from "./metadata-store";
 import { blossomMetadataStore } from "./metadata-store";
 
-export interface UploadStatus {
+interface UploadStatus {
   server: string;
   status: "pending" | "uploading" | "success" | "error";
   progress?: number;

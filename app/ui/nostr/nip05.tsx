@@ -1,17 +1,6 @@
 import { useNip05 } from "~/nostr/queries";
 import PureNip05, { type Nip05Props } from "./pure-nip05";
 
-export function Invalid({ nip05, className = "text-sm" }: Nip05Props) {
-  return (
-    <PureNip05
-      nip05={nip05}
-      isLoading={false}
-      isVerified={false}
-      className={className}
-    />
-  );
-}
-
 export function Loading({ nip05, className = "text-sm" }: Nip05Props) {
   return (
     <PureNip05

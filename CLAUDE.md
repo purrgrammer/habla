@@ -130,11 +130,21 @@ app/
 ├── nostr/        # actions.ts (publish/comment/zap), publish-article.ts, queries.ts
 ├── ui/           # Components; ui/nostr/* is the nostr-aware layer
 ├── hooks/nostr.ts
-├── lib/          # event.ts, url.ts, markdown-serializer.ts, utils.ts, http.ts
+├── lib/          # event.ts, url.ts, markdown-serializer.ts, utils.ts
 ├── featured.ts   # Home-page articles, highlights and authors, hardcoded
 └── const.ts
 .nsite/config.json  # nsyte deploy target
 ```
+
+Two fields in `.nsite/config.json` are decisions rather than settings:
+
+- **`fallback: "/index.html"`** — without it every URL past `/` is a gateway
+  404. An nsite serves what its manifest lists, and every Habla address below
+  the root (`/a/<naddr>`, `/p/<nprofile>`, `/e/<nevent>`) is a client route
+  that only exists once the app has booted.
+- **`publishAppHandler: false`** — a NIP-89 handler needs a URL, and the site
+  has none until the signing key and the gateway are known. The `appHandler`
+  block names the kinds (30023, 30024) and waits for that host.
 
 ## Conventions
 

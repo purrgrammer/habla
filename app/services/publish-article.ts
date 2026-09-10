@@ -1,7 +1,7 @@
 import type { NostrEvent } from "nostr-tools";
 import pool from "~/services/relay-pool";
 
-export interface RelayPublishStatus {
+interface RelayPublishStatus {
   relay: string;
   status: "pending" | "publishing" | "success" | "error";
   message?: string;

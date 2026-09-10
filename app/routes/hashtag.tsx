@@ -8,7 +8,6 @@ export function meta({ params }: Route.MetaArgs) {
   return buildBaseSeoTags({
     title: `#${tag}`,
     description: `Explore the content tagged with #${tag}`,
-    url: `https://habla.news/tag/${tag}`,
   });
 }
 

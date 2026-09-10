@@ -17,13 +17,6 @@ import { modifyPublicTags } from "applesauce-factory/operations";
 import factory from "~/services/event-factory";
 import { COMMENT } from "~/const";
 
-export {
-  PublishArticle,
-  extractTitle,
-  extractContent,
-  generateIdentifier,
-} from "./publish-article";
-
 /** An `a` tag for `event`, if it is addressable at all. */
 function addressTagFor(event?: NostrEvent) {
   if (!event || !isReplaceable(event.kind)) return [];
