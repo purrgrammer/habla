@@ -19,15 +19,6 @@ function MarkdownLink({
   href,
   ...props
 }: { href?: string; children?: ReactNode } & ExtraProps) {
-  const properties: { className?: string } | undefined = node?.properties;
-
-  //if (properties?.className?.includes("internal") && properties.href) {
-  //  return (
-  //    <WikiLink href={href} node={node} {...props}>
-  //      {children}
-  //    </WikiLink>
-  //  );
-  //}
   if (!href) return null;
 
   // render nostr: mentions
