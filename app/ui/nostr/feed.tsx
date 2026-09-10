@@ -1,5 +1,5 @@
 import { cn } from "~/lib/utils";
-import { type ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { CircleSlash2 } from "lucide-react";
 import { type NostrEvent, type Filter } from "nostr-tools";
 import { type ProfileContent } from "applesauce-core/helpers";
@@ -48,15 +48,18 @@ export function PureFeed({
 
   return (
     <Grid className={className}>
-      {feed?.map((event, idx) => {
+      {feed?.map((event) => {
         const Component = components[event.kind];
+        // The key belongs on the fragment: it is the list item. It used to sit
+        // on <Component>, a child of an unkeyed <>, so React saw a keyless list
+        // and fell back to reordering by position.
         return Component ? (
-          <>
-            <Component key={event.id} event={event} profile={profile} />
+          <Fragment key={event.id}>
+            <Component event={event} profile={profile} />
             {showSeparator ? <hr /> : null}
-          </>
+          </Fragment>
         ) : (
-          <Debug>{event}</Debug>
+          <Debug key={event.id}>{event}</Debug>
         );
       })}
       {isLoading ? <SkeletonCard /> : null}
