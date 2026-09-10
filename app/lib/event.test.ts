@@ -1,11 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { kinds, type NostrEvent } from "nostr-tools";
+import { finalizeEvent, generateSecretKey, getPublicKey } from "nostr-tools/pure";
 import { addressOrId, displayPubkey } from "./event";
 
 const AUTHOR = "a".repeat(64);
 const WALLET = "b".repeat(64);
 const SENDER = "c".repeat(64);
 const ID = "d".repeat(64);
+const IMPOSTOR = "e".repeat(64);
 
 function event(over: Partial<NostrEvent> = {}): NostrEvent {
   return {
@@ -54,6 +56,28 @@ describe("addressOrId", () => {
   });
 });
 
+/**
+ * A real signed kind-9734. applesauce verifies the signature before it will
+ * hand back a zap request, so a hand-built object would be rejected and the
+ * test would pass for the wrong reason.
+ */
+function signedZapRequest() {
+  const sk = generateSecretKey();
+  const request = finalizeEvent(
+    {
+      kind: 9734,
+      created_at: 1700000000,
+      content: "",
+      tags: [
+        ["p", "f".repeat(64)],
+        ["relays", "wss://nos.lol"],
+      ],
+    },
+    sk,
+  );
+  return { request, pubkey: getPublicKey(sk) };
+}
+
 describe("displayPubkey", () => {
   it("returns the author for an ordinary event", () => {
     expect(displayPubkey(event())).toBe(AUTHOR);
@@ -76,5 +100,66 @@ describe("displayPubkey", () => {
   it("does not look for a sender on a non-zap event", () => {
     const note = event({ tags: [["P", SENDER]] });
     expect(displayPubkey(note)).toBe(AUTHOR);
+  });
+
+  it("credits the author of the signed zap request", () => {
+    const { request, pubkey } = signedZapRequest();
+    const receipt = event({
+      kind: kinds.Zap,
+      pubkey: WALLET,
+      tags: [["description", JSON.stringify(request)]],
+    });
+    expect(displayPubkey(receipt)).toBe(pubkey);
+  });
+
+  /**
+   * The precedence that matters. `P` is unsigned metadata written by whoever
+   * published the receipt; the description holds a signed event. When they
+   * disagree, the signature wins — otherwise a wallet could attribute a zap to
+   * anyone it liked and Habla would render that person's name and avatar.
+   */
+  it("prefers the signed request over a P tag that disagrees", () => {
+    const { request, pubkey } = signedZapRequest();
+    const receipt = event({
+      kind: kinds.Zap,
+      pubkey: WALLET,
+      tags: [
+        ["description", JSON.stringify(request)],
+        ["P", IMPOSTOR],
+      ],
+    });
+    expect(displayPubkey(receipt)).toBe(pubkey);
+    expect(displayPubkey(receipt)).not.toBe(IMPOSTOR);
+  });
+
+  it("falls back to P when the receipt carries no description", () => {
+    const receipt = event({
+      kind: kinds.Zap,
+      pubkey: WALLET,
+      tags: [["P", SENDER]],
+    });
+    expect(displayPubkey(receipt)).toBe(SENDER);
+  });
+
+  it("ignores a description that is not a valid signed zap request", () => {
+    const forged = { ...signedZapRequest().request, pubkey: IMPOSTOR };
+    const receipt = event({
+      kind: kinds.Zap,
+      pubkey: WALLET,
+      tags: [["description", JSON.stringify(forged)]],
+    });
+    // Swapping the pubkey breaks the signature, so the request is discarded
+    // and the wallet that published the receipt is all that is left.
+    expect(displayPubkey(receipt)).toBe(WALLET);
+  });
+
+  it("ignores a description that is not JSON", () => {
+    const receipt = event({
+      kind: kinds.Zap,
+      pubkey: WALLET,
+      tags: [["description", "{not json"]],
+    });
+    expect(() => displayPubkey(receipt)).not.toThrow();
+    expect(displayPubkey(receipt)).toBe(WALLET);
   });
 });
