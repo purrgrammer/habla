@@ -9,7 +9,7 @@ export default function ComingSoon() {
         <Shovel className="size-18 text-muted-foreground" />
         <p className="text-lg">
           This feature is coming soonᵀᴹ. Consider making a donation to the
-          project so
+          project so{" "}
           <UserLink
             wrapper="inline-block text-primary hover:underline hover:decoration-dotted"
             img="size-5"
