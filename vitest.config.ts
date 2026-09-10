@@ -1,8 +1,8 @@
 import { defineConfig } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  // Same as vite.config.ts: `~/` resolves from tsconfig natively now.
+  resolve: { tsconfigPaths: true },
   test: {
     include: ["app/**/*.test.ts"],
   },

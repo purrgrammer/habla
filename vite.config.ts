@@ -1,8 +1,10 @@
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  // `~/` comes from tsconfig. Vite 8 resolves tsconfig paths natively, so the
+  // vite-tsconfig-paths plugin this replaced is no longer a dependency.
+  resolve: { tsconfigPaths: true },
+  plugins: [tailwindcss(), reactRouter()],
 });
