@@ -14,9 +14,12 @@ export const BOOK_CHAPTER = 30_041;
  * so asking them is cheap and drags no firehose behind it. More than one on
  * purpose: a single indexer is both a privacy funnel and a single point of
  * failure for every profile on the site.
+ *
+ * purplepag.es is deliberately absent. It is the best-known indexer and it is
+ * down often enough that having it first meant a tier that regularly answered
+ * with a refused connection.
  */
 export const INDEX_RELAYS = [
-  "wss://purplepag.es",
   "wss://user.kindpag.es",
   "wss://indexer.coracle.social",
   "wss://relay.vertexlab.io",
