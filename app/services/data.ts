@@ -1,11 +1,4 @@
-import {
-  catchError,
-  defaultIfEmpty,
-  firstValueFrom,
-  of,
-  timeout,
-  type Observable,
-} from "rxjs";
+import type { Observable } from "rxjs";
 import type { NostrEvent } from "nostr-tools";
 import { kinds } from "nostr-tools";
 import type {
@@ -19,6 +12,7 @@ import { getProfileContent } from "applesauce-core/helpers";
 import { type DataStore } from "./types";
 import type { Pubkey, Relay } from "~/types";
 import { getRelayURLs } from "~/lib/url";
+import { firstOrNothing as withDeadline } from "~/lib/first-or-nothing";
 
 /**
  * Client fetches get a longer leash than SSR does — nobody is waiting on a
@@ -28,16 +22,8 @@ import { getRelayURLs } from "~/lib/url";
 const CLIENT_TIMEOUT = Number(import.meta.env?.VITE_CLIENT_TIMEOUT ?? 10_000);
 
 /** First event from a loader, or `undefined` — never hangs, never throws. */
-function firstOrNothing(
-  source: Observable<NostrEvent>,
-): Promise<NostrEvent | undefined> {
-  return firstValueFrom(
-    source.pipe(
-      timeout(CLIENT_TIMEOUT),
-      catchError(() => of(undefined)),
-      defaultIfEmpty(undefined),
-    ),
-  );
+function firstOrNothing(source: Observable<NostrEvent>) {
+  return withDeadline(source, CLIENT_TIMEOUT);
 }
 
 function fetchProfile(
