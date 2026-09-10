@@ -212,7 +212,7 @@ function Repliers({ replies }: { replies: NostrEvent[] }) {
             exit={{ opacity: 0 }}
           >
             {replies.map((r) => (
-              <EventReply event={r} />
+              <EventReply key={r.id} event={r} />
             ))}
           </motion.div>
         ) : null}

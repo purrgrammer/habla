@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc", "unicorn"],
+  "env": { "browser": true, "es2024": true },
+  "ignorePatterns": ["build", ".react-router", "node_modules"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/jsx-key": "error",
+    "react/no-children-prop": "error",
+    "react/exhaustive-deps": "warn",
+    "typescript/no-unused-vars": "warn",
+    "no-unused-vars": "off",
+    "react/only-export-components": "off"
+  }
+}

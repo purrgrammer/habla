@@ -8,6 +8,8 @@
   },
   "scripts": {
     "dev": "react-router dev",
+    "lint": "oxlint --config .oxlintrc.json",
+    "lint:fix": "oxlint --config .oxlintrc.json --fix",
     "build": "react-router build",
     "preview": "sirv build/client --single --port 4173",
     "deploy:nsite": "pnpm build && nsyte deploy build/client",
@@ -82,6 +84,7 @@
     "@types/node": "^22.20.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "oxlint": "^1.82.0",
     "prettier": "3.9.6",
     "sirv-cli": "^3.0.1",
     "tailwindcss": "^4.3.3",

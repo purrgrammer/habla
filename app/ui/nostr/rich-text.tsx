@@ -59,11 +59,15 @@ function PureRichText({
   event?: NostrEvent;
   content?: string;
 }) {
-  if (!event && !content) return null;
+  // The hook runs unconditionally. It used to sit behind an early return for
+  // the empty case, which changes the hook count between renders of the same
+  // component — React's rules-of-hooks violation, and a crash once a mounted
+  // RichText goes from having content to having none.
   const p = useRenderedContent(
     content && event ? { ...event, content } : event ? event : content || "",
     components,
   );
+  if (!event && !content) return null;
   // Not a <p>. The component map above renders embedded events as Cards and
   // nested notes as their own RichText, so a paragraph wrapper puts <div> and
   // <p> inside a <p> — which the parser closes early, and React reports as a

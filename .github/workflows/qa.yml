@@ -1,0 +1,52 @@
+name: QA
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# A new push makes the in-flight run for the same ref pointless.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    name: QA
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      # From .nvmrc, not a literal. The old workflow pinned "20" and silently
+      # went stale when the toolchain moved: vitest 5 wants >=22.12 and
+      # react-router 8 wants >=22.22.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # `if: !cancelled()` on each step so one push reports every problem
+      # instead of stopping at the first.
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        if: ${{ !cancelled() }}
+        run: pnpm typecheck
+
+      - name: Build
+        if: ${{ !cancelled() }}
+        run: pnpm build
+
+      - name: Test
+        if: ${{ !cancelled() }}
+        run: pnpm test

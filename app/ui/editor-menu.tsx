@@ -125,7 +125,10 @@ function LoggedInUser({
                 <DropdownMenuSubContent>
                   {timeline?.map((article) => {
                     return (
-                      <DropdownMenuItem onClick={() => onLoad(article)}>
+                      <DropdownMenuItem
+                        key={article.id}
+                        onClick={() => onLoad(article)}
+                      >
                         <div className="flex flex-row items-center justify-between gap-8 w-full">
                           {getArticleTitle(article)}
                         </div>
