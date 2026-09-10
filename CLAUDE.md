@@ -49,7 +49,7 @@ that identity belongs to them, not to us.
 
 ## Tech Stack
 
-- React Router v7 (framework mode, SPA)
+- React Router v8 (framework mode, SPA)
 - applesauce v6 (nostr client libraries) — see the **applesauce skill**
 - TipTap v3 (editor, serializes to Markdown)
 - Tailwind v4 + Radix UI

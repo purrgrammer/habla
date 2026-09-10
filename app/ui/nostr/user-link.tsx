@@ -39,6 +39,10 @@ function PureUserLink({
 }) {
   const relays = useRelays(pubkey);
   const link = useUserLink(pubkey, relays);
+  // `img="hidden"` is how a caller asks for the name alone. Hiding the avatar
+  // is not enough: its <Link> stayed in the flex row as a 0x0 item and still
+  // took a `gap-1`, which showed up as a stray space before the name.
+  const showAvatar = !img?.split(/\s+/).includes("hidden");
   // Spans, not divs. Callers pass `wrapper="inline"` / `"inline-block"` because
   // this is rendered mid-sentence — inside a react-markdown <p> for a `nostr:`
   // mention, and inside RichText — and a <div> there is illegal, which the
@@ -48,15 +52,17 @@ function PureUserLink({
   return (
     <span className={cn("block", wrapper)}>
       <span className={cn("flex flex-row items-center gap-1", className)}>
-        <Link to={link} className="flex-shrink-0">
-          <Avatar
-            profile={profile}
-            className={cn(
-              "mr-1 rounded-full object-cover inline-block flex-shrink-0",
-              img,
-            )}
-          />
-        </Link>
+        {showAvatar ? (
+          <Link to={link} className="flex-shrink-0">
+            <Avatar
+              profile={profile}
+              className={cn(
+                "mr-1 rounded-full object-cover inline-block flex-shrink-0",
+                img,
+              )}
+            />
+          </Link>
+        ) : null}
         <span className="flex flex-col gap-0">
           <Link to={link}>
             <Username

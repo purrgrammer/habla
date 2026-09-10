@@ -19,9 +19,15 @@ export default function Footer() {
             <span>code</span>
           </Link>
         </p>
-        <div className="flex flex-row items-center gap-1">
+        {/*
+          The type size lives on the row, not on the label. UserLink only
+          applies `name` to the innermost span, so its wrappers inherit from
+          here — sizing just the label left a 24px box beside a 20px one and
+          the credit sat a couple of pixels low.
+        */}
+        <div className="flex flex-row items-center gap-1 text-sm font-light">
           <Logo className="size-5 mr-1 text-muted-foreground" />
-          <span className="text-sm font-light">logo by</span>
+          <span>logo by</span>
           <UserLink
             wrapper="inline"
             name="text-sm font-light text-primary hover:underline hover:decoration-dotted"
