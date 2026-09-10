@@ -42,9 +42,9 @@ export default function Profile({
         </div>
         <div className="px-4 pt-4 flex flex-col gap-3">
           {about ? (
-            <p className="text-md leading-tight">
+            <div className="text-md leading-tight">
               <RichText content={about} />
-            </p>
+            </div>
           ) : null}
           {profile?.website ? (
             <Link

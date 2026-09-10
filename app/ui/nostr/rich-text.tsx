@@ -64,7 +64,13 @@ function PureRichText({
     content && event ? { ...event, content } : event ? event : content || "",
     components,
   );
-  return <p>{p}</p>;
+  // Not a <p>. The component map above renders embedded events as Cards and
+  // nested notes as their own RichText, so a paragraph wrapper puts <div> and
+  // <p> inside a <p> — which the parser closes early, and React reports as a
+  // hydration error. `.prose` never reaches this component (it is applied in
+  // the editor, the article body and unknown-kind, none of which render
+  // RichText, and Card is `not-prose`), so nothing styles it as a paragraph.
+  return <div>{p}</div>;
 }
 
 export default function RichText({

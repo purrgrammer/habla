@@ -39,15 +39,20 @@ export function PureHighlight({
   const [p] = getHighlightAttributions(event);
   return (
     <div className="flex flex-col gap-2">
-      <NEventLink {...getEventPointerForEvent(event)}>
-        <div className="flex flex-col gap-2">
-          {comment ? (
-            <div className="font-sans text-lg leading-tight">
-              <RichText event={event} content={comment} />
-            </div>
-          ) : null}
-          <Blockquote text={event.content} className={blockquote} />
+      {/*
+        Only the blockquote is wrapped. The comment renders through RichText,
+        which emits its own links, images and video — all of which are illegal
+        inside an <a>, and the nested anchors were a hydration error on every
+        highlight carrying a URL. The quote itself is plain text and stays
+        clickable, which is the part that reads as "open this highlight".
+      */}
+      {comment ? (
+        <div className="font-sans text-lg leading-tight">
+          <RichText event={event} content={comment} />
         </div>
+      ) : null}
+      <NEventLink {...getEventPointerForEvent(event)}>
+        <Blockquote text={event.content} className={blockquote} />
       </NEventLink>
       <div className={footer}>
         {url ? (
