@@ -7,6 +7,7 @@ import { useTimeline } from "~/hooks/nostr";
 import { Card as SkeletonCard } from "../skeleton";
 import Grid from "../grid";
 import Debug from "../debug";
+import EventErrorBoundary from "./event-error-boundary";
 
 interface FeedComponentProps {
   event: NostrEvent;
@@ -53,9 +54,14 @@ export function PureFeed({
         // The key belongs on the fragment: it is the list item. It used to sit
         // on <Component>, a child of an unkeyed <>, so React saw a keyless list
         // and fell back to reordering by position.
+        // Every item is relay data, so every item gets its own boundary: a
+        // renderer that throws on one author's event costs that card, not the
+        // whole feed.
         return Component ? (
           <Fragment key={event.id}>
-            <Component event={event} profile={profile} />
+            <EventErrorBoundary event={event}>
+              <Component event={event} profile={profile} />
+            </EventErrorBoundary>
             {showSeparator ? <hr /> : null}
           </Fragment>
         ) : (

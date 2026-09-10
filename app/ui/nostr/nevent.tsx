@@ -10,6 +10,7 @@ import NostrCard from "./card";
 import { PureHighlight } from "./highlight";
 import type { ReactNode } from "react";
 import { EventReply } from "./reply";
+import EventErrorBoundary from "./event-error-boundary";
 
 interface ComponentProps {
   event: NostrEvent;
@@ -50,5 +51,12 @@ export default function NEvent(props: EventPointer) {
   }
 
   const Component = components[event?.kind];
-  return Component ? <Component event={event} /> : <EventReply event={event} />;
+  // The other place untrusted events are rendered: embedded mid-article and
+  // mid-note. Without this, a quoted event that throws takes the article with
+  // it — and the reader has no idea why the page went blank.
+  return (
+    <EventErrorBoundary event={event}>
+      {Component ? <Component event={event} /> : <EventReply event={event} />}
+    </EventErrorBoundary>
+  );
 }
