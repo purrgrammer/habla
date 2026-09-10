@@ -3,15 +3,15 @@
   "title": "Habla",
   "description": "Read, write and publish long-form articles on nostr.",
   "relays": [
-    "wss://relay.damus.io",
+    "wss://nostr.wine",
     "wss://nos.lol",
     "wss://relay.primal.net",
-    "wss://nostr.wine"
+    "wss://relay.ditto.pub"
   ],
   "servers": [
     "https://nostr.download",
-    "https://blossom.band",
-    "https://cdn.hzrd149.com"
+    "https://cdn.hzrd149.com",
+    "https://blossom.ditto.pub"
   ],
   "gatewayHostnames": ["nsite.lol"],
   "fallback": "/index.html",
@@ -21,5 +21,6 @@
     "name": "Habla",
     "description": "Read, write and publish long-form articles on nostr.",
     "kinds": [30023, 30024]
-  }
+  },
+  "bunkerPubkey": "90a600fc462329472bf34d645ddb4a41ac3b060c582e0df9ff37881ca0e6fa37"
 }
