@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useActiveAccount } from "applesauce-react/hooks";
-import { useRelays, useProfile } from "~/hooks/nostr";
+import { useRelays } from "~/hooks/nostr";
 import { extractTitle, generateIdentifier } from "~/nostr/publish-article";
 import { toast } from "sonner";
 import ImageUploadDialog from "~/ui/image-upload-dialog";
@@ -54,16 +54,16 @@ export default function PublishDialog({
 }: PublishDialogProps) {
   const account = useActiveAccount();
   const userRelays = useRelays(account?.pubkey || "");
-  const profile = useProfile(account?.pubkey || "");
   const navigate = useNavigate();
 
   const [image, setImage] = useState<string>(existingImage || "");
   const [summary, setSummary] = useState<string>(existingSummary || "");
-  const [selectedRelays, setSelectedRelays] = useState<string[]>([]);
+  // null until the user toggles one, so it follows the write relays as they load
+  const [chosenRelays, setChosenRelays] = useState<string[] | null>(null);
+  const selectedRelays = chosenRelays ?? userRelays;
   const [isPublishing, setIsPublishing] = useState(false);
   const [imageUploadOpen, setImageUploadOpen] = useState(false);
   const [relaysExpanded, setRelaysExpanded] = useState(false);
-  const [articleUrl, setArticleUrl] = useState<string>("");
 
   // Extract title from markdown
   const title = useMemo(() => extractTitle(markdown), [markdown]);
@@ -74,39 +74,30 @@ export default function PublishDialog({
   }, [existingIdentifier, title]);
 
   // Generate article URL preview
-  useEffect(() => {
-    if (!open || !account?.pubkey) {
-      setArticleUrl("");
-      return;
-    }
-
-    setArticleUrl(
-      `/a/${nip19.naddrEncode({
-        kind: kinds.LongFormArticle,
-        pubkey: account.pubkey,
-        identifier,
-      })}`,
-    );
-  }, [open, account?.pubkey, profile?.nip05, identifier]);
-
-  // Initialize selected relays (all write relays by default)
-  useEffect(() => {
-    if (open && userRelays.length > 0 && selectedRelays.length === 0) {
-      setSelectedRelays(userRelays);
-    }
-  }, [open, userRelays, selectedRelays.length]);
+  const pubkey = account?.pubkey;
+  const articleUrl = useMemo(() => {
+    if (!open || !pubkey) return "";
+    return `/a/${nip19.naddrEncode({
+      kind: kinds.LongFormArticle,
+      pubkey,
+      identifier,
+    })}`;
+  }, [open, pubkey, identifier]);
 
   // Reset state when dialog opens
-  useEffect(() => {
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
     if (open) {
       setImage(existingImage || "");
       setSummary(existingSummary || "");
       setIsPublishing(false);
     }
-  }, [open, existingImage, existingSummary]);
+  }
 
   function toggleRelay(relay: string) {
-    setSelectedRelays((prev) => {
+    setChosenRelays((chosen) => {
+      const prev = chosen ?? userRelays;
       const isSelected = prev.includes(relay);
       const newSelection = isSelected
         ? prev.filter((r) => r !== relay)

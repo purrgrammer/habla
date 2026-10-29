@@ -61,16 +61,14 @@ export function ZapRequest({
         content: message,
       },
       modifyPublicTags(
-        ...[
-          addPubkeyTag(pointer),
-          setSingletonTag(["amount", amount]),
-          setSingletonTag(["relays", ...relays]),
-          ...(lnurl ? [setSingletonTag(["lnurl", lnurl])] : []),
-          ...(event
-            ? [addEventTag(event), setSingletonTag(["k", String(event.kind)])]
-            : []),
-          ...addressTagFor(event),
-        ],
+        addPubkeyTag(pointer),
+        setSingletonTag(["amount", amount]),
+        setSingletonTag(["relays", ...relays]),
+        ...(lnurl ? [setSingletonTag(["lnurl", lnurl])] : []),
+        ...(event
+          ? [addEventTag(event), setSingletonTag(["k", String(event.kind)])]
+          : []),
+        ...addressTagFor(event),
       ),
     );
     await publish(await sign(draft));
@@ -118,18 +116,16 @@ export function Comment({
         content: message,
       },
       modifyPublicTags(
-        ...[
-          addPubkeyTag(pointer),
-          addEventTag(event),
-          setSingletonTag(["K", K]),
-          ...(A
-            ? [setSingletonTag(["A", A])]
-            : E
-              ? [setSingletonTag(["E", E])]
-              : []),
-          setSingletonTag(["k", String(event.kind)]),
-          ...addressTagFor(event),
-        ],
+        addPubkeyTag(pointer),
+        addEventTag(event),
+        setSingletonTag(["K", K]),
+        ...(A
+          ? [setSingletonTag(["A", A])]
+          : E
+            ? [setSingletonTag(["E", E])]
+            : []),
+        setSingletonTag(["k", String(event.kind)]),
+        ...addressTagFor(event),
       ),
     );
     await publish(await sign(draft));

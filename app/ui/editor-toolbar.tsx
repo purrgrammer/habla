@@ -268,7 +268,7 @@ export default function EditorToolbar({
           <ToggleGroup
             type="multiple"
             variant="outline"
-            value={[...(state.isLink ? ["link"] : [])]}
+            value={state.isLink ? ["link"] : []}
             className="gap-0"
           >
             <ToggleGroupItem

@@ -5,7 +5,7 @@ import { isSafeRelayURL } from "applesauce-core/helpers";
 export function prettify(url: string) {
   const clean = url
     .trim()
-    .replace(/^https?\:\/\//, "")
+    .replace(/^https?:\/\//, "")
     .replace(/\/$/, "");
   try {
     return clean ? decodeURIComponent(clean) : url;
